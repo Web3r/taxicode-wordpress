@@ -9,11 +9,6 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: Home
-    },
-    {
-      path: '/settings',
       name: 'Settings',
       component: Settings
     },

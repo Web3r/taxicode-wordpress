@@ -1,6 +1,6 @@
 <template>
   <div id="vue-backend-app">
-    <h1>Backend App</h1>
+    <h1>Taxicode</h1>
 
     <router-view />
   </div>
