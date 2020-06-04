@@ -6,6 +6,9 @@ import { faPlane,faTrain,faMapMarkerAlt } from '@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {  } from 'bootstrap-vue'
 
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 
 library.add(faPlane,faTrain,faMapMarkerAlt)
 

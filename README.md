@@ -4,6 +4,7 @@ This is a wordpress plugin to allow booking with the Taxicode API, using Stripe 
 
 You will need public and private API keys for Taxicode, and an appropriate public API key for Stripe.  Please contact support@taxicode.com to get these - without the correct keys, supplied by Taxicode, this plugin will not work.
 
+This plugin will only work under HTTPS.
 
 ## 📦 Working with this plugin
 
@@ -16,7 +17,7 @@ Out of the box, it ships with markup suitable for Bootstrap 4, and an npm-based 
    - Separate `vendor.js` with all vendor scripts
    - Uglify JS for production
    - Separate `frontend.js` and `admin.js`
-   - Extracted CSS/LESS to separate `frontend.css` and `admin.css` files.
+   - Extracted CSS/LESS to separate `frontend.css` (named vendor.css) and `admin.css` files.
    - Auto reloading with Browser with **Browsersync** *([config](config.json))*
  - [Vue](https://vuejs.org/) and [Vue Router](https://router.vuejs.org/en/)
  - Frontend (shortcode) and Backend starter app
@@ -30,25 +31,29 @@ Out of the box, it ships with markup suitable for Bootstrap 4, and an npm-based 
 1. Add the appropriate keys in the plugin
 1. Add the shortcode [taxicode-app] to the page you want to run this plugin inside.
 
-## 👨‍💻 Post Installation
+## 👨‍💻 Markup/CSS Customisation
 
-1. The name of the plugin class is `Base_Plugin`, change the class name with your desired class name.
-1. Replace the PHP namespace `App` with your desired name.
-1. Replace `baseplugin` or `BASEPLUGIN` reference in files.
+This is relatively simple, even for people without Vue.JS experience.
+The search form, and results template can be found at src/frontend/pages/Home.vue
+The payment form can be found at src/frontend/pages/Checkout.vue
+The confirmation page can be found src/frontend/pages/Checkout.vue
+
+As long as field ID names and all the vue specific references are preservered,
+operation should continue quite easily - essentially, add you can add any
+class names your theme requires.
+
+Alternatively, you can simply add "style" blocks below the "script" blocks in each
+component, to apply custom styles there, as per the vue.js docs.
+
+After making any modifications, while in the plugin base folder
+(ie. wp-content/plugins/taxicode) simply:
+
 1. Run `npm install`
-1. To start developing, run `npm run dev` 🤘
-1. For production build, run `npm run build` 👍
+1. On a dev system, run `npm run dev` 🤘
+1. On a production system, run `npm run build` 👍
 
-## 🎁 Preview
+## Noteable Additonal Packages used
 
-![screenshot](http://tareq.in/owiyZI+)
-
-## ⛑ Extra Goodies
-
- 1. [Vue List Table Component](https://github.com/tareq1988/vue-wp-list-table-component) - Helps you to build WordPress list tables easily.
-
-## About
-
-Made by [Tareq Hasan](https://github.com/tareq1988) from [weDevs](https://wedevs.com).
-
-*Found anything that can be improved? You are welcome to contribute.*
+This plugin currently makes use of
+vue-bootstrap (https://bootstrap-vue.org/) for
+datepicker, timepicker, and icon elements.
