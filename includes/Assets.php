@@ -82,6 +82,11 @@ class Assets {
                 'version'   => filemtime( TAXICODE_PATH . '/assets/js/frontend.js' ),
                 'in_footer' => true
             ],
+            'taxicode-config' => [
+                'src'       => TAXICODE_URL . '/settings.php',
+                'version'   => filemtime( TAXICODE_PATH . '/assets/js/frontend.js' ),
+                'in_footer' => false
+            ],
             'taxicode-admin' => [
                 'src'       => TAXICODE_ASSETS . '/js/admin.js',
                 'deps'      => [ 'jquery', 'taxicode-vendor', 'taxicode-runtime' ],

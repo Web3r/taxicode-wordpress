@@ -176,6 +176,10 @@ export default class Form {
      * @param {object} data
      */
     onSuccess(data) {
+        if(typeof(this.originalData.preserve_on_submit)!=undefined && this.originalData.preserve_on_submit==true)
+        {
+            return data;
+        }
         this.reset();
         return data;
     }

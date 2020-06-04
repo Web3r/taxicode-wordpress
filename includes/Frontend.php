@@ -7,7 +7,7 @@ namespace Taxicode;
 class Frontend {
 
     public function __construct() {
-        add_shortcode( 'vue-app', [ $this, 'render_frontend' ] );
+        add_shortcode( 'taxicode-app', [ $this, 'render_frontend' ] );
     }
 
     /**
@@ -21,15 +21,17 @@ class Frontend {
     public function render_frontend( $atts, $content = '' ) {
         wp_enqueue_style( 'taxicode-frontend' );
         wp_enqueue_script( 'taxicode-frontend' );
+        //wp_enqueue_script( 'taxicode-config' );
         /*
          * @todo: replace key with app config setting
          */
         $content .= '
                     <script src="https://js.stripe.com/v3/"></script>
                     <script>
-                        let stripe = Stripe(\'pk_live_JMwJ7cLYnvUhJp1ic10DmHSO\'),
+                        let stripe = Stripe(\''.get_option('tcplugin_stripe_public').'\'),
                             elements = stripe.elements(),
                             card = undefined;
+                        let tc_public_key = \''.get_option('tcplugin_taxicode_public').'\';
                     </script>
                     ';
 

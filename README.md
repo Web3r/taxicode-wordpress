@@ -1,8 +1,15 @@
-# Vue.js WordPress Starter
+# Taxicode For Wordpress
 
-A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 😎
+This is a wordpress plugin to allow booking with the Taxicode API, using Stripe for payments.
 
-## 📦 What it ships with?
+You will need public and private API keys for Taxicode, and an appropriate public API key for Stripe.  Please contact support@taxicode.com to get these - without the correct keys, supplied by Taxicode, this plugin will not work.
+
+
+## 📦 Working with this plugin
+
+It is expected that any given install of this plugin will want to make modifications to fit with theme etc etc.
+
+Out of the box, it ships with markup suitable for Bootstrap 4, and an npm-based build system.
 
  - Pre-configured webpack config
    - Babel loader, Vue loader, CSS and LESS loader
@@ -20,6 +27,8 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
 
 1. Clone this repository in your plugins folder
 1. Activate the plugin
+1. Add the appropriate keys in the plugin
+1. Add the shortcode [taxicode-app] to the page you want to run this plugin inside.
 
 ## 👨‍💻 Post Installation
 

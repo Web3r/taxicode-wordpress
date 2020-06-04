@@ -37,7 +37,7 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="card-holder-name" class="control-label">Cardholder Name</label>
-                        <input id="card-holder-name" class="form-control" type="text" v-model="cardholder_name">
+                        <input id="card-holder-name" class="form-control" type="text" v-model="name">
                     </div>
                 </div>
                 <div class="col">
@@ -98,7 +98,7 @@
                     formData.append('email', self.email);
                     formData.append('name', self.name);
                     formData.append('telephone', self.telephone);
-                    formData.append('key', config.API_KEY);
+                    formData.append('key',tc_public_key);
                     formData.append('quote', self.quote_id);
                     formData.append('vehicle', self.vehicle);
                     formData.append('test', 1);

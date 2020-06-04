@@ -19,7 +19,7 @@ class Admin {
         global $submenu;
 
         $capability = 'manage_options';
-        $slug       = 'vue-app';
+        $slug       = 'taxicode-app';
 
         $hook = add_menu_page( __( 'Taxicode', 'textdomain' ), __( 'Taxicode', 'textdomain' ), $capability, $slug, [ $this, 'plugin_page' ], 'dashicons-text' );
 

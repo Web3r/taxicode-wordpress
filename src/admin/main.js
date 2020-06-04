@@ -2,6 +2,10 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import menuFix from './utils/admin-menu-fix'
+import axios from 'axios';
+window.axios = require('axios');
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Vue.config.productionTip = false
 
@@ -13,5 +17,5 @@ new Vue({
 });
 
 
-// fix the admin menu for the slug "vue-app"
-menuFix('vue-app');
+// fix the admin menu for the slug "taxicode-app"
+menuFix('taxicode-app');

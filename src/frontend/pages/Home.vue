@@ -42,14 +42,17 @@
                         </template>
                     </vue-bootstrap-typeahead>
                 </div>
+
+            </div>
+            <div class="row">
                 <div class="col">
-                    <b-form-datepicker class="form-control" :state="errors.date"  v-model="date"></b-form-datepicker>
-                    <p> Date: '{{date}}'</p>
+                    <b-form-datepicker locale="en" class="form-control" :state="errors.date"  v-model="date"></b-form-datepicker>
                 </div>
                 <div class="col">
-                    <b-form-timepicker v-model="time" :state="errors.time" locale="en"></b-form-timepicker>
-                    <div class="mt-2">Value: '{{ time }}'</div>
+                    <b-form-timepicker locale="en" v-model="time" :state="errors.time"></b-form-timepicker>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col">
                     <input type="number" class="form-control" :class=" errors.people ? 'is-invalid' : ''" placeholder="People" v-model="people">
                 </div>
@@ -59,6 +62,10 @@
             </div>
         </form>
         <div id="results">
+            <div v-if="loading">
+                Loading...
+            </div>
+
             <div class="row">
                 <div v-for="(quote,id) in quotes" class="col-sm-auto">
                     <div class="card" style="width: 18rem;">
@@ -96,14 +103,15 @@
         },
         data() {
             return {
-                pickup: '',
+                pickup: 'Tooting Broadway',
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: '',
-                date: '',
-                time: '',
-                people: '',
+                destination: 'Gatwick Airport',
+                date: '2020-12-12',
+                time: '13:00',
+                people: '3',
                 quotes: [],
+                loading: false,
                 errors: {
                     pickup: false,
                     destination: false,
@@ -122,7 +130,9 @@
         },
         methods: {
             queryApi: function() {
-                axios.get(config.QUOTE_URL+'?key='+config.API_KEY+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people).then(function (response) {
+                this.loading = true;
+                axios.get(config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people).then(function (response) {
+                    this.loading = false;
                     this.quotes = response.data.quotes;
                 }.bind(this));
             },
