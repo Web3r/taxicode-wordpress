@@ -132,7 +132,7 @@
                     formData.append('test', 1);
                     formData.append('new_pay', true);
                     formData.append('payment_token', result.token.id);
-                    formData.append('method', 'applepay');
+                    formData.append('method', 'wordpress-stripe');
                     axios.post(config.PAYMENT_URL,formData,{
                         headers: {
                             'Content-Type': 'application/application/x-www-form-urlencoded',
