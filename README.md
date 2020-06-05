@@ -34,16 +34,16 @@ Out of the box, it ships with markup suitable for Bootstrap 4, and an npm-based 
 ## 👨‍💻 Markup/CSS Customisation
 
 This is relatively simple, even for people without Vue.JS experience.
-The search form, and results template can be found at src/frontend/pages/Home.vue
-The payment form can be found at src/frontend/pages/Checkout.vue
-The confirmation page can be found src/frontend/pages/Checkout.vue
+The search form, and results template can be found at src/frontend/pages/templates/Home.html
+The payment form can be found at src/frontend/pages/templates/Checkout.html
+The confirmation page can be found src/frontend/pages/templates/Complete.html
 
-As long as field ID names and all the vue specific references are preservered,
+As long as field ID names and all the vue specific references are preserved,
 operation should continue quite easily - essentially, add you can add any
 class names your theme requires.
 
 Alternatively, you can simply add "style" blocks below the "script" blocks in each
-component, to apply custom styles there, as per the vue.js docs.
+Vue component, to apply custom styles there, as per the vue.js docs.
 
 After making any modifications, while in the plugin base folder
 (ie. wp-content/plugins/taxicode) simply:
