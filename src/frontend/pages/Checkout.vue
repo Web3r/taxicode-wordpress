@@ -49,7 +49,28 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <p>Booking Details go here</p>
+                    <div class="card">
+                        <div class="card-header">
+                            Booking Details
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>Date:</strong> {{journey_data.date}} at {{journey_data.time}}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>Travelling From:</strong> {{journey_data.pickup}}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>Going To:</strong> {{journey_data.destination}}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center" v-if="journey_data.via">
+                                <strong>Via:</strong> {{journey_data.vias[0].string}}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center" v-if="journey_data.return">
+                                <strong>Returning:</strong> {{journey_data.return}} at {{journey_data.return_time}}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
@@ -72,11 +93,18 @@
                 telephone: '07789000228',
                 flight_number: null,
                 quote_id: null,
+                journey_id: null,
                 vehicle: 0,
+                journey_data: {}
             }
         },
         created() {
             this.quote_id = this.$route.params.quote_id;
+            this.journey_id = this.$route.params.journey_id;
+            axios.get(config.JOURNEY_URL+this.journey_id)
+                .then(function(response) {
+                this.journey_data = response.data.journey;
+                }.bind(this));
         },
         mounted: function () {
             card = elements.create('card');

@@ -14,7 +14,7 @@ export default new Router({
       component: Home
     },
     {
-      path: '/checkout/:quote_id',
+      path: '/checkout/:quote_id/:journey_id',
       name: 'Checkout',
       component: Checkout
     },
