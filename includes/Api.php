@@ -31,6 +31,10 @@ class Api extends WP_REST_Controller {
             require_once __DIR__ . '/Api/Details.php';
 
         }
+        if ( !class_exists( __NAMESPACE__ . '\Api\GetPluginSettings'  ) ) {
+            require_once __DIR__ . '/Api/GetPluginSettings.php';
+
+        }
     }
 
     /**
@@ -41,6 +45,7 @@ class Api extends WP_REST_Controller {
     public function register_routes() {
         (new Api\Settings())->register_routes();
         (new Api\Details())->register_routes();
+        (new Api\GetPluginSettings())->register_routes();
     }
 
 }
