@@ -1,31 +1,31 @@
 <div>
-    <form id="purchaseform" @submit.prevent="onSubmit">
+    <form id="purchaseform">
         <div class="row">
-            <div class="col">
+            <div class="col" id="tcplugin-passenger-name">
                 <div class="form-group">
                     <label for="customer_name">Name</label>
-                    <input v-model="name" type="text" class="form-control" id="customer_name" aria-describedby="nameHelp" placeholder="Enter name">
+                    <input v-model="name" :inputClass="errors.name? 'is-invalid' : ''" type="text" class="form-control" id="customer_name" aria-describedby="nameHelp" placeholder="Enter name" required>
                     <small id="nameHelp" class="form-text text-muted">The name of the person travelling,</small>
                 </div>
             </div>
             <div class="col">
-                <div class="form-group">
+                <div class="form-group" id="tcplugin-email">
                     <label for="customer_email">Email</label>
-                    <input v-model="email" type="email" class="form-control" id="customer_email" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input v-model="email" type="email" :inputClass="errors.email? 'is-invalid' : ''" class="form-control" id="customer_email" aria-describedby="emailHelp" placeholder="Enter email" required>
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col" id="tcplugin-passenger-telephone">
                 <div class="form-group">
                     <label for="telephone">Mobile telephone</label>
-                    <input v-model="telephone" type="text" class="form-control" id="telephone" aria-describedby="mobileHelp" placeholder="Enter mobile #">
+                    <input v-model="telephone" type="text" :inputClass="errors.telelphone ? 'is-invalid' : ''" class="form-control" id="telephone" aria-describedby="mobileHelp" placeholder="Enter mobile #" required>
                     <small id="mobileHelp" class="form-text text-muted">Valid UK mobile numbers only, please</small>
                 </div>
             </div>
             <div class="col">
-                <div class="form-group">
+                <div class="form-group" id="tcplugin-flight-number">
                     <label for="flight_number">Flight #</label>
                     <input v-model="flight_number" type="email" class="form-control" id="flight_number" aria-describedby="flightHelp" placeholder="Enter name">
                     <small id="flightHelp" class="form-text text-muted">If this is an airport pickup or dropoff, the relevent flight number</small>
@@ -33,21 +33,63 @@
             </div>
         </div>
         <div class="row">
+            <div class="col" id="tcplugin-payament-select">
+                Select Payment Method:
+            </div>
             <div class="col">
+                <b-form-select v-model="payment_method" :options="payment_options" @change="mountStripe"></b-form-select>
+            </div>
+        </div>
+        <div class="row" v-if="payment_method=='Pay with card'">
+            <div class="col" id="tcplugin-cardholder-name">
                 <div class="form-group">
                     <label for="card-holder-name" class="control-label">Cardholder Name</label>
                     <input id="card-holder-name" class="form-control" type="text" v-model="name">
                 </div>
             </div>
-            <div class="col">
+            <div class="col" id="tcplugin-stripe-card-details">
                 <div class="form-group">
                     <label for="card" class="control-label">Card Details</label>
                     <div id="card" ref="card" class="form-control"></div>
                 </div>
+                <div class="form-group">
+                    <input type="button" @click="onSubmit" class="btn btn-primary" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1">
+                </div>
+            </div>
+
+        </div>
+        <div class="row" v-else>
+            <div class="col"></div>
+            <div class="col" id="tcplugin-paypal-plugin">
+                <div class="form-group">
+                    <label for="paypal" class="control-label">Or Pay With Paypal</label>
+                    <v-braintree
+                            :authorization="paypal_token"
+                            :paypal="{
+                                    flow:'checkout',
+                                    amount: price,
+                                    currency: 'GBP'
+                                }"
+                            @success="onPaypalSubmit"
+                            @error="onPaypalError"
+                            @loadFail="onLoadFail"
+                    >
+                        <template v-slot:button="slotProps">
+                            <div class="form-group">
+                                <input type="button" @click="slotProps.submit" class="btn btn-primary" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1">
+                            </div>
+                        </template>
+                    </v-braintree>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="posterror">
+            <div class="col" id="tcplugin-payment-error">
+                {{posterror}}
             </div>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col" id="tcplugin-checkout-booking-details">
                 <div class="card">
                     <div class="card-header">
                         Booking Details
@@ -68,12 +110,10 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center" v-if="journey_data.return">
                             <strong>Returning:</strong> {{journey_data.return}} at {{journey_data.return_time}}
                         </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Price</strong> &pound;{{price}}
+                        </li>
                     </ul>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <input type="submit" class="btn btn-primary" value="Book Now">
                 </div>
             </div>
         </div>

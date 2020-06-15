@@ -16,12 +16,12 @@
             return {
                 journey_options: ['One Way','Return'],
                 journey_type: 'One Way',
-                pickup: 'Tooting Broadway',
+                pickup: 'York',
                 via: '',
                 vialocations: [],
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: 'Gatwick Airport',
+                destination: 'York Station',
                 date: '2020-12-12',
                 time: '13:00',
                 return_date: '2020-12-12',
@@ -36,7 +36,9 @@
                     date: null,
                     time: null,
                     people: false
-                }
+                },
+                quote_settings: '',
+                noquotes: false
             }
         },
         watch: {
@@ -47,9 +49,17 @@
             via: _.debounce(function(newVia) { this.locationSearch(newVia,'via') }, 500),
 
         },
+        created() {
+            this.quote_settings = quote_settings;
+        },
         methods: {
+            setPrice : function(price) {
+                console.log('setting price to'+price);
+                this.$store.commit('setPrice',price)
+            },
             queryApi: function() {
                 this.loading = true;
+                this.noquotes = false;
                 let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
                 if(this.journey_type=='Return')
                 {
@@ -61,8 +71,17 @@
                 }
                 axios.get(url).then(function (response) {
                     this.loading = false;
-                    this.quotes = response.data.quotes;
-                    this.journey_id = response.data.journey_id;
+
+                    console.log(response.data.quotes.length);
+                    if(response.data.quotes.length!=0) {
+                        this.quotes = response.data.quotes;
+                        this.journey_id = response.data.journey_id;
+                    }
+                    else
+                    {
+                        this.quotes = [];
+                        this.noquotes = true;
+                    }
                 }.bind(this));
             },
             submitForm: function() {
@@ -101,8 +120,14 @@
                 return errors;
             },
             flipImage: function(id,event) {
+                let price = this.quotes[id].vehicles[event.target.value].price;
+                this.$refs[id][2].$el.setAttribute('data-price',price)
                 this.$refs[id][0].src = this.quotes[id].vehicles[event.target.value].image;
-                this.$refs[id][1].innerHTML = '&pound;'+this.quotes[id].vehicles[event.target.value].price+'.00';
+                this.$refs[id][1].innerHTML = '&pound;'+price+'.00';
+                this.setPrice(price+'.00');
+            },
+            setPriceBeforeTransition: function(id,event) {
+                this.setPrice(event.target.dataset.price+'.00');
             },
             locationSearch(string,type='pickup')
             {
