@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPlane,faTrain,faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPlane,faTrain,faMapMarkerAlt,faUsers,faSuitcase } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {  } from 'bootstrap-vue'
 import vuebraintree from 'vue-braintree'
@@ -12,7 +12,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 
-library.add(faPlane,faTrain,faMapMarkerAlt)
+library.add(faPlane,faTrain,faMapMarkerAlt,faUsers,faSuitcase)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
