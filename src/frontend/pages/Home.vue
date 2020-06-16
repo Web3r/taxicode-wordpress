@@ -15,18 +15,24 @@
         data() {
             return {
                 journey_options: ['One Way','Return'],
+                type_map : {
+                    cheapest: 'Cheapest Price',
+                    exec: 'Best Executive',
+                    luxury: 'Best Luxury',
+                    chauffeur :'Best Chauffeur'
+                },
                 journey_type: 'One Way',
-                pickup: 'York',
+                pickup: 'York Station, YO24 1AB',
                 via: '',
                 vialocations: [],
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: 'York Station',
-                date: '2020-12-12',
+                destination: 'York',
+                date: '2020-06-26',
                 time: '13:00',
-                return_date: '2020-12-12',
-                return_time: '13:00',
-                people: '3',
+                return_date: '',
+                return_time: '',
+                people: '1',
                 quotes: [],
                 journey_id: '',
                 loading: false,
@@ -72,9 +78,15 @@
                 axios.get(url).then(function (response) {
                     this.loading = false;
 
-                    console.log(response.data.quotes.length);
                     if(response.data.quotes.length!=0) {
-                        this.quotes = response.data.quotes;
+                        if(this.quote_settings=='type_class')
+                        {
+                            this.quotes = this.reduceToTypeAndClass(response.data.quotes);
+                        }
+                        else
+                        {
+                            this.quotes = response.data.quotes;
+                        }
                         this.journey_id = response.data.journey_id;
                     }
                     else
@@ -83,6 +95,110 @@
                         this.noquotes = true;
                     }
                 }.bind(this));
+            },
+            reduceToTypeAndClass: function(quotes)
+            {
+                //sorting taking from app, but needs further reconstructing for web UI
+                let sorted_quotes = this.formatQuotes(quotes);
+                console.log(sorted_quotes);
+                let display_quotes = {};
+                display_quotes['cheapest'] = sorted_quotes.sorted.recommended[0];
+                display_quotes['exec'] = sorted_quotes.sorted.executive[0];
+                display_quotes['luxury'] = sorted_quotes.sorted.vip[0];
+                display_quotes['chauffeur'] = sorted_quotes.sorted.chauffeur[0];
+                console.log(display_quotes);
+                return display_quotes;
+            },
+            formatQuotes: function (quotes) {
+                // initiate quotes keys
+                let raw = {};
+                let sorted = {};
+
+                for (let key in quotes) {
+                    // get the current object based on key
+                    let temp = quotes[key];
+
+                    // skip the non active quotes
+                    if (temp.active) {
+                        // put it on the raw list first
+                        raw[key] = temp;
+
+                        // add quote id to temp in order to use it as unique key in Flat Lists
+                        temp['quote_id'] = key;
+
+                        // loop through quote's vehicles
+                        for (let i = 0; i < temp['vehicles'].length; i++) {
+
+                            // get a copy of temp so we don't affect temp object
+                            let temp_copy = { ...temp };
+
+                            // get vehicle details
+                            temp_copy['vehicle'] = temp['vehicles'][i];
+
+                            // save vehicle index
+                            temp_copy['vehicle']['index'] = i;
+
+                            // set price to vehicle price
+                            temp_copy['price'] = temp_copy['vehicle']['price'];
+
+                            // get vehicle class
+                            let vehicle_class = temp_copy['vehicle']['type']['class'];
+
+                            // remove vehicles array because we already have the vehicle details now
+                            delete temp_copy['vehicles'];
+
+                            // if recommended key is not present, set it
+                            if (!sorted.hasOwnProperty('recommended')) {
+                                sorted['recommended'] = []
+                            }
+
+                            // check if quote has a highlight
+                            if (!!temp_copy.highlight) {
+                                // only add it to recommended if it's the first vehicle of quote
+                                if (i === 0) {
+                                    sorted['recommended'].push(temp_copy);
+                                } else {
+                                    temp_copy['highlight'] = false;
+                                }
+                            }
+
+                            // if all key is not present, set it
+                            if (!sorted.hasOwnProperty('all')) {
+                                sorted['all'] = [];
+                            }
+
+                            // append the temp to all
+                            sorted['all'].push(temp_copy);
+
+                            // if vehicle class is not a key of the sorted array, make it one
+                            if (!sorted.hasOwnProperty(vehicle_class)) {
+                                sorted[vehicle_class] = [];
+                            }
+
+                            // append the temp to its relevant class
+                            sorted[vehicle_class].push(temp_copy);
+
+                        }
+                    }
+                }
+
+                for (let type in sorted) {
+                    sorted[type] = this.sortQuotes(sorted[type], 'SORT_BY_PRICE');
+                }
+                return { raw, sorted };
+            },
+
+            sortQuotes: function (quotes, field) {
+                switch (field) {
+                    case 'SORT_BY_PRICE':
+                        // price sort is ascending
+                        return quotes.sort(function(a,b) {return (a.price > b.price) ? 1 : ((b.price > a.price) ? -1 : 0);});
+                    case 'SORT_BY_RATING':
+                        // rating sort is descending
+                        return quotes.sort(function(a,b) {return (a.rating.score > b.rating.score) ? -1 : ((b.rating.score > a.rating.score) ? 1 : 0);});
+                    default:
+                        return quotes;
+                }
             },
             submitForm: function() {
                 if(this.validQuote()) {

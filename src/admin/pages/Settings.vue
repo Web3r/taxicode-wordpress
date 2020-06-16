@@ -61,6 +61,7 @@
                     <legend class="screen-reader-text"><span>Quotes</span></legend>
                     <label><input v-model="form.quote_type" type="radio" name="quote_type" value="all"> All</label><br>
                     <label><input v-model="form.quote_type" type="radio" name="quote_type" value="best"> Only Best</label><br>
+                    <label><input v-model="form.quote_type" type="radio" name="quote_type" value="type_class"> Cheapest by type and class</label><br>
                 </td>
             </tr>
             <tr>
