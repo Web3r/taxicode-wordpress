@@ -323,6 +323,7 @@
             {
                 let airports = [];
                 let stations = [];
+                let locations = [];
                 axios.get(`https://api.taxicode.com/places/?term=${string}`)
                     .then((res) => {
                         if(typeof(res.data.results.STATION)!='undefined')
@@ -347,7 +348,18 @@
                                 return output;
                             });
                         }
-                        const results = airports.concat(stations.concat(res.data.results.GOOGLE));
+                        if(typeof(res.data.results.LOCATION)!='undefined')
+                        {
+                            locations = res.data.results.LOCATION.map(function(value){
+                                const output = {
+                                    string: value,
+                                    type : 'location'
+                                };
+                                return output;
+                            });
+                        }
+
+                        const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
                         if(type=='pickup') {
                             this.pickuplocations = results;
                         }
