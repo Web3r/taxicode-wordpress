@@ -56,6 +56,12 @@ class Admin {
      * @return void
      */
     public function plugin_page() {
-        echo '<div class="wrap"><div id="vue-admin-app"></div></div>';
+
+        $content = '<script>
+            let tcplugin_data_url = "'.get_rest_url('','/taxicode/v1/settings-get/').'"
+            let tcplugin_update_url = "'.get_rest_url('','/taxicode/v1/settings-save/').'"
+</script>';
+        $content .= '<div class="wrap"><div id="vue-admin-app"></div></div>';
+        echo $content;
     }
 }

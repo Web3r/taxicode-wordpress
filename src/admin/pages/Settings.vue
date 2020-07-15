@@ -120,7 +120,9 @@
             };
         },
         created() {
-            axios.get('/wp-json/taxicode/v1/settings-get/').then(function(response){
+            this.tcplugin_data_url = tcplugin_data_url;
+            this.tcplugin_update_url = tcplugin_update_url;
+            axios.get(this.tcplugin_data_url).then(function(response){
                 this.form.taxicode_public = response.data.taxicode_public;
                 this.form.taxicode_private = response.data.taxicode_private;
                 this.form.stripe_public = response.data.stripe_public;
@@ -138,7 +140,7 @@
             save: function()
             {
                 console.log(this.form.data());
-                this.form.put('/wp-json/taxicode/v1/settings-save')
+                this.form.post(this.tcplugin_update_url)
                     .then(response => {
                         this.message_class = 'updated';
                         this.message = 'Settings Updated';

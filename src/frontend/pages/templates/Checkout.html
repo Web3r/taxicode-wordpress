@@ -4,14 +4,14 @@
             <div class="col" id="tcplugin-passenger-name">
                 <div class="form-group">
                     <label for="customer_name">Name</label>
-                    <input v-model="name" :inputClass="errors.name? 'is-invalid' : ''" type="text" class="form-control" id="customer_name" aria-describedby="nameHelp" placeholder="Enter name" required>
+                    <input v-model="name" :class="errors.name ? 'is-invalid' : ''" type="text" class="form-control" id="customer_name" aria-describedby="nameHelp" placeholder="Enter name" required>
                     <small id="nameHelp" class="form-text text-muted">The name of the person travelling,</small>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group" id="tcplugin-email">
                     <label for="customer_email">Email</label>
-                    <input v-model="email" type="email" :inputClass="errors.email? 'is-invalid' : ''" class="form-control" id="customer_email" aria-describedby="emailHelp" placeholder="Enter email" required>
+                    <input v-model="email" type="email" :class="errors.email? 'is-invalid' : ''" class="form-control" id="customer_email" aria-describedby="emailHelp" placeholder="Enter email" required>
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="col" id="tcplugin-passenger-telephone">
                 <div class="form-group">
                     <label for="telephone">Mobile telephone</label>
-                    <input v-model="telephone" type="text" :inputClass="errors.telelphone ? 'is-invalid' : ''" class="form-control" id="telephone" aria-describedby="mobileHelp" placeholder="Enter mobile #" required>
+                    <input v-model="telephone" type="text" :class="errors.telephone ? 'is-invalid' : ''" class="form-control" id="telephone" aria-describedby="mobileHelp" placeholder="Enter mobile #" required>
                     <small id="mobileHelp" class="form-text text-muted">Valid UK mobile numbers only, please</small>
                 </div>
             </div>
@@ -44,7 +44,7 @@
             <div class="col" id="tcplugin-cardholder-name">
                 <div class="form-group">
                     <label for="card-holder-name" class="control-label">Cardholder Name</label>
-                    <input id="card-holder-name" class="form-control" type="text" v-model="name">
+                    <input id="card-holder-name" class="form-control" type="text" v-model="cardholder_name">
                 </div>
             </div>
             <div class="col" id="tcplugin-stripe-card-details">

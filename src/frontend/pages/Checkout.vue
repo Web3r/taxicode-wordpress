@@ -17,14 +17,15 @@
         },
         data() {
             return {
-                name: 'Alasdair Test',
-                email: 'alasdair@alasdair.biz',
-                telephone: '07789000228',
+                name: '',
+                email: '',
+                telephone: '',
                 flight_number: null,
                 quote_id: null,
                 journey_id: null,
                 vehicle: 0,
                 journey_data: {},
+                cardholder_name: '',
                 errors: {
                     name: false,
                     email: false,
@@ -38,6 +39,8 @@
             }
         },
         created() {
+            //paypayl token and test mode are set in page JS
+            // before vue load, and imported here
             this.paypal_token = paypal_token;
             this.test_mode = test_mode;
             this.quote_id = this.$route.params.quote_id;
@@ -62,16 +65,28 @@
                     this.errors.name='Booking name must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.name = false;
+                }
 
                 if(this.email=='')
                 {
                     this.errors.email='Email location must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.email = false;
+                }
                 if(this.telephone=='')
                 {
                     this.errors.telephone = 'Telephone must be set';
                     errors = false;
+                }
+                else
+                {
+                    this.errors.telephone = false;
                 }
                 return errors;
             },

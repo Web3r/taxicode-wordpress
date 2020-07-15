@@ -22,11 +22,30 @@ class Frontend {
     public function render_frontend( $atts, $content = '' ) {
         wp_enqueue_style( 'taxicode-frontend' );
         wp_enqueue_script( 'taxicode-frontend' );
-        $temp_token = 'access_token$production$fp5wb8q4wmhgkhyq$9d779c202302e7ed1ed0408bfc6f64cb';
+        //$temp_token = 'access_token$production$fp5wb8q4wmhgkhyq$9d779c202302e7ed1ed0408bfc6f64cb';
         $gateway = new Gateway([
-            'accessToken' => $temp_token,
-            //'accessToken' => get_option('tcplugin_paypal_public'),
+            //'accessToken' => $temp_token,
+            'accessToken' => get_option('tcplugin_paypal_public'),
         ]);
+        if(isset($_POST['tcplugin_include_post']) && $_POST['tcplugin_include_post']==1)
+        {
+            $post_js = 'let postData = {
+                search_on_load: "true",
+                journey_type: "'.$_POST['journey_type'].'",
+                pickup: "'.$_POST['pickup'].'",
+                destination: "'.$_POST['destination'].'",
+                via: "'.$_POST['via'].'",
+                date: "'.$_POST['date'].'",
+                time: "'.$_POST['time'].'",
+                return_date: "'.$_POST['return_date'].'",
+                return_time: "'.$_POST['return_time'].'",
+                people: "'.$_POST['people'].'"
+            }';
+        }
+        else
+        {
+            $post_js = 'let postData = {}';
+        }
         $clientToken = $gateway->clientToken()->generate();
 
 
@@ -48,6 +67,7 @@ class Frontend {
                         let quote_settings = \''.get_option('tcplugin_quote_type').'\';
                         let complete_page_text = \''.get_option('tcplugin_complete_page_text').'\';
                         let test_mode = \''.get_option('tcplugin_test_mode').'\';
+                        '.$post_js.'
                     </script>
                     ';
 

@@ -19,6 +19,7 @@
                             :serializer="item => item.string"
                             @hit="selectedLocation = $event"
                             placeholder="Pickup postcode or place name"
+                            ref="pickupfield"
                     >
                         <template slot="suggestion" slot-scope="{ data, htmlText }">
                             <div class="d-flex align-items-center">
@@ -35,6 +36,7 @@
                 <div class="form-group" id="tcplugin-destination">
                     <label>Destination</label>
                     <vue-bootstrap-typeahead
+                            ref="destinationfield"
                             v-model="destination"
                             :inputClass="errors.destination? 'is-invalid' : ''"
                             :data="destinationlocations"
@@ -59,6 +61,7 @@
             <div class="col" id="tcplugin-via">
                 <label>(Optional) Via</label>
                 <vue-bootstrap-typeahead
+                        ref="viafield"
                         v-model="via"
                         :inputClass="errors.via? 'is-invalid' : ''"
                         :data="vialocations"

@@ -12,6 +12,9 @@
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
         },
+        props: {
+            postData: []
+        },
         data() {
             return {
                 journey_options: ['One Way','Return'],
@@ -22,14 +25,14 @@
                     chauffeur :'Best Chauffeur'
                 },
                 journey_type: 'One Way',
-                pickup: 'York Station, YO24 1AB',
+                pickup: '',
                 via: '',
                 vialocations: [],
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: 'York',
-                date: '2020-06-26',
-                time: '13:00',
+                destination: '',
+                date: '',
+                time: '',
                 return_date: '',
                 return_time: '',
                 people: '1',
@@ -56,11 +59,62 @@
 
         },
         created() {
+            //set in page js before load, and imported here
+            this.postData = postData;
+            this.mapPostToForm();
             this.quote_settings = quote_settings;
+
+        },
+        mounted()
+        {
+            this.$refs.pickupfield.inputValue = this.pickup;
+            this.$refs.destinationfield.inputValue = this.destination;
+            this.$refs.viafield.inputValue = this.via;
+            if(this.postData.search_on_load)
+            {
+                this.submitForm();
+            }
         },
         methods: {
+            mapPostToForm: function() {
+                if(typeof this.postData.journey_type!='undefined')
+                {
+                    this.journey_type = this.postData.journey_type
+                }
+                if(typeof this.postData.pickup!='undefined')
+                {
+                    this.pickup = this.postData.pickup
+                }
+                if(typeof this.postData.destination!='undefined')
+                {
+                    this.destination = this.postData.destination
+                }
+                if(typeof this.postData.via!='undefined')
+                {
+                    this.via = this.postData.via
+                }
+                if(typeof this.postData.date!='undefined')
+                {
+                    this.date = this.postData.date
+                }
+                if(typeof this.postData.time!='undefined')
+                {
+                    this.time = this.postData.time
+                }
+                if(typeof this.postData.people!='undefined')
+                {
+                    this.people = this.postData.people
+                }
+                if(typeof this.postData.return_date!='undefined')
+                {
+                    this.return_date = this.postData.return_date
+                }
+                if(typeof this.postData.return_time!='undefined')
+                {
+                    this.return_time = this.postData.return_time
+                }
+            },
             setPrice : function(price) {
-                console.log('setting price to'+price);
                 this.$store.commit('setPrice',price)
             },
             queryApi: function() {
@@ -212,26 +266,46 @@
                     this.errors.pickup='Pickup location must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.pickup = false;
+                }
 
                 if(this.destination=='')
                 {
                     this.errors.destination='Pickup location must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.destination = false;
+                }
                 if(this.date=='')
                 {
                     this.errors.date = false;
                     errors = false;
+                }
+                else
+                {
+                    this.errors.date = null;
                 }
                 if(this.time=='')
                 {
                     this.errors.time=false;
                     errors = false;
                 }
+                else
+                {
+                    this.errors.time = null;
+                }
                 if(this.people=='')
                 {
                     this.errors.people==true;
                     errors = false;
+                }
+                else
+                {
+                    this.errors.people = false;
                 }
                 return errors;
             },
