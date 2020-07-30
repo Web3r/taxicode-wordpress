@@ -65,6 +65,7 @@ class Frontend {
                         let tc_public_key = \''.get_option('tcplugin_taxicode_public').'\';
                         let paypal_token = \''.$clientToken.'\';
                         let quote_settings = \''.get_option('tcplugin_quote_type').'\';
+                        let complete_page_url = "'.get_rest_url('','/taxicode/v1/booking-details/?booking_ref=').'"
                         let complete_page_text = \''.get_option('tcplugin_complete_page_text').'\';
                         let test_mode = \''.get_option('tcplugin_test_mode').'\';
                         '.$post_js.'

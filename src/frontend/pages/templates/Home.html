@@ -20,6 +20,7 @@
                             @hit="selectedLocation = $event"
                             placeholder="Pickup postcode or place name"
                             ref="pickupfield"
+                            :max-matches="30"
                     >
                         <template slot="suggestion" slot-scope="{ data, htmlText }">
                             <div class="d-flex align-items-center">
@@ -43,6 +44,7 @@
                             :serializer="item => item.string"
                             @hit="selectedLocation = $event"
                             placeholder="Destination postcode or place name"
+                            :max-matches="30"
                     >
                         <template slot="suggestion" slot-scope="{ data, htmlText }">
                             <div class="d-flex align-items-center">
@@ -68,6 +70,7 @@
                         :serializer="item => item.string"
                         @hit="selectedLocation = $event"
                         placeholder="Via postcode or place name"
+                        :max-matches="30"
                 >
                     <template slot="suggestion" slot-scope="{ data, htmlText }">
                         <div class="d-flex align-items-center">

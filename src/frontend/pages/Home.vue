@@ -6,6 +6,18 @@
     import axios from 'axios';
     import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
+    import {
+        toNormalised,
+        toOutcode,
+        toIncode,
+        toArea,
+        toDistrict,
+        toSubDistrict,
+        toSector,
+        toUnit,
+        match
+    } from "postcode";
+
 
     export default {
         name: 'search',
@@ -351,6 +363,20 @@
                         if(typeof(res.data.results.LOCATION)!='undefined')
                         {
                             locations = res.data.results.LOCATION.map(function(value){
+
+                                let string_postcode = match(string);
+                                if(string_postcode.length > 0)
+                                {
+                                    let postcode = match(value);
+                                    if(postcode.length > 0 && string_postcode[0].indexOf(' ') >= 0)
+                                    {
+                                        let formatted_postcode = toNormalised(postcode[0]);
+                                        value = value.replace(postcode[0], formatted_postcode);
+                                    }
+                                }
+
+
+
                                 const output = {
                                     string: value,
                                     type : 'location'
