@@ -6,6 +6,9 @@
     import axios from 'axios';
     import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
+    import Mapbox from "mapbox-gl";
+    import { MglMap,MglMarker,MglGeojsonLayer } from "vue-mapbox";
+
     import {
         toNormalised,
         toOutcode,
@@ -23,6 +26,9 @@
         name: 'search',
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
+            MglMap,
+            MglMarker,
+            MglGeojsonLayer
         },
         props: {
             postData: []
@@ -37,14 +43,14 @@
                     chauffeur :'Best Chauffeur'
                 },
                 journey_type: 'One Way',
-                pickup: '',
+                pickup: 'Tooting',
                 via: '',
                 vialocations: [],
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: '',
-                date: '',
-                time: '',
+                destination: 'Balham',
+                date: '2020-08-30',
+                time: '13:00',
                 return_date: '',
                 return_time: '',
                 people: '1',
@@ -59,7 +65,37 @@
                     people: false
                 },
                 quote_settings: '',
-                noquotes: false
+                noquotes: false,
+                quotesloaded: false,
+                mindate: new Date(),
+                accessToken: mapbox_api,
+                mapStyle: 'mapbox://styles/taxicode-testing/cke2xdy4u1chp19n2abb4516w',
+                pickup_coords: [],
+                destination_coords: [],
+                geoJsonSource: {
+                    type: 'geojson',
+                    data: {
+                        id: 'thisIsMySource',
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [[0,0]],
+                        }
+                    }
+                },
+                geoJsonLayer: {
+                    type: 'line',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#0876BA',
+                        'line-width': 4,
+                        'line-opacity': 1
+                    }
+                }
             }
         },
         watch: {
@@ -75,6 +111,7 @@
             this.postData = postData;
             this.mapPostToForm();
             this.quote_settings = quote_settings;
+            this.mapbox = Mapbox;
 
         },
         mounted()
@@ -132,6 +169,7 @@
             queryApi: function() {
                 this.loading = true;
                 this.noquotes = false;
+                this.quotesloaded = false;
                 let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
                 if(this.journey_type=='Return')
                 {
@@ -154,13 +192,30 @@
                             this.quotes = response.data.quotes;
                         }
                         this.journey_id = response.data.journey_id;
+                        this.pickup_coords = [response.data.journey.pickup.position[1],response.data.journey.pickup.position[0]];
+                        this.destination_coords = [response.data.journey.destination.position[1],response.data.journey.destination.position[0]];
+                        this.quotesloaded = true;
                     }
                     else
                     {
                         this.quotes = [];
                         this.noquotes = true;
+                        this.quotesloaded = false;
                     }
                 }.bind(this));
+            },
+            async onMapLoaded(event) {
+                // Here we cathing 'load' map event
+                const asyncActions = event.component.actions
+                await asyncActions.fitBounds([this.pickup_coords,this.destination_coords]);
+                await asyncActions.zoomOut();
+                var coords_string = this.pickup_coords.join(',')+';'+this.destination_coords.join(',');
+                var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + coords_string + '?geometries=geojson&access_token=' + this.accessToken;
+
+                axios.get(url).then(function (response) {
+                    this.geoJsonSource.data.geometry.coordinates = response.data.routes[0].geometry.coordinates;
+                }.bind(this));
+
             },
             reduceToTypeAndClass: function(quotes)
             {

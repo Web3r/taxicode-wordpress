@@ -70,9 +70,9 @@
                     this.errors.name = false;
                 }
 
-                if(this.email=='')
+                if(this.email=='' || !this.validEmail(this.email))
                 {
-                    this.errors.email='Email location must be set';
+                    this.errors.email='Valid email must be set';
                     errors = false;
                 }
                 else
@@ -88,7 +88,22 @@
                 {
                     this.errors.telephone = false;
                 }
+                if(this.cardholder_name=='')
+                {
+                    this.errors.cardholder_name = 'Cardholder name must be set';
+                    errors = false;
+                }
+                else
+                {
+                    this.errors.cardholder_name = false;
+                }
+
+
                 return errors;
+            },
+            validEmail: function (email) {
+                var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
             },
             onPaypalSubmit: function(payload) {
                 if(this.validate()) {

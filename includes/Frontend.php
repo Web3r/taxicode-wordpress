@@ -21,6 +21,7 @@ class Frontend {
      */
     public function render_frontend( $atts, $content = '' ) {
         wp_enqueue_style( 'taxicode-frontend' );
+        wp_enqueue_style( 'taxicode-frontend-mpabox','https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' );
         wp_enqueue_script( 'taxicode-frontend' );
         //$temp_token = 'access_token$production$fp5wb8q4wmhgkhyq$9d779c202302e7ed1ed0408bfc6f64cb';
         $gateway = new Gateway([
@@ -63,6 +64,7 @@ class Frontend {
                             elements = stripe.elements(),
                             card = undefined;
                         let tc_public_key = \''.get_option('tcplugin_taxicode_public').'\';
+                        let mapbox_api = \''.get_option('tcplugin_mapbox_api').'\';
                         let paypal_token = \''.$clientToken.'\';
                         let quote_settings = \''.get_option('tcplugin_quote_type').'\';
                         let complete_page_url = "'.get_rest_url('','/taxicode/v1/booking-details/?booking_ref=').'"

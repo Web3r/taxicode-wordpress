@@ -93,13 +93,21 @@
             <div class="col">
                 <div class="form-group" id="tcplugin-date">
                     <label>Date</label>
-                    <b-form-datepicker locale="en" class="form-control" :state="errors.date"  v-model="date"></b-form-datepicker>
+                    <b-form-datepicker locale="en" class="form-control" :min="mindate" :state="errors.date"  v-model="date">
+                        <template slot="button-content">
+                            <img src="https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-date.png"/>
+                        </template>
+                    </b-form-datepicker>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group" id="tcplugin-time">
                     <label>Time</label>
-                    <b-form-timepicker locale="en" v-model="time" :state="errors.time"></b-form-timepicker>
+                    <b-form-timepicker locale="en" v-model="time" :state="errors.time">
+                        <template slot="button-content">
+                            <img src="https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-time.png"/>
+                        </template>
+                    </b-form-timepicker>
                 </div>
             </div>
         </div>
@@ -107,7 +115,7 @@
             <div class="col" id="tcplugin-return-date">
                 <div class="form-group">
                     <label>Return Date</label>
-                    <b-form-datepicker locale="en" class="form-control" :state="errors.return_date"  v-model="return_date"></b-form-datepicker>
+                    <b-form-datepicker locale="en" class="form-control" :min="mindate" :state="errors.return_date"  v-model="return_date"></b-form-datepicker>
                 </div>
             </div>
             <div class="col">
@@ -125,7 +133,7 @@
             <div class="col" id="tcplugin-search-submit">
                 <div class="form-group">
                     <label></label>
-                    <input type="button" class="form-control" value="Search" @click="submitForm">
+                    <input type="button" class="form-control" value="Get a quote" @click="submitForm">
                 </div>
             </div>
         </div>
@@ -137,74 +145,89 @@
         <div v-if="noquotes">
             Sorry, we could not find any quotes for the selected journey.  Please try a different journey.
         </div>
-
-        <div class="row" v-if="quote_settings!='type_class'">
-            <div v-for="(quote,id) in quotes" class="col-sm-auto">
-                <div v-if="quote_settings=='best'">
-                    <div class="card" style="width: 18rem;" v-if="quote.highlight">
-                        <img class="card-img-top" :src="quote.vehicles[0].image" alt="Vehicle type image" :ref="id">
-                        <div class="card-header">
-                            {{quote.highlight}}
+        <div class="row" v-if="quotesloaded">
+            <div class="col-md-4">
+                <MglMap :accessToken="accessToken" :mapStyle="mapStyle" @load="onMapLoaded">
+                    <MglMarker :coordinates="pickup_coords" color="blue" />
+                    <MglMarker :coordinates="destination_coords" color="blue" />
+                    <MglGeojsonLayer
+                            :sourceId="geoJsonSource.data.id"
+                            :source="geoJsonSource"
+                            layerId="myLayer"
+                            :layer="geoJsonLayer"
+                    />
+                </MglMap>
+            </div>
+            <div class="col-md-8">
+                <div class="row" v-if="quote_settings!='type_class'">
+                    <div v-for="(quote,id) in quotes" class="col-sm-auto">
+                        <div v-if="quote_settings=='best'">
+                            <div class="card" style="width: 18rem;" v-if="quote.highlight">
+                                <img class="card-img-top" :src="quote.vehicles[0].image" alt="Vehicle type image" :ref="id">
+                                <div class="card-header">
+                                    {{quote.highlight}}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{quote.company_name}}</h5>
+                                    <p class="card-text text-center display-4" id="selected_price" :ref="id">&pound;{{quote.vehicles[0].price}}.00</p>
+                                    <select class="custom-select" @change="flipImage(id,$event)">
+                                        <option
+                                                v-for="(vehicle,id) in quote.vehicles"
+                                                v-model="quote.selected_vehicle"
+                                                :value="id"
+                                                :data-image="vehicle.image"
+                                                :data-price="vehicle.price"
+                                        >
+                                            {{vehicle.name}}
+                                        </option>
+                                    </select>
+                                    <router-link :data-price="quote.vehicles[0].price" :ref="id" :to="{ name: 'Checkout', params: { quote_id: id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{quote.company_name}}</h5>
-                            <p class="card-text text-center display-4" id="selected_price" :ref="id">&pound;{{quote.vehicles[0].price}}.00</p>
-                            <select class="custom-select" @change="flipImage(id,$event)">
-                                <option
-                                        v-for="(vehicle,id) in quote.vehicles"
-                                        v-model="quote.selected_vehicle"
-                                        :value="id"
-                                        :data-image="vehicle.image"
-                                        :data-price="vehicle.price"
-                                >
-                                    {{vehicle.name}}
-                                </option>
-                            </select>
-                            <router-link :data-price="quote.vehicles[0].price" :ref="id" :to="{ name: 'Checkout', params: { quote_id: id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                        <div class="card" style="width: 18rem;" v-else>
+                            <img class="card-img-top" :src="quote.vehicles[0].image" alt="Vehicle type image" :ref="id">
+                            <div class="card-body">
+                                <h5 class="card-title">{{quote.company_name}}</h5>
+                                <p class="card-text text-center display-4" id="selected_price" :ref="id">&pound;{{quote.vehicles[0].price}}.00</p>
+                                <select class="custom-select" @change="flipImage(id,$event)">
+                                    <option
+                                            v-for="(vehicle,id) in quote.vehicles"
+                                            v-model="quote.selected_vehicle"
+                                            :value="id"
+                                            :data-image="vehicle.image"
+                                            :data-price="vehicle.price"
+                                    >
+                                        {{vehicle.name}}
+                                    </option>
+                                </select>
+                                <router-link :data-price="quote.vehicles[0].price" :ref="id" :to="{ name: 'Checkout', params: { quote_id: id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card" style="width: 18rem;" v-else>
-                    <img class="card-img-top" :src="quote.vehicles[0].image" alt="Vehicle type image" :ref="id">
-                    <div class="card-body">
-                        <h5 class="card-title">{{quote.company_name}}</h5>
-                        <p class="card-text text-center display-4" id="selected_price" :ref="id">&pound;{{quote.vehicles[0].price}}.00</p>
-                        <select class="custom-select" @change="flipImage(id,$event)">
-                            <option
-                                    v-for="(vehicle,id) in quote.vehicles"
-                                    v-model="quote.selected_vehicle"
-                                    :value="id"
-                                    :data-image="vehicle.image"
-                                    :data-price="vehicle.price"
-                            >
-                                {{vehicle.name}}
-                            </option>
-                        </select>
-                        <router-link :data-price="quote.vehicles[0].price" :ref="id" :to="{ name: 'Checkout', params: { quote_id: id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                <div class="row" v-else>
+                    <div class="col-sm-auto" v-for="(quote,type) in quotes">
+                        <div class="card" style="width: 18rem;">
+                            <img class="card-img-top" :src="quote.vehicle.image" alt="Vehicle type image" :ref="quote.quote_id">
+                            <div class="card-header">
+                                {{type_map[type]}}
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">{{quote.vehicle.name}}</h6>
+                                <div class="card-text d-flex justify-content-center align-items-center">
+                                    <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="users" /> {{quote.vehicle.passengers}}</div>
+                                    <div>&nbsp;</div>
+                                    <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="suitcase" /> {{quote.vehicle.luggage_small}}</div>
+                                </div>
+                                <p class="card-text text-center display-4" id="selected_price" :ref="quote.quote_id">&pound;{{quote.price}}.00</p>
+                                <router-link :data-price="quote.price" :ref="quote.quote_id" :to="{ name: 'Checkout', params: { quote_id: quote.quote_id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                            </div>
+                        </div>
                     </div>
+                    <!--the type_class structure and markup are unavoidably quite different -->
                 </div>
             </div>
-        </div>
-        <div class="row" v-else>
-            <div class="col-sm-auto" v-for="(quote,type) in quotes">
-                <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" :src="quote.vehicle.image" alt="Vehicle type image" :ref="quote.quote_id">
-                    <div class="card-header">
-                        {{type_map[type]}}
-                    </div>
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">{{quote.vehicle.name}}</h6>
-                        <div class="card-text d-flex justify-content-center align-items-center">
-                            <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="users" /> {{quote.vehicle.passengers}}</div>
-                            <div>&nbsp;</div>
-                            <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="suitcase" /> {{quote.vehicle.luggage_small}}</div>
-                        </div>
-                        <p class="card-text text-center display-4" id="selected_price" :ref="quote.quote_id">&pound;{{quote.price}}.00</p>
-                        <router-link :data-price="quote.price" :ref="quote.quote_id" :to="{ name: 'Checkout', params: { quote_id: quote.quote_id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
-                    </div>
-                </div>
-            </div>
-            <!--the type_class structure and markup are unavoidably quite different -->
         </div>
     </div>
 </div>
