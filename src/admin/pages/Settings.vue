@@ -137,8 +137,9 @@
         methods: {
             save: function()
             {
+                console.log("taxicode plugin settings:");
                 console.log(this.form.data());
-                this.form.put('/wp-json/taxicode/v1/settings-save')
+                this.form.post('/wp-json/taxicode/v1/settings-save')
                     .then(response => {
                         this.message_class = 'updated';
                         this.message = 'Settings Updated';
