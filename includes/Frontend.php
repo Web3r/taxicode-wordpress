@@ -21,6 +21,8 @@ class Frontend {
      */
     public function render_frontend( $atts, $content = '' ) {
         wp_enqueue_style( 'taxicode-frontend' );
+        wp_enqueue_style( 'taxicode-frontend-bootstrap' );
+        wp_enqueue_style( 'taxicode-frontend-style' );
         wp_enqueue_style( 'taxicode-frontend-mpabox','https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' );
         wp_enqueue_script( 'taxicode-frontend' );
         //$temp_token = 'access_token$production$fp5wb8q4wmhgkhyq$9d779c202302e7ed1ed0408bfc6f64cb';
@@ -60,6 +62,7 @@ class Frontend {
                     '.get_option('tcplugin_custom_css').'
                     </style>
                     <script>
+                        let tcplugin_asset_path = \''. plugins_url().'/taxicode/assets\';
                         let stripe = Stripe(\''.get_option('tcplugin_stripe_public').'\'),
                             elements = stripe.elements(),
                             card = undefined;
