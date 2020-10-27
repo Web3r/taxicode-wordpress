@@ -7,6 +7,7 @@ services:
      image: tc-wp-plugin:latest
      volumes:
        - wordpress_files:/var/www/html
+     command: cd /var/www/html/wp-content/plugins/taxicode && npm run build
      ports:
        - "8080:80"
      restart: always
