@@ -17,14 +17,15 @@
         },
         data() {
             return {
-                name: 'Alasdair Test',
-                email: 'alasdair@alasdair.biz',
-                telephone: '07789000228',
+                name: '',
+                email: '',
+                telephone: '',
                 flight_number: null,
                 quote_id: null,
                 journey_id: null,
                 vehicle: 0,
                 journey_data: {},
+                cardholder_name: '',
                 errors: {
                     name: false,
                     email: false,
@@ -38,6 +39,8 @@
             }
         },
         created() {
+            //paypayl token and test mode are set in page JS
+            // before vue load, and imported here
             this.paypal_token = paypal_token;
             this.test_mode = test_mode;
             this.quote_id = this.$route.params.quote_id;
@@ -62,18 +65,45 @@
                     this.errors.name='Booking name must be set';
                     errors = false;
                 }
-
-                if(this.email=='')
+                else
                 {
-                    this.errors.email='Email location must be set';
+                    this.errors.name = false;
+                }
+
+                if(this.email=='' || !this.validEmail(this.email))
+                {
+                    this.errors.email='Valid email must be set';
                     errors = false;
+                }
+                else
+                {
+                    this.errors.email = false;
                 }
                 if(this.telephone=='')
                 {
                     this.errors.telephone = 'Telephone must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.telephone = false;
+                }
+                if(this.cardholder_name=='')
+                {
+                    this.errors.cardholder_name = 'Cardholder name must be set';
+                    errors = false;
+                }
+                else
+                {
+                    this.errors.cardholder_name = false;
+                }
+
+
                 return errors;
+            },
+            validEmail: function (email) {
+                var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
             },
             onPaypalSubmit: function(payload) {
                 if(this.validate()) {

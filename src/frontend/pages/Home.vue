@@ -6,11 +6,26 @@
     import axios from 'axios';
     import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
+    import Mapbox from "mapbox-gl";
+    import { MglMap,MglMarker,MglGeojsonLayer } from "vue-mapbox";
+    import moment from 'moment';
+
+    import {
+        toNormalised,
+        match
+    } from "postcode";
+
 
     export default {
         name: 'search',
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
+            MglMap,
+            MglMarker,
+            MglGeojsonLayer
+        },
+        props: {
+            postData: []
         },
         data() {
             return {
@@ -22,14 +37,14 @@
                     chauffeur :'Best Chauffeur'
                 },
                 journey_type: 'One Way',
-                pickup: 'York Station, YO24 1AB',
+                pickup: '',
                 via: '',
                 vialocations: [],
                 pickuplocations: [],
                 destinationlocations: [],
-                destination: 'York',
-                date: '2020-06-26',
-                time: '13:00',
+                destination: '',
+                date: '',
+                time: '',
                 return_date: '',
                 return_time: '',
                 people: '1',
@@ -44,7 +59,39 @@
                     people: false
                 },
                 quote_settings: '',
-                noquotes: false
+                asset_url: '',
+                noquotes: false,
+                quotesloaded: false,
+                mindate: new Date(),
+                accessToken: mapbox_api,
+                mapStyle: 'mapbox://styles/taxicode-testing/cke2xdy4u1chp19n2abb4516w',
+                pickup_coords: [-0.118092,51.509865],
+                destination_coords: [-0.118092,51.509865],
+                distance: 1,
+                geoJsonSource: {
+                    type: 'geojson',
+                    data: {
+                        id: 'thisIsMySource',
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [[0,0]],
+                        }
+                    }
+                },
+                geoJsonLayer: {
+                    type: 'line',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#0876BA',
+                        'line-width': 4,
+                        'line-opacity': 1
+                    }
+                }
             }
         },
         watch: {
@@ -55,17 +102,82 @@
             via: _.debounce(function(newVia) { this.locationSearch(newVia,'via') }, 500),
 
         },
+        computed: {
+            mapCentre: function()
+            {
+                return [((this.pickup_coords[0]+this.destination_coords[0])/2),((this.pickup_coords[1]+this.destination_coords[1])/2)]
+            }
+        },
         created() {
+            //set in page js before load, and imported here
+            this.postData = postData;
+            this.mapPostToForm();
             this.quote_settings = quote_settings;
+            this.mapbox = Mapbox;
+            this.asset_url = tcplugin_asset_path;
+
+        },
+        mounted()
+        {
+            this.$refs.pickupfield.inputValue = this.pickup;
+            this.$refs.destinationfield.inputValue = this.destination;
+            this.$refs.viafield.inputValue = this.via;
+            if(this.postData.search_on_load)
+            {
+                this.submitForm();
+            }
+        },
+        filters: {
+            readable_date(value) {
+                return moment(String(value)).format('ll');
+            },
         },
         methods: {
+            mapPostToForm: function() {
+                if(typeof this.postData.journey_type!='undefined')
+                {
+                    this.journey_type = this.postData.journey_type
+                }
+                if(typeof this.postData.pickup!='undefined')
+                {
+                    this.pickup = this.postData.pickup
+                }
+                if(typeof this.postData.destination!='undefined')
+                {
+                    this.destination = this.postData.destination
+                }
+                if(typeof this.postData.via!='undefined')
+                {
+                    this.via = this.postData.via
+                }
+                if(typeof this.postData.date!='undefined')
+                {
+                    this.date = this.postData.date
+                }
+                if(typeof this.postData.time!='undefined')
+                {
+                    this.time = this.postData.time
+                }
+                if(typeof this.postData.people!='undefined')
+                {
+                    this.people = this.postData.people
+                }
+                if(typeof this.postData.return_date!='undefined')
+                {
+                    this.return_date = this.postData.return_date
+                }
+                if(typeof this.postData.return_time!='undefined')
+                {
+                    this.return_time = this.postData.return_time
+                }
+            },
             setPrice : function(price) {
-                console.log('setting price to'+price);
                 this.$store.commit('setPrice',price)
             },
             queryApi: function() {
                 this.loading = true;
                 this.noquotes = false;
+                this.quotesloaded = false;
                 let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
                 if(this.journey_type=='Return')
                 {
@@ -88,25 +200,57 @@
                             this.quotes = response.data.quotes;
                         }
                         this.journey_id = response.data.journey_id;
+                        this.pickup_coords = [response.data.journey.pickup.position[1],response.data.journey.pickup.position[0]];
+                        this.destination_coords = [response.data.journey.destination.position[1],response.data.journey.destination.position[0]];
+                        this.distance = response.data.journey.distance;
+                        this.quotesloaded = true;
+                        //this.onMapLoaded();
+                        this.onMapChange();
                     }
                     else
                     {
                         this.quotes = [];
                         this.noquotes = true;
+                        this.quotesloaded = false;
                     }
                 }.bind(this));
+            },
+            async onMapChange()
+            {
+                if(typeof this.$refs.mpbx !="undefined") {
+                    const asyncActions = this.$refs.mpbx.actions;
+                    await asyncActions.fitBounds([this.pickup_coords, this.destination_coords], {animate: false});
+                    await asyncActions.zoomOut();
+                    var coords_string = this.pickup_coords.join(',') + ';' + this.destination_coords.join(',');
+                    var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + coords_string + '?geometries=geojson&access_token=' + this.accessToken;
+
+                    axios.get(url).then(function (response) {
+                        this.geoJsonSource.data.geometry.coordinates = response.data.routes[0].geometry.coordinates;
+                    }.bind(this));
+                }
+            },
+            async onMapLoaded(event) {
+                // Here we cathing 'load' map event
+                const asyncActions = event.component.actions;
+                await asyncActions.fitBounds([this.pickup_coords,this.destination_coords],{animate:false});
+                await asyncActions.zoomOut();
+                var coords_string = this.pickup_coords.join(',')+';'+this.destination_coords.join(',');
+                var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + coords_string + '?geometries=geojson&access_token=' + this.accessToken;
+
+                axios.get(url).then(function (response) {
+                    this.geoJsonSource.data.geometry.coordinates = response.data.routes[0].geometry.coordinates;
+                }.bind(this));
+
             },
             reduceToTypeAndClass: function(quotes)
             {
                 //sorting taking from app, but needs further reconstructing for web UI
                 let sorted_quotes = this.formatQuotes(quotes);
-                console.log(sorted_quotes);
                 let display_quotes = {};
                 display_quotes['cheapest'] = sorted_quotes.sorted.recommended[0];
                 display_quotes['exec'] = sorted_quotes.sorted.executive[0];
                 display_quotes['luxury'] = sorted_quotes.sorted.vip[0];
                 display_quotes['chauffeur'] = sorted_quotes.sorted.chauffeur[0];
-                console.log(display_quotes);
                 return display_quotes;
             },
             formatQuotes: function (quotes) {
@@ -134,6 +278,9 @@
 
                             // get vehicle details
                             temp_copy['vehicle'] = temp['vehicles'][i];
+
+                            //temp_copy['rating'] = temp['rating'];
+
 
                             // save vehicle index
                             temp_copy['vehicle']['index'] = i;
@@ -212,26 +359,46 @@
                     this.errors.pickup='Pickup location must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.pickup = false;
+                }
 
                 if(this.destination=='')
                 {
                     this.errors.destination='Pickup location must be set';
                     errors = false;
                 }
+                else
+                {
+                    this.errors.destination = false;
+                }
                 if(this.date=='')
                 {
                     this.errors.date = false;
                     errors = false;
+                }
+                else
+                {
+                    this.errors.date = null;
                 }
                 if(this.time=='')
                 {
                     this.errors.time=false;
                     errors = false;
                 }
+                else
+                {
+                    this.errors.time = null;
+                }
                 if(this.people=='')
                 {
                     this.errors.people==true;
                     errors = false;
+                }
+                else
+                {
+                    this.errors.people = false;
                 }
                 return errors;
             },
@@ -249,6 +416,7 @@
             {
                 let airports = [];
                 let stations = [];
+                let locations = [];
                 axios.get(`https://api.taxicode.com/places/?term=${string}`)
                     .then((res) => {
                         if(typeof(res.data.results.STATION)!='undefined')
@@ -273,7 +441,32 @@
                                 return output;
                             });
                         }
-                        const results = airports.concat(stations.concat(res.data.results.GOOGLE));
+                        if(typeof(res.data.results.LOCATION)!='undefined')
+                        {
+                            locations = res.data.results.LOCATION.map(function(value){
+
+                                let string_postcode = match(string);
+                                if(string_postcode.length > 0)
+                                {
+                                    let postcode = match(value);
+                                    if(postcode.length > 0 && string_postcode[0].indexOf(' ') >= 0)
+                                    {
+                                        let formatted_postcode = toNormalised(postcode[0]);
+                                        value = value.replace(postcode[0], formatted_postcode);
+                                    }
+                                }
+
+
+
+                                const output = {
+                                    string: value,
+                                    type : 'location'
+                                };
+                                return output;
+                            });
+                        }
+
+                        const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
                         if(type=='pickup') {
                             this.pickuplocations = results;
                         }
@@ -286,7 +479,8 @@
                             this.destinationlocations = results;
                         }
                     })
-            }
+            },
+
 
         }
     }
