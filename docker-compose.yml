@@ -1,31 +1,40 @@
 version: '3.3'
   
 services:
-   wordpress:
-     depends_on:
-       - db
-     image: tc-wp-plugin:latest
-     volumes:
-       - wordpress_files:/var/www/html
-     command: cd /var/www/html/wp-content/plugins/taxicode && npm run build
-     ports:
-       - "8080:80"
-     restart: always
-     environment:
-       WORDPRESS_DB_HOST: db:3306
-       WORDPRESS_DB_USER: wordpress
-       WORDPRESS_DB_PASSWORD: my_wordpress_db_password
+    
+    wordpress:
 
-   db:
-     image: mysql:5.7
-     volumes:
-       - db_data:/var/lib/mysql
-     restart: always
-     environment:
-       MYSQL_ROOT_PASSWORD: my_db_root_password
-       MYSQL_DATABASE: wordpress
-       MYSQL_USER: wordpress
-       MYSQL_PASSWORD: my_wordpress_db_password
+        image: tc/wordpress/plugin/booking:beta
+        volumes:
+            - wordpress_files:/var/www/html
+            - plugin_files:/var/www/html/wp-content/plugins/taxicode
+#            - ./:/var/www/html/wp-content/plugins/taxicode
+#        command: cd /var/www/html/wp-content/plugins/taxicode && npm run build
+        restart: always
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+        environment:
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: my_wordpress_db_password
+        container_name: tc-dev-wordpress
+
+    db:
+
+        image: mysql:5.7
+        volumes:
+            - db_data:/var/lib/mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: my_db_root_password
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: my_wordpress_db_password
+        container_name: tc-dev-wordpress-db
+
 volumes:
     wordpress_files:
+    plugin_files:
     db_data:
