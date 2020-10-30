@@ -8,3 +8,5 @@ RUN git clone --branch docker-testing https://github.com/Web3r/taxicode-wordpres
 COPY package*.json "/var/www/html/wp-content/plugins/taxicode/"
 RUN cd "/var/www/html/wp-content/plugins/taxicode" && npm install && npm audit fix && npm update
 
+VOLUME /var/www/html/wp-content/plugins/taxicode
+
