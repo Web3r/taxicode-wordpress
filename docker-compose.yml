@@ -7,8 +7,8 @@ services:
         image: tc/wordpress/plugin/booking:beta
         volumes:
             - wordpress_files:/var/www/html
-            - plugin_files:/var/www/html/wp-content/plugins/taxicode
-#            - ./:/var/www/html/wp-content/plugins/taxicode
+#            - plugin_files:/var/www/html/wp-content/plugins/taxicode
+            - ./:/var/www/html/wp-content/plugins/taxicode
 #        command: cd /var/www/html/wp-content/plugins/taxicode && npm run build
         restart: always
         ports:
