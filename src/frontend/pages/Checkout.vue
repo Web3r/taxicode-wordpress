@@ -88,15 +88,18 @@
                 {
                     this.errors.telephone = false;
                 }
-                if(this.cardholder_name=='')
+                if(this.payment_method=='Pay with card')
                 {
-                    this.errors.cardholder_name = 'Cardholder name must be set';
-                    errors = false;
-                }
-                else
-                {
-                    this.errors.cardholder_name = false;
-                }
+                    if (this.cardholder_name == '')
+                    {
+                        this.errors.cardholder_name = 'Cardholder name must be set';
+                        errors = false;
+                    }
+                    else
+                    {
+                       this.errors.cardholder_name = false;
+                    }
+               }
 
 
                 return errors;
