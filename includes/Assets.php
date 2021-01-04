@@ -112,12 +112,6 @@ class Assets {
             'taxicode-frontend' => [
                 'src' =>  TAXICODE_ASSETS . '/css/vendors.css'
             ],
-            'taxicode-frontend-bootstrap' => [
-                'src' =>  TAXICODE_ASSETS . '/css/bootstrap.min.css'
-            ],
-            'taxicode-frontend-style' => [
-                'src' =>  TAXICODE_ASSETS . '/css/style.css'
-            ],
             'taxicode-admin' => [
                 'src' =>  TAXICODE_ASSETS . '/css/admin.css'
             ],
