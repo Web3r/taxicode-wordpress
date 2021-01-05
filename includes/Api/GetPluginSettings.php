@@ -54,7 +54,6 @@ class GetPluginSettings extends WP_REST_Controller
             'stripe_public' => get_option('tcplugin_stripe_public'),
             'stripe_private' => get_option('tcplugin_stripe_private'),
             'paypal_public' => get_option('tcplugin_paypal_public'),
-            'mapbox_api' => get_option('tcplugin_mapbox_api'),
             'quote_type' => get_option('tcplugin_quote_type'),
             'complete_page_text' => get_option('tcplugin_complete_page_text'),
             'custom_css' => get_option('tcplugin_custom_css'),

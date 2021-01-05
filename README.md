@@ -56,5 +56,4 @@ After making any modifications, while in the plugin base folder
 
 This plugin currently makes use of
 vue-bootstrap (https://bootstrap-vue.org/) for
-datepicker, timepicker, and icon elements, and https://github.com/francoislevesque/vue-braintree to manage the paypal
-integrations.
+datepicker, timepicker, and icon elements.

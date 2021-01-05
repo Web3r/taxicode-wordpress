@@ -50,7 +50,6 @@ class Settings extends WP_REST_Controller {
         $stripe_public =  $request['stripe_public'];
         $stripe_private =  $request['stripe_private'];
         $paypal_public = $request['paypal_public'];
-        $mapbox_api = $request['mapbox_api'];
         $quote_type = $request['quote_type'];
         $complete_page_text = $request['complete_page_text'];
         $custom_css = $request['custom_css'];
@@ -76,10 +75,6 @@ class Settings extends WP_REST_Controller {
         if(trim($paypal_public)!='')
         {
             update_option('tcplugin_paypal_public', $paypal_public);
-        }
-        if(trim($mapbox_api)!='')
-        {
-            update_option('tcplugin_mapbox_api', $mapbox_api);
         }
 
         if(trim($quote_type)!='')
@@ -110,7 +105,6 @@ class Settings extends WP_REST_Controller {
             'stripe_public' => get_option('tcplugin_stripe_public'),
             'stripe_private' => get_option('tcplugin_stripe_private'),
             'paypal_public' => get_option('tcplugin_paypal_public'),
-            'mapbox_api' => get_option('tcplugin_mapbox_api'),
             'quote_type' => get_option('tcplugin_quote_type'),
             'complete_page_text' => get_option('tcplugin_complete_page_text'),
             'custom_css' => get_option('tcplugin_custom_css'),
