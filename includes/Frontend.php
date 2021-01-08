@@ -59,7 +59,8 @@ class Frontend {
                     '.get_option('tcplugin_custom_css').'
                     </style>
                     <script>
-                        let stripe = Stripe(\''.get_option('tcplugin_stripe_public').'\'),
+                        let gateway_api_key = \''.get_option('tcplugin_stripe_public').'\';
+                        let stripe = Stripe(gateway_api_key),
                             elements = stripe.elements(),
                             card = undefined;
                         let tc_public_key = \''.get_option('tcplugin_taxicode_public').'\';
