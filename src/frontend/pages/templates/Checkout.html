@@ -47,7 +47,7 @@
                 Select Payment Method:
             </div>
             <div class="col">
-                <b-form-select v-model="payment_method" :options="payment_options" @change="mountStripe"></b-form-select>
+                <b-form-select v-model="payment_method" :options="payment_options" @change="onMethodChanged"></b-form-select>
             </div>
         </div>
         <div class="row" v-if="payment_method=='Pay with card'">
@@ -62,8 +62,14 @@
                     <label for="card" class="control-label">Card Details</label>
                     <div id="card" ref="card" class="form-control"></div>
                 </div>
+            <div class="col" id="tcplugin-billing_postcode">
                 <div class="form-group">
-                    <input type="button" @click="onSubmit" class="btn btn-primary" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1">
+                    <label for="billing-postcode" class="control-label">Billing Postcode</label>
+                    <input id="billing-postcode" :class="errors.billing_postcode ? 'is-invalid' : ''" class="form-control" type="text" placeholder="Billing Postcode" v-model="billing_postcode">
+                </div>
+            </div>
+                <div class="form-group">
+                    <input type="button" @click="onStripeSubmit" class="btn btn-primary" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1">
                 </div>
             </div>
 

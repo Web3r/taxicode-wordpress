@@ -4,7 +4,7 @@ services:
     
     wordpress:
 
-        image: tc/wordpress/plugin/booking:beta
+        image: ewc2020/tc-wordpress-base:latest
         volumes:
             - wordpress_files:/var/www/html
 #            - plugin_files:/var/www/html/wp-content/plugins/taxicode

@@ -38,6 +38,9 @@ export default class StripeCardFormHandler {
        // set the stripe library resources
         this.stripe = Stripe(this.pk);
         this.stripeElements = this.stripe.elements();
+        this.elementCreated = false;
+        this.elementMounted = false;
+        this.elementMountedOn = 'card';
         // define a privae version of the handler methods
         this.handler = {
             transactionSuccess      : this.transactionSuccessCB,
@@ -119,9 +122,12 @@ export default class StripeCardFormHandler {
     
     /**
      * Promise to return a payment intent client secret to use with the wallet transaction
+     * @param {String} key The API key being used
+     * @param {String} quote The selected quote ID
+     * @param {String} vehicle The selected quote vehicle array index
      * @returns {Promise}
      */
-    getClientSecretIntent() {
+    getClientSecretIntent(key, quote, vehicle) {
         const amount = this.getAmount();
         const handler = this.getHandlerName();
         const customer_token = this.getCustomerToken();
@@ -129,9 +135,10 @@ export default class StripeCardFormHandler {
         return new Promise(function(resolve, reject) {
 			// need to have at least 1 POSTed input value to trigger the POST method
 			const post_data = {
-				amount,
-                handler,
-                customer_token
+                key,
+                quote,
+                vehicle,
+                handler
 			};
             // make the request to create a payment intent for the transaction
 			$.ajax({
@@ -165,21 +172,29 @@ export default class StripeCardFormHandler {
 		});
     }
     
-    getSourceCardToken() {
+    /**
+     * Get the card payment token for the transaction
+     * @param {String} key The API key being used
+     * @param {String} quote The selected quote ID
+     * @param {String} vehicle The selected quote vehicle array index
+     * @param {String} cardholder_name The cardholder name
+     * @param {String} billing_postcode The card billing address post code
+     */
+    getSourceCardToken(key, quote, vehicle, cardholder_name, billing_postcode) {
         // define a localised handler object referenced to the callbacks required
         const handler = this.handler;
         const publicHandler = this.publicHandler;
         const card = this.card;
-        handler.getClientSecretIntent().then(function(clientSecret) {
+        this.getClientSecretIntent(key, quote, vehicle).then(function(clientSecret) {
             // Confirm the PaymentIntent without handling potential next actions (yet).
             handler.stripe.confirmCardPayment(
               clientSecret,
               { payment_method  : {
                       card              : card,
                       billing_details   : { 
-                          name      : $('#card_name').val(),
+                          name      : cardholder_name,
                           address   : {
-                              postal_code   : $('#billing_postcode').val()
+                              postal_code   : billing_postcode
                           }
                       }
               }},
@@ -212,24 +227,41 @@ export default class StripeCardFormHandler {
             });
         });
     }
+    
+    /**
+     * Mount the Stripe Elements card form on the specified DOM element if not already mounted
+     */
+    mountElement() {
+        if(this.elementMounted) {
+            return;
+        }
+        this.card.mount(this.elementMountedOn);
+        this.elementMounted = true;
+    }
+    
+    /**
+     * Unmount the Stripe Elements card form from the specified DOM element if mounted
+     */
+    unmountElement() {
+        if(!this.elementMounted) {
+            return;
+        }
+        this.card.unmount(this.elementMountedOn);
+        this.elementMounted = false;
+    }
 	
 	/** 
 	 * Initialise the gateway handler with additional config.
 	 * @param {string} mount_on the selector ID
-	 * @param {Object} config Additional Checkout config options
-	 * @param {Object} options the payment request config options
+	 * @param {Object} options the payment intent card form element config options
 	 */
-	initialise(mount_on, config, options) {
-        // define a localised handler object referenced to the callbacks required
-        const handler = this.handler;
-        const publicHandler = this.publicHandler;
-        console.log(mount_on);
-        console.log(config);
+	initialise(mount_on, options) {
         console.log(options);
-		// create the payment request pay button
-		this.card = handler.stripeElements.create('card', options);
-        this.card.mount('#' + mount_on);
+        console.log(mount_on);
+		// create the Stripe card form elements
+		this.card = this.stripeElements.create('card', options);
+        // set where / on what the card form section will be mounted in the DOM
+        this.elementMountedOn = mount_on;
     }
-
 
 }
