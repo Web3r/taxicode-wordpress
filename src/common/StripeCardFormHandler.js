@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export default class StripeCardFormHandler {
         
     /**
@@ -141,7 +143,7 @@ export default class StripeCardFormHandler {
                 handler
 			};
             // make the request to create a payment intent for the transaction
-			$.ajax({
+			axios({
 				type        : "POST",
 				url         : intent_secret_uri,
 				data        : post_data,
