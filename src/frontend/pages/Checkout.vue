@@ -63,7 +63,19 @@
                     gateway_api_key,
             /** The transaction success handler */
                     function(handler, paymentIntent) {
-                        checkout.makeBooking(paymentIntent.id, handler.getHandlerName());
+                        checkout.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
+                            console.log(paymentIntent);
+                            // add the API field values for additional payment related data
+                            formData.append('card_cardholder', checkout.cardholder_name);
+                            // @todo Add the additional card field values from the 
+                            // payment intent response
+                            // - card_type
+                            // - card_number (xxxxxxxxxxxx1234)
+                            // - card_expiry
+                            // - card_address1 (if available?)
+                            formData.append('postcode', checkout.billing_postcode);
+                            // - city (if available?)
+                        });
                     },
             /** The transaction failed handler */
                     function(handler, error) {
@@ -163,27 +175,30 @@
                     this.posterror = false;
                     this.loading = 1;
                     // the card form handler has a success & error callback set (see the created method)
-                    this.cardFormHandler.getSourceCardToken(this.cardholder_name, this.billing_postcode);
+                    this.cardFormHandler.getSourceCardToken(tc_public_key, this.quote_id, this.vehicle, this.cardholder_name, this.billing_postcode);
                 }
             },
 
-            makeBooking: function(token, method) {
+            makeBooking: function(token, method, formdataAppend) {
                 // this is a bit annoying - our API can't handle standard axios requests on POST
                 // for some reason, so I've had to abandon my form class and hand crank this
                 // request.
                 const self = this;
                 const formData = new FormData();
-                formData.append('email', self.email);
-                formData.append('name', self.name);
-                formData.append('telephone', self.telephone);
                 formData.append('key',tc_public_key);
-                formData.append('quote', self.quote_id);
-                formData.append('vehicle', self.vehicle);
-                formData.append('test', self.test_mode);
+                formData.append('quote', this.quote_id);
+                formData.append('vehicle', this.vehicle);
+                formData.append('test', this.test_mode);
                 formData.append('new_pay', true);
+                formData.append('email', this.email);
+                formData.append('name', this.name);
+                formData.append('telephone', this.telephone);
                 formData.append('payment_token', token);
                 formData.append('method', method);
-
+                if(typeof(formdataAppend) == 'function') {
+                    // allow the calling method to add payment method specific fields to the API call
+                    formdataAppend(formData);
+                }
                 axios.post(config.PAYMENT_URL,formData,{
                     headers: {
                         'Content-Type': 'application/application/x-www-form-urlencoded',

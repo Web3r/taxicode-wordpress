@@ -47,7 +47,8 @@ class Details extends WP_REST_Controller {
 
         $booking_ref = $request['booking_ref'];
 
-        $url = 'https://api.taxicode.com/booking/details/?key='.get_option('tcplugin_taxicode_public').'&secret='.get_option('tcplugin_taxicode_private').'&id='.$booking_ref;
+        $url = 'https://api.stagingtaxis.co.uk/booking/details/?key='.get_option('tcplugin_taxicode_public').'&secret='.get_option('tcplugin_taxicode_private').'&id='.$booking_ref;
+//        $url = 'https://api.taxicode.com/booking/details/?key='.get_option('tcplugin_taxicode_public').'&secret='.get_option('tcplugin_taxicode_private').'&id='.$booking_ref;
 
         $response = json_decode(wp_remote_retrieve_body( wp_remote_get( $url ) ));
 

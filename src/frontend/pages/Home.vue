@@ -153,15 +153,24 @@
             reduceToTypeAndClass: function(quotes)
             {
                 //sorting taking from app, but needs further reconstructing for web UI
-                let sorted_quotes = this.formatQuotes(quotes);
+                const sorted_quotes = this.formatQuotes(quotes);
                 console.log(sorted_quotes);
-                let display_quotes = {};
-                display_quotes['cheapest'] = sorted_quotes.sorted.recommended[0];
-                display_quotes['exec'] = sorted_quotes.sorted.executive[0];
-                display_quotes['luxury'] = sorted_quotes.sorted.vip[0];
-                display_quotes['chauffeur'] = sorted_quotes.sorted.chauffeur[0];
-                console.log(display_quotes);
-                return display_quotes;
+                const sorted = sorted_quotes.sorted;
+                const display = {};
+                if(sorted.hasOwnProperty('recommended') && sorted.length) {
+                    display['cheapest'] = sorted.recommended[0];
+                }
+                if(sorted.hasOwnProperty('executive') && sorted.executive.length) {
+                    display['exec'] = sorted.executive[0];
+                }
+                if(sorted.hasOwnProperty('vip') && sorted.vip.length) {
+                    display['luxury'] = sorted.vip[0];
+                }
+                if(sorted.hasOwnProperty('chauffeur') && sorted.chauffeur.length) {
+                    display['chauffeur'] = sorted.chauffeur[0];
+                }
+                console.log(display);
+                return display;
             },
             formatQuotes: function (quotes) {
                 // initiate quotes keys

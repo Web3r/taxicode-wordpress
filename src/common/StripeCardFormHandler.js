@@ -130,47 +130,44 @@ export default class StripeCardFormHandler {
      * @returns {Promise}
      */
     getClientSecretIntent(key, quote, vehicle) {
-        const amount = this.getAmount();
         const handler = this.getHandlerName();
-        const customer_token = this.getCustomerToken();
         const intent_secret_uri = this.intent_secret_uri;
         return new Promise(function(resolve, reject) {
 			// need to have at least 1 POSTed input value to trigger the POST method
-			const post_data = {
-                key,
-                quote,
-                vehicle,
-                handler
-			};
+            const formData = new FormData();
+            formData.append('handler', handler);
+            formData.append('key', key);
+            formData.append('quote', quote);
+            formData.append('vehicle', vehicle);
             // make the request to create a payment intent for the transaction
 			axios({
-				type        : "POST",
-				url         : intent_secret_uri,
-				data        : post_data,
-				dataType    : "json",
-				success     : function(response) {
-                    // resolve the client secret as promised
-					resolve(response.client_secret);
-				},
-				error       : function(jqXHR, textStatus, errorThrown) {
-                    console.group('Failed to get a client secret response from `${intent_secret_uri}`.');
-                    console.warn(`The error message received was: '${textStatus}'`);
-                    console.info(post_data);
-                    let error;
-                    try {
-                        // get the error response reason
-					    const response = JSON.parse(jqXHR.responseText);
-                        error = response.error;
-                        console.log(response);
-                    } catch(e) {
-                    // log the error in the error response
-                        error = e
-                    }
-                    console.groupEnd();
-					// reject the response as an error
-					reject(error);
-				}
-			});
+				url             : intent_secret_uri,
+				method          : "post",
+				data            : formData,
+				responseType    : "json",
+                headers: {
+                    'Content-Type': 'application/application/x-www-form-urlencoded',
+                }
+            }).then(function(response) {
+                // resolve the client secret as promised
+                console.log(response);
+                resolve(response.data.response.intent.client_secret);
+            }).catch(function(error) {
+                if(error.response) {
+                    const reason = error.response;
+                } else if(error.request) {
+                    const reason = error.request;
+                } else {
+                    const reason = error.message;
+                }
+                console.group('Failed to get a client secret response from `${intent_secret_uri}`.');
+                console.warn(`The error message received was: '${reason}'`);
+                console.info(formData);
+                console.info(error);
+                console.groupEnd();
+                // reject the response as an error
+                reject(reason);
+            });
 		});
     }
     
@@ -226,6 +223,8 @@ export default class StripeCardFormHandler {
                         }
                     });
                 }
+            }).catch(function(error) {
+                handler.transactionFail(publicHandler, error);
             });
         });
     }
