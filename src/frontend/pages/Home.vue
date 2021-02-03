@@ -1,9 +1,8 @@
-<template src="./templates/Home.html">
-
-</template>
+<template src="./templates/Home.html"></template>
 
 <script>
     import axios from 'axios';
+    import { mapGetters, mapActions } from 'vuex';
     import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
 
@@ -38,7 +37,6 @@
                 people: '1',
                 quotes: [],
                 journey_id: '',
-                loading: false,
                 errors: {
                     pickup: false,
                     destination: false,
@@ -46,10 +44,10 @@
                     time: null,
                     people: false
                 },
-                quote_settings: '',
-                noquotes: false
+                quote_settings: ''
             }
         },
+
         watch: {
             // When the query  changes, fetch new results from
             // the API - in practice this action should be debounced
@@ -58,6 +56,7 @@
             via: _.debounce(function(newVia) { this.locationSearch(newVia,'via') }, 500),
 
         },
+
         created() {
             //set in page js before load, and imported here
             this.postData = postData;
@@ -65,8 +64,8 @@
             this.quote_settings = quote_settings;
 
         },
-        mounted()
-        {
+
+        mounted() {
             this.$refs.pickupfield.inputValue = this.pickup;
             this.$refs.destinationfield.inputValue = this.destination;
             this.$refs.viafield.inputValue = this.via;
@@ -75,83 +74,132 @@
                 this.submitForm();
             }
         },
+
+        computed: mapGetters([
+            // Journey quoting state
+            'loadingQuotes', 
+            'quotesLoaded', 
+            'zeroQuotes', 
+            'journeyID', 
+            'journeyDetails', 
+            'journeyQuotes',
+            'displayQuotes',
+            // Book Now Checkout state
+            'basket',
+            'quoteID',
+            'vehicleIndex',
+            'price',
+            'quoteData',
+            'quoteVehicleData',
+        ]),
+
         methods: {
+            ...mapActions([
+                // Journey quoting state
+                'quoting', 
+                'quoted',
+                // Book Now Checkout state
+                'bookNow'
+            ]),
+
+            onBookNowClicked: function(params, event) {
+                console.group("Book Now Clicked");
+                console.info(params);
+                console.info(this.journeyQuotes[params.quote]);
+                console.info(event);
+                console.groupEnd();
+                this.bookNow({
+                    quote : this.journeyQuotes[params.quote], 
+                    vehicle : params.vehicle,
+                    
+                });
+            },
+
             mapPostToForm: function() {
-                if(typeof this.postData.journey_type!='undefined')
-                {
+                if(typeof this.postData.journey_type!='undefined') {
                     this.journey_type = this.postData.journey_type
                 }
-                if(typeof this.postData.pickup!='undefined')
-                {
+                if(typeof this.postData.pickup!='undefined') {
                     this.pickup = this.postData.pickup
                 }
-                if(typeof this.postData.destination!='undefined')
-                {
+                if(typeof this.postData.destination!='undefined') {
                     this.destination = this.postData.destination
                 }
-                if(typeof this.postData.via!='undefined')
-                {
+                if(typeof this.postData.via!='undefined') {
                     this.via = this.postData.via
                 }
-                if(typeof this.postData.date!='undefined')
-                {
+                if(typeof this.postData.date!='undefined') {
                     this.date = this.postData.date
                 }
-                if(typeof this.postData.time!='undefined')
-                {
+                if(typeof this.postData.time!='undefined') {
                     this.time = this.postData.time
                 }
-                if(typeof this.postData.people!='undefined')
-                {
+                if(typeof this.postData.people!='undefined') {
                     this.people = this.postData.people
                 }
-                if(typeof this.postData.return_date!='undefined')
-                {
+                if(typeof this.postData.return_date!='undefined') {
                     this.return_date = this.postData.return_date
                 }
-                if(typeof this.postData.return_time!='undefined')
-                {
+                if(typeof this.postData.return_time!='undefined') {
                     this.return_time = this.postData.return_time
                 }
             },
+
             setPrice : function(price) {
                 this.$store.commit('setPrice',price)
             },
-            queryApi: function() {
-                this.loading = true;
-                this.noquotes = false;
-                let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
-                if(this.journey_type=='Return')
-                {
-                    url = url +'&return='+this.return_date+' '+this.return_time;
-                }
-                if(this.via!='')
-                {
-                    url = url + '&via='+this.via;
-                }
-                axios.get(url).then(function (response) {
-                    this.loading = false;
 
-                    if(response.data.quotes.length!=0) {
-                        if(this.quote_settings=='type_class')
-                        {
-                            this.quotes = this.reduceToTypeAndClass(response.data.quotes);
+            queryApi: function() {
+                const journey_details = {
+                    journey_type : this.journey_type,
+                    pickup : this.pickup,
+                    destination : this.destination, 
+                    date : this.date, 
+                    time : this.time, 
+                    people : this.people
+                };
+                let quotes = [];
+                let journey_id = null;
+                let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
+                if(this.journey_type=='Return') {
+                // add the optional return journey details
+                    url = url +'&return='+this.return_date+' '+this.return_time;
+                    journey_details.returning = {
+                        date : this.return_date, 
+                        time : this.return_time, 
+                    };
+                }
+                if(this.via!='') {
+                // add the optional journey via location(s)
+                    url = url + '&via='+this.via;
+                    journey_details.via = this.via;
+                }
+                // update the state with the journey details being quoted for
+                // also updates the state flag for loading quotes
+                this.quoting(journey_details);
+                // get the quotes for the specified journey details
+                axios.get(url)
+                .then(function (response) {
+                    if(Object.keys(response.data.quotes).length > 0) {
+                        if(this.quote_settings=='type_class') {
+                        // sort the quotes first
+                            quotes = this.reduceToTypeAndClass(response.data.quotes);
+                        } else {
+                        // raw unsorted API quotes results
+                            quotes = response.data.quotes;
                         }
-                        else
-                        {
-                            this.quotes = response.data.quotes;
-                        }
-                        this.journey_id = response.data.journey_id;
+                        journey_id = response.data.journey_id;
                     }
-                    else
-                    {
-                        this.quotes = [];
-                        this.noquotes = true;
-                    }
+                    this.journey_id = journey_id;
+                    this.quotes = quotes;
+                    // update the state with the journey ID and the quote results
+                    // also updates the state flags for loading quotes, quotes loaded & zero quotes
+                    this.quoted({ id : journey_id, quotes : response.data.quotes, display : quotes });
                 }.bind(this));
+                // @todo add an error catch for when the API throws a fit
             },
-            reduceToTypeAndClass: function(quotes)
-            {
+
+            reduceToTypeAndClass: function(quotes) {
                 //sorting taking from app, but needs further reconstructing for web UI
                 const sorted_quotes = this.formatQuotes(quotes);
                 console.log(sorted_quotes);
@@ -172,6 +220,7 @@
                 console.log(display);
                 return display;
             },
+
             formatQuotes: function (quotes) {
                 // initiate quotes keys
                 let raw = {};
@@ -263,61 +312,49 @@
                         return quotes;
                 }
             },
+
             submitForm: function() {
                 if(this.validQuote()) {
                     this.queryApi();
                 };
             },
+
             validQuote() {
                 var errors = true;
-                if(this.pickup=='')
-                {
+                if(this.pickup=='') {
                     this.errors.pickup='Pickup location must be set';
                     errors = false;
-                }
-                else
-                {
+                } else {
                     this.errors.pickup = false;
                 }
 
-                if(this.destination=='')
-                {
+                if(this.destination=='') {
                     this.errors.destination='Pickup location must be set';
                     errors = false;
-                }
-                else
-                {
+                } else {
                     this.errors.destination = false;
                 }
-                if(this.date=='')
-                {
+                if(this.date=='') {
                     this.errors.date = false;
                     errors = false;
-                }
-                else
-                {
+                } else {
                     this.errors.date = null;
                 }
-                if(this.time=='')
-                {
+                if(this.time=='') {
                     this.errors.time=false;
                     errors = false;
-                }
-                else
-                {
+                } else {
                     this.errors.time = null;
                 }
-                if(this.people=='')
-                {
+                if(this.people=='') {
                     this.errors.people==true;
                     errors = false;
-                }
-                else
-                {
+                } else {
                     this.errors.people = false;
                 }
                 return errors;
             },
+
             flipImage: function(id,event) {
                 let price = this.quotes[id].vehicles[event.target.value].price;
                 this.$refs[id][2].$el.setAttribute('data-price',price)
@@ -325,62 +362,57 @@
                 this.$refs[id][1].innerHTML = '&pound;'+price+'.00';
                 this.setPrice(price+'.00');
             },
+
             setPriceBeforeTransition: function(id,event) {
                 this.setPrice(event.target.dataset.price+'.00');
             },
-            locationSearch(string,type='pickup')
-            {
+
+            locationSearch(string,type='pickup') {
                 let airports = [];
                 let stations = [];
                 let locations = [];
-                axios.get(`https://api.taxicode.com/places/?term=${string}`)
-                    .then((res) => {
-                        if(typeof(res.data.results.STATION)!='undefined')
-                        {
-                            stations = res.data.results.STATION.map(function(value){
-                                const output = {
-                                    string: value,
-                                    type : 'station'
-                                };
-                                return output;
-                            });
-                        }
+                axios.get(`${config.PLACES_URL}?term=${string}`)
+                .then((res) => {
 
+                    if(typeof(res.data.results.STATION)!='undefined') {
+                        stations = res.data.results.STATION.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'station'
+                            };
+                            return output;
+                        });
+                    }
 
-                        if(typeof(res.data.results.AIRPORT)!='undefined')
-                        {
-                            airports = res.data.results.AIRPORT.map(function(value){
-                                const output = {
-                                    string: value,
-                                    type : 'airport'
-                                };
-                                return output;
-                            });
-                        }
-                        if(typeof(res.data.results.LOCATION)!='undefined')
-                        {
-                            locations = res.data.results.LOCATION.map(function(value){
-                                const output = {
-                                    string: value,
-                                    type : 'location'
-                                };
-                                return output;
-                            });
-                        }
+                    if(typeof(res.data.results.AIRPORT)!='undefined') {
+                        airports = res.data.results.AIRPORT.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'airport'
+                            };
+                            return output;
+                        });
+                    }
 
-                        const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
-                        if(type=='pickup') {
-                            this.pickuplocations = results;
-                        }
-                        else if(type=='via')
-                        {
-                            this.vialocations = results;
-                        }
-                        else
-                        {
-                            this.destinationlocations = results;
-                        }
-                    })
+                    if(typeof(res.data.results.LOCATION)!='undefined') {
+                        locations = res.data.results.LOCATION.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'location'
+                            };
+                            return output;
+                        });
+                    }
+
+                    const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
+                    if(type=='pickup') {
+                        this.pickuplocations = results;
+                    } else if(type=='via') {
+                        this.vialocations = results;
+                    } else {
+                        this.destinationlocations = results;
+                    }
+                })
             }
 
         }

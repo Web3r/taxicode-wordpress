@@ -1,14 +1,15 @@
 <template>
     <div class="app-settings">
-        <h3>Payment Settings</h3>
+        <h3>Booking Instant Quotes Settings</h3>
         <div :class="message_class">
             {{message}}
         </div>
+        <h3>Taxicode Affiliate Settings</h3>
         <table class="form-table" role="presentation">
             <tbody>
                 <tr>
                     <th scope="row">
-                        <label for="taxicode_public">Taxicode API public key</label>
+                        <label for="taxicode_public">Taxicode public API key</label>
                     </th>
                     <td>
                         <input name="taxicode_public" type="text" id="taxicode_public" v-model="form.taxicode_public" class="regular-text">
@@ -16,18 +17,33 @@
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="taxicode_private">Taxicode API private key</label>
+                        <label for="taxicode_private">Taxicode private API key</label>
                     </th>
                     <td>
                         <input name="taxicode_private" type="text" id="taxicode_private" v-model="form.taxicode_private" class="regular-text">
                     </td>
                 </tr>
+            </tbody>
+        </table>
+        <h3>Payment Settings</h3>
+        <table class="form-table" role="presentation">
+            <tbody>
                 <tr>
                     <th scope="row">
-                        <label for="stripe_public">Stripe API public key</label>
+                        <label for="stripe_public">Stripe public API key</label>
                     </th>
                     <td>
                         <input name="stripe_public" type="text" id="stripe_public" v-model="form.stripe_public" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="stripe_cardform_css">Stripe Cardform Custom CSS</label>
+                    </th>
+                    <td>
+                        <textarea name="stripe_cardform_css" id="stripe_cardform_css" v-model="form.stripe_cardform_css" class="regular-text">
+                        </textarea><br />
+                        See <a href="https://stripe.com/docs/js/appendix/style" title="Stripe JS Card Element Style Object" target="_blank">Stripe JS Card Element Style Object</a> for details of valid options.
                     </td>
                 </tr>
                 <tr>
@@ -110,6 +126,7 @@
                     taxicode_private:'',
                     stripe_public:'',
                     stripe_private:'',
+                    stripe_cardform_css:'',
                     paypal_public: '',
                     complete_page_text: '',
                     quote_type: '',
@@ -127,6 +144,7 @@
                 this.form.taxicode_private = response.data.taxicode_private;
                 this.form.stripe_public = response.data.stripe_public;
                 this.form.stripe_private = response.data.stripe_private;
+                this.form.stripe_cardform_css = response.data.stripe_cardform_css;
                 this.form.paypal_public = response.data.paypal_public;
                 this.form.quote_type = response.data.quote_type;
                 this.form.complete_page_text = response.data.complete_page_text;
