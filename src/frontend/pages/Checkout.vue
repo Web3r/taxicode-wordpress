@@ -77,12 +77,12 @@
             /** The URI to get the client secret from */
                     config.CLIENT_SECRET_URL
                 );
+            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, config.PGH_CONF.hidePostalCode);
             console.log("created");
         },
 
         mounted: function () {
             this.cardFormHandler.setAmount(this.price, "Taxi journey");
-            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, true);
             this.cardFormHandler.mountElement();
             console.log("mounted");
         },

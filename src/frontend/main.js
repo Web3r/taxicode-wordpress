@@ -31,7 +31,7 @@ import router from './router'
 import store from './store'
 
 const config = require('./config.js');
-window.config = config;
+window.config = config.DEV;
 
 /* eslint-disable no-new */
 new Vue({

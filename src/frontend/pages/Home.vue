@@ -69,8 +69,7 @@
             this.$refs.pickupfield.inputValue = this.pickup;
             this.$refs.destinationfield.inputValue = this.destination;
             this.$refs.viafield.inputValue = this.via;
-            if(this.postData.search_on_load)
-            {
+            if(this.postData.search_on_load) {
                 this.submitForm();
             }
         },
