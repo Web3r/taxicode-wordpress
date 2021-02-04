@@ -2,7 +2,9 @@
 
 <script>
     import axios from 'axios';
+    import { mapGetters, mapActions } from 'vuex';
     import StripeCardFormHandler from 'common/StripeCardFormHandler';
+
     export default {
         name: "Checkout",
         props: {
@@ -11,22 +13,12 @@
                 default : null
             }
         },
-        computed: {
-            price() {
-                return this.$store.state.price
-            }
-        },
         data() {
             return {
                 name: '',
                 email: '',
                 telephone: '',
                 flight_number: null,
-                quote_id: null,
-                journey_id: null,
-                vehicle: 0,
-                journey_data: {},
-                amount : 0,
                 cardholder_name: '',
                 billing_postcode: '',
                 errors: {
@@ -48,13 +40,11 @@
             // before vue load, and imported here
             this.paypal_token = paypal_token;
             this.test_mode = test_mode;
-            this.quote_id = this.$route.params.quote_id;
-            this.journey_id = this.$route.params.journey_id;
-            axios.get(config.JOURNEY_URL+this.journey_id+'&include_quote=true')
-                .then(function(response) {
-                    console.log(response.data);
+            axios.get(config.JOURNEY_URL+this.journeyID+'&include_quote=true')
+            .then(function(response) {
+                console.log(response.data);
                 checkout.journey_data = response.data.journey;
-                }.bind(this));
+            }.bind(this));
             /** create a new stripe card form payment option */
             this.cardFormHandler = new StripeCardFormHandler(
             /** The Stripe public key */
@@ -81,25 +71,53 @@
                     function(handler, error) {
                         checkout.loading = 0;
                         checkout.hasCardErrors = true;
+                        checkout.posterror = error.message;
                         checkout.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
                     },
             /** The URI to get the client secret from */
                     config.CLIENT_SECRET_URL
                 );
+            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, config.PGH_CONF.hidePostalCode);
             console.log("created");
         },
 
         mounted: function () {
-            this.cardFormHandler.setAmount(this.$store.state.price, "Taxi journey");
-            this.cardFormHandler.initialise(this.$refs.card, config.PGH_CONF);
+            this.cardFormHandler.setAmount(this.price, "Taxi journey");
             this.cardFormHandler.mountElement();
             console.log("mounted");
         },
 
+        computed: mapGetters([
+            // Journey quoting state
+            'loadingQuotes', 
+            'quotesLoaded', 
+            'zeroQuotes', 
+            'journeyID', 
+            'journeyDetails', 
+            'journeyQuotes',
+            'displayQuotes',
+            // Book Now Checkout state
+            'basket',
+            'quoteID',
+            'vehicleIndex',
+            'price',
+            'quoteData',
+            'quoteVehicleData',
+        ]),
+
         methods: {
+            ...mapActions([
+                // Journey quoting state
+                'quoting', 
+                'quoted',
+                // Book Now Checkout state
+                'bookNow'
+            ]),
+
             isCardPayment : function() {
                 return (this.payment_method == 'Pay with card');
             },
+
             validate: function() {
                 // reset the common validation error flags
                 this.errors = {
@@ -146,11 +164,10 @@
                 if(this.isCardPayment()) {
                     const self = this;
                     this.$nextTick(function() {
-                        console.log('mounting card')
                         self.cardFormHandler.mountElement();
                     });
                 } else {
-                    this.cardFormHandler.UnmountElement();
+                    this.cardFormHandler.unmountElement();
                 }
             },
 
@@ -175,7 +192,7 @@
                     this.posterror = false;
                     this.loading = 1;
                     // the card form handler has a success & error callback set (see the created method)
-                    this.cardFormHandler.getSourceCardToken(tc_public_key, this.quote_id, this.vehicle, this.cardholder_name, this.billing_postcode);
+                    this.cardFormHandler.getSourceCardToken(tc_public_key, this.quoteID, this.vehicleIndex, this.cardholder_name, this.billing_postcode);
                 }
             },
 
@@ -186,8 +203,8 @@
                 const self = this;
                 const formData = new FormData();
                 formData.append('key',tc_public_key);
-                formData.append('quote', this.quote_id);
-                formData.append('vehicle', this.vehicle);
+                formData.append('quote', this.quoteID);
+                formData.append('vehicle', this.vehicleIndex);
                 formData.append('test', this.test_mode);
                 formData.append('new_pay', true);
                 formData.append('email', this.email);

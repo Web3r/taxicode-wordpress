@@ -12,29 +12,30 @@ export default class StripeCardFormHandler {
      */
     constructor(public_key, transactionSuccessCB, transactionFailCB, client_secret_from_uri) {
         // because of safai we can't have nice things & have to bind these anyway
-        this.setAmount = this.setAmount.bind(this);
+        this.initialise = this.initialise.bind(this);
+        this.mountElement = this.mountElement.bind(this);
+        this.unmountElement = this.unmountElement.bind(this);
         this.getHandlerName = this.getHandlerName.bind(this);
         this.getAmount = this.getAmount.bind(this);
         this.getDescription = this.getDescription.bind(this);
+        this.setAmount = this.setAmount.bind(this);
         this.updateAmount = this.updateAmount.bind(this);
-        this.initialise = this.initialise.bind(this);
-        this.getSourceCardToken = this.getSourceCardToken.bind(this);
-        this.getClientSecretIntent = this.getClientSecretIntent.bind(this);
         this.getCustomerToken = this.getCustomerToken.bind(this);
         this.setCustomerToken = this.setCustomerToken.bind(this);
+        this.getClientSecretIntent = this.getClientSecretIntent.bind(this);
+        this.getSourceCardToken = this.getSourceCardToken.bind(this);
         this.paymentHandlerName = 'jstoken_stripe';
         this.country = 'GB';
         this.currency = 'gbp';
         // set the initial state
         this.amount = 0;
         this.description = '';
+        this.customer_token = null;
         // set the gateway public key
         this.pk = public_key;
         // set the callback functions to allow for adaption 
         this.transactionSuccessCB = transactionSuccessCB;
         this.transactionFailCB = transactionFailCB;
-        // set some default values
-        this.customer_token = null;
         // set the URI to create the payment intent to get the client secret from
         this.intent_secret_uri = client_secret_from_uri;
        // set the stripe library resources
@@ -60,6 +61,53 @@ export default class StripeCardFormHandler {
             getCustomerToken    : this.getCustomerToken,
             setCustomerToken    : this.setCustomerToken
         };
+    }
+	
+	/** 
+	 * Initialise the gateway handler with additional config.
+	 * @param {string} mount_on the selector ID
+	 * @param {Object} options the payment intent card form element config options
+	 */
+	initialise(mount_on, style_options, hide_postcode) {
+        console.group("Stripe card form handler initialising...");
+        console.info(mount_on);
+        console.info(style_options);
+        console.info(hide_postcode);
+        const options = {
+            style           : style_options,
+            hidePostalCode  : (typeof hide_postcode !== 'undefined') ? !!hide_postcode : false
+        };
+        console.info(options);
+		// create the Stripe card form elements
+		this.card = this.stripeElements.create('card', options);
+        // set where / on what the card form section will be mounted in the DOM
+        this.elementMountedOn = mount_on;
+        console.log("Stripe card form handler initialised");
+        console.groupEnd();
+    }
+    
+    /**
+     * Mount the Stripe Elements card form on the specified DOM element if not already mounted
+     */
+    mountElement() {
+        if(this.elementMounted) {
+            return;
+        }
+        console.log('Mounting Stripe card element on ' + this.elementMountedOn);
+        this.card.mount(document.getElementById(this.elementMountedOn));
+        this.elementMounted = true;
+    }
+    
+    /**
+     * Unmount the Stripe Elements card form from the specified DOM element if mounted
+     */
+    unmountElement() {
+        if(!this.elementMounted) {
+            return;
+        }
+        console.log('Unmounting Stripe card element from ' + this.elementMountedOn);
+        this.card.unmount(document.getElementById(this.elementMountedOn));
+        this.elementMounted = false;
     }
     
     /**
@@ -227,42 +275,6 @@ export default class StripeCardFormHandler {
                 handler.transactionFail(publicHandler, error);
             });
         });
-    }
-    
-    /**
-     * Mount the Stripe Elements card form on the specified DOM element if not already mounted
-     */
-    mountElement() {
-        if(this.elementMounted) {
-            return;
-        }
-        this.card.mount(this.elementMountedOn);
-        this.elementMounted = true;
-    }
-    
-    /**
-     * Unmount the Stripe Elements card form from the specified DOM element if mounted
-     */
-    unmountElement() {
-        if(!this.elementMounted) {
-            return;
-        }
-        this.card.unmount(this.elementMountedOn);
-        this.elementMounted = false;
-    }
-	
-	/** 
-	 * Initialise the gateway handler with additional config.
-	 * @param {string} mount_on the selector ID
-	 * @param {Object} options the payment intent card form element config options
-	 */
-	initialise(mount_on, options) {
-        console.log(options);
-        console.log(mount_on);
-		// create the Stripe card form elements
-		this.card = this.stripeElements.create('card', options);
-        // set where / on what the card form section will be mounted in the DOM
-        this.elementMountedOn = mount_on;
     }
 
 }

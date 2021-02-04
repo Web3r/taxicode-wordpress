@@ -49,15 +49,16 @@ class GetPluginSettings extends WP_REST_Controller
     public function get_items($request)
     {
         $response = [
-            'taxicode_public' => get_option('tcplugin_taxicode_public'),
-            'taxicode_private' => get_option('tcplugin_taxicode_private'),
-            'stripe_public' => get_option('tcplugin_stripe_public'),
-            'stripe_private' => get_option('tcplugin_stripe_private'),
-            'paypal_public' => get_option('tcplugin_paypal_public'),
-            'quote_type' => get_option('tcplugin_quote_type'),
-            'complete_page_text' => get_option('tcplugin_complete_page_text'),
-            'custom_css' => get_option('tcplugin_custom_css'),
-            'test_mode' => get_option('tcplugin_test_mode')
+            'taxicode_public'       => get_option('tcplugin_taxicode_public'),
+            'taxicode_private'      => get_option('tcplugin_taxicode_private'),
+            'stripe_public'         => get_option('tcplugin_stripe_public'),
+            'stripe_private'        => get_option('tcplugin_stripe_private'),
+            'stripe_cardform_css'   => get_option('tcplugin_stripe_cardform_css'),
+            'paypal_public'         => get_option('tcplugin_paypal_public'),
+            'quote_type'            => get_option('tcplugin_quote_type'),
+            'complete_page_text'    => get_option('tcplugin_complete_page_text'),
+            'custom_css'            => get_option('tcplugin_custom_css'),
+            'test_mode'             => get_option('tcplugin_test_mode')
         ];
 
         $response = rest_ensure_response( $response );

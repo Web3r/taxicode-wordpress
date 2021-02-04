@@ -52,12 +52,13 @@ class Frontend
                     '.get_option('tcplugin_custom_css').'
                     </style>
                     <script>
-                        let gateway_api_key = \'' . get_option('tcplugin_stripe_public') . '\';
-                        let tc_public_key = \'' . get_option('tcplugin_taxicode_public') . '\';
-                        let paypal_token = \'' . $paypalGateway->clientToken()->generate() . '\';
-                        let quote_settings = \'' . get_option('tcplugin_quote_type') . '\';
-                        let complete_page_text = \'' . get_option('tcplugin_complete_page_text') . '\';
-                        let test_mode = \'' . get_option('tcplugin_test_mode') . '\';
+                        const gateway_api_key = \'' . get_option('tcplugin_stripe_public') . '\';
+                        const stripe_cardform_css = ' . get_option('tcplugin_stripe_cardform_css') . ';
+                        const tc_public_key = \'' . get_option('tcplugin_taxicode_public') . '\';
+                        const paypal_token = \'' . $paypalGateway->clientToken()->generate() . '\';
+                        const quote_settings = \'' . get_option('tcplugin_quote_type') . '\';
+                        const complete_page_text = \'' . get_option('tcplugin_complete_page_text') . '\';
+                        const test_mode = \'' . get_option('tcplugin_test_mode') . '\';
                         ' . $post_js . '
                     </script>
                     ';
