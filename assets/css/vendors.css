@@ -1,12 +1,3 @@
-
-.vbt-autcomplete-list[data-v-9a21a6f4] {
-  padding-top: 5px;
-  position: absolute;
-  max-height: 350px;
-  overflow-y: auto;
-  z-index: 999;
-}
-
 /*!
  * Bootstrap v4.5.0 (https://getbootstrap.com/)
  * Copyright 2011-2020 The Bootstrap Authors
@@ -13103,3 +13094,12 @@ input[type="color"].form-control:disabled {
   font-size: 125%;
   vertical-align: text-bottom;
 }
+
+.vbt-autcomplete-list[data-v-9a21a6f4] {
+  padding-top: 5px;
+  position: absolute;
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 999;
+}
+

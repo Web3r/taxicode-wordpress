@@ -5,19 +5,24 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex';
+    import { mapGetters, mapActions } from 'vuex'
+
     export default {
-        name: 'BookingInstantQuotes',
+        name: 'BIQApp',
+
         computed: mapGetters([
-            // Journey quoting state
+        // BIQ Quote Search state
+            'searchDetails',
+            'displayQuotes',
+        // BIQ Quoting state
             'loadingQuotes', 
             'quotesLoaded', 
             'zeroQuotes', 
             'journeyID', 
             'journeyDetails', 
             'journeyQuotes',
-            'displayQuotes',
-            // Book Now Checkout state
+        // BIQ Quoted Journey state
+        // Book Now Quote Checkout state
             'basket',
             'quoteID',
             'vehicleIndex',
@@ -25,16 +30,22 @@
             'quoteData',
             'quoteVehicleData',
         ]),
+
         methods: mapActions([
-            // Journey quoting state
+        // BIQ Quote Search state
+            'searchingQuotes', 
+            'searchedQuotes',
+        // BIQ Quoting state
             'quoting', 
             'quoted',
+            // Journey quoting state
             // Book Now Checkout state
-            'bookNow'
+            'bookNow',
+            'booked'
         ])
     };
 </script>
 
-<style>
+<style scoped>
 
 </style>

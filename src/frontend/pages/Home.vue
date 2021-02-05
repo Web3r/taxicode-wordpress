@@ -8,12 +8,15 @@
 
     export default {
         name: 'search',
+
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
         },
+
         props: {
             postData: []
         },
+
         data() {
             return {
                 journey_options: ['One Way','Return'],
@@ -62,7 +65,15 @@
             this.postData = postData;
             this.mapPostToForm();
             this.quote_settings = quote_settings;
-
+            // define a function to add leading zeros to the date time values for string value use
+            const az = i => (i<10) ? i="0"+i : i;
+            const d = new Date();
+            // just put the date & time forward a little
+            d.setDate(d.getDate() + 1);
+            d.setHours(d.getHours() + 2);
+            // getMonth is zero based, getDate is not
+            this.date = d.getFullYear() + "-" + az(d.getMonth() +1) + "-" + az(d.getDate());
+            this.time = az(d.getHours()) + ":" + az(d.getMinutes()) + ":" + az(d.getSeconds());
         },
 
         mounted() {
@@ -75,29 +86,23 @@
         },
 
         computed: mapGetters([
-            // Journey quoting state
+        // BIQ Quote Search state
+            'searchDetails',
+            'displayQuotes',
+        // BIQ Quoting state
             'loadingQuotes', 
             'quotesLoaded', 
-            'zeroQuotes', 
+            'zeroQuotes',
             'journeyID', 
-            'journeyDetails', 
-            'journeyQuotes',
-            'displayQuotes',
-            // Book Now Checkout state
-            'basket',
-            'quoteID',
-            'vehicleIndex',
-            'price',
-            'quoteData',
-            'quoteVehicleData',
+            'journeyQuotes'
         ]),
 
         methods: {
             ...mapActions([
-                // Journey quoting state
-                'quoting', 
-                'quoted',
-                // Book Now Checkout state
+            // BIQ Quote Search state
+                'searchingQuotes', 
+                'searchedQuotes',
+            // Book Now Checkout state
                 'bookNow'
             ]),
 
@@ -175,7 +180,7 @@
                 }
                 // update the state with the journey details being quoted for
                 // also updates the state flag for loading quotes
-                this.quoting(journey_details);
+                this.searchingQuotes(journey_details);
                 // get the quotes for the specified journey details
                 axios.get(url)
                 .then(function (response) {
@@ -193,7 +198,7 @@
                     this.quotes = quotes;
                     // update the state with the journey ID and the quote results
                     // also updates the state flags for loading quotes, quotes loaded & zero quotes
-                    this.quoted({ id : journey_id, quotes : response.data.quotes, display : quotes });
+                    this.searchedQuotes({ id : journey_id, quotes : response.data.quotes, display : quotes });
                 }.bind(this));
                 // @todo add an error catch for when the API throws a fit
             },

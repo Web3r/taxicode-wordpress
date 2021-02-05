@@ -1,11 +1,14 @@
 import Vue from 'vue'
 Vue.config.productionTip = false;
+// allow the use of dev tools before the vuex store is created
 Vue.config.devtools = true;
 
 import Vuex from 'vuex'
-Vue.use(Vuex);
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+//import {  } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
@@ -19,24 +22,25 @@ import { faPlane, faTrain, faMapMarkerAlt, faUsers, faSuitcase } from '@fortawes
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
+// is this really needed at app level? 
+// should it not be imported in the checkout where it is used?
 import vuebraintree from 'vue-braintree'
 Vue.use(vuebraintree);
 
-import {  } from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
-import App from './App.vue'
+// start the import of the app code 
+import BIQApp from './BIQApp.vue'
 import router from './router'
 import store from './store'
+Vue.use(Vuex);
 
 const config = require('./config.js');
+// environment aware config
 window.config = config.DEV;
 
 /* eslint-disable no-new */
 new Vue({
-  store,
-  render: h => h(App),
-  el: '#vue-frontend-app',
-  router
+  store : store,
+  render : h => h(BIQApp),
+  el : '#vue-frontend-app',
+  router : router
 });
