@@ -1,5 +1,5 @@
 
-const BIQCheckoutStore = {
+const BIQCheckout = {
     
     state : {
         quote_id : null,
@@ -38,13 +38,15 @@ const BIQCheckoutStore = {
         
         buildBasket(state, basket) {
             console.group("BIQCheckoutStore Build Basket");
-            console.log(basket);
-            console.groupEnd();
+            console.log({...state});
+            console.log({...basket});
             state.quote_id = basket.quote.quote_id;
             state.vehicle_index = basket.vehicle;
             state.quote = basket.quote;
             state.vehicle = basket.quote.vehicles[basket.vehicle];
             state.amount = basket.quote.vehicles[basket.vehicle].price;
+            console.log({...state});
+            console.groupEnd();
         },
         
         emptyBasket(state) {
@@ -61,4 +63,4 @@ const BIQCheckoutStore = {
     }
 };
 
-export default BIQCheckoutStore;
+export default BIQCheckout;

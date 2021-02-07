@@ -57,11 +57,13 @@ class Admin {
      */
     public function plugin_page() {
 
-        $content = '<script>
-            let tcplugin_data_url = "'.get_rest_url('','/taxicode/v1/settings-get/').'"
-            let tcplugin_update_url = "'.get_rest_url('','/taxicode/v1/settings-save/').'"
-</script>';
-        $content .= '<div class="wrap"><div id="vue-admin-app"></div></div>';
+        $content = '
+<script>
+    const biq_app_settings_url = "' . get_rest_url('','/taxicode/v1/settings-get/').'"
+    const biq_save_app_settings_url = "' . get_rest_url('','/taxicode/v1/settings-save/').'"
+    const tc_private_key = \'' . get_option('tcplugin_taxicode_private') . '\';
+</script>
+<div class="wrap"><div id="biq-admin-vue-app"></div></div>';
         echo $content;
     }
 }

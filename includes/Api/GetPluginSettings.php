@@ -51,10 +51,9 @@ class GetPluginSettings extends WP_REST_Controller
         $response = [
             'taxicode_public'       => get_option('tcplugin_taxicode_public'),
             'taxicode_private'      => get_option('tcplugin_taxicode_private'),
-            'stripe_public'         => get_option('tcplugin_stripe_public'),
-            'stripe_private'        => get_option('tcplugin_stripe_private'),
-            'stripe_cardform_css'   => get_option('tcplugin_stripe_cardform_css'),
             'paypal_public'         => get_option('tcplugin_paypal_public'),
+            'stripe_public'         => get_option('tcplugin_stripe_public'),
+            'stripe_cardform_css'   => get_option('tcplugin_stripe_cardform_css'),
             'quote_type'            => get_option('tcplugin_quote_type'),
             'complete_page_text'    => get_option('tcplugin_complete_page_text'),
             'custom_css'            => get_option('tcplugin_custom_css'),

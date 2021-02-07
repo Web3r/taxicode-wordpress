@@ -12,17 +12,31 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
+      props : {
+        postData,
+        quote_type
+      }
     },
     {
-      path: '/:journey_id',
-      name: 'HomeSearch',
-      component: Home
+      path: '/:journey',
+      name: 'HomeSearched',
+      component: Home,
+      props : {
+        postData,
+        quote_type
+      }
     },
     {
       path: '/checkout/:journey/:quote/:vehicle',
       name: 'Checkout',
-      component: Checkout
+      component: Checkout,
+      props : {
+        tc_public_key,
+        paypal_key,
+        gateway_api_key,
+        test_mode
+      }
     },
     {
       path: '/complete/:booking_ref',

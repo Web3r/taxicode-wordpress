@@ -1,0 +1,112 @@
+<div class="app-settings">
+    <h3>Settings</h3>
+    <div :class="message_class">
+        {{message}}
+    </div>
+    <h3>Taxicode Affiliate Settings</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+            <tr>
+                <th scope="row">
+                    <label for="taxicode_public">Taxicode public API key</label>
+                </th>
+                <td>
+                    <input v-model="form.taxicode_public" id="taxicode_public" name="taxicode_public" type="text" class="regular-text">
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="taxicode_private">Taxicode private API key</label>
+                </th>
+                <td>
+                    <input v-model="form.taxicode_private" id="taxicode_private" name="taxicode_private" type="text" class="regular-text">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Payment Settings</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+            <tr>
+                <th scope="row">
+                    <label for="paypal_public">Paypal Client ID</label>
+                </th>
+                <td>
+                    <input v-model="form.paypal_public" id="paypal_public" name="paypal_public" type="text" class="regular-text">
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="stripe_public">Stripe public API key</label>
+                </th>
+                <td>
+                    <input v-model="form.stripe_public" id="stripe_public" name="stripe_public" type="text" class="regular-text">
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="stripe_cardform_css">Stripe Cardform Custom CSS</label>
+                </th>
+                <td>
+                    <span>See <a href="https://stripe.com/docs/js/appendix/style" title="Stripe JS Card Element Style Object" target="_blank">Stripe JS Card Element Style Object</a> for details of valid options.</span>
+                    <br /><br />
+                    <textarea v-model="form.stripe_cardform_css" id="stripe_cardform_css" name="stripe_cardform_css" class="regular-text code" rows="10" cols="50">
+                    </textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Plugin Settings</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+        <tr>
+            <th scope="row">
+                <label>Booking Test Mode</label>
+            </th>
+            <td>
+                <legend class="screen-reader-text"><span>Quotes</span></legend>
+                <label><input v-model="form.test_mode" name="test_mode" type="radio" value="1">Making Bookings In Test Mode</label><br>
+                <label><input v-model="form.test_mode" name="test_mode" type="radio" value="0">Make Live Bookings</label><br>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label>Quote Display</label>
+            </th>
+            <td>
+                <legend class="screen-reader-text"><span>Quotes</span></legend>
+                <label><input v-model="form.quote_type" name="quote_type" type="radio" value="all"> All</label><br>
+                <label><input v-model="form.quote_type" name="quote_type" type="radio" value="best"> Only Best</label><br>
+                <label><input v-model="form.quote_type" name="quote_type" type="radio" value="type_class"> Cheapest by type and class</label><br>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="complete_page_text">Complete page text</label>
+            </th>
+            <td>
+                <textarea v-model="form.complete_page_text" id="complete_page_text" name="complete_page_text" class="regular-text" rows="10" cols="50">
+                </textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Custom CSS</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+        <tr>
+            <th scope="row">
+                <label for="custom_css">Custom CSS</label>
+            </th>
+            <td>
+                <textarea v-model="form.custom_css" id="custom_css" name="custom_css" class="regular-text code" rows="10" cols="50">
+                </textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button @click="onSaveSettings" class="button button-primary">Save Settings</button>
+    &nbsp;
+    <button @click="onReloadSettings" class="button">Reload Settings</button>
+</div>

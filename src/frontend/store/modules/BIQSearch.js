@@ -1,5 +1,5 @@
 
-const BIQSearchStore = {
+const BIQSearch = {
     
     state : {
         search_details : {
@@ -21,8 +21,8 @@ const BIQSearchStore = {
     actions : {
         
         searchingQuotes({ commit, dispatch }, details) {
-            dispatch('quoting', null, { root : true });
             commit('searchingQuotesFor', details);
+            dispatch('quoting', null, { root : true });
         },
         
         searchedQuotes({ commit, dispatch }, journey) {
@@ -36,18 +36,20 @@ const BIQSearchStore = {
             console.group("BIQSearchStore quoting state");
             console.log({...state});
             console.log(details);
-            console.groupEnd();
             state.search_details = details;
+            console.log({...state});
+            console.groupEnd();
         },
         
         displaying(state, quotes) {
             console.group("BIQSearchStore quoted state");
             console.log({...state});
-            console.log(quotes);
-            console.groupEnd();
+            console.log({...quotes});
             state.display_quotes = quotes;
+            console.log({...state});
+            console.groupEnd();
         }    
     }
 };
 
-export default BIQSearchStore;
+export default BIQSearch;

@@ -1,21 +1,23 @@
 import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
+Vue.config.productionTip = false;
+// allow the use of dev tools before the vuex store is created
+Vue.config.devtools = true;
+
+// fix the admin menu for the slug "taxicode-app"
 import menuFix from './utils/admin-menu-fix'
+menuFix('taxicode-app');
+
 import axios from 'axios';
 window.axios = require('axios');
-
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-Vue.config.productionTip = false
+// start the import of the admin app code 
+import BIQAdminApp from './BIQAdminApp.vue'
+import router from './router'
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#vue-admin-app',
-  router,
-  render: h => h(App)
+  render: h => h(BIQAdminApp),
+  el: '#biq-admin-vue-app',
+  router
 });
-
-
-// fix the admin menu for the slug "taxicode-app"
-menuFix('taxicode-app');

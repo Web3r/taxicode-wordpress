@@ -47,10 +47,10 @@ class Settings extends WP_REST_Controller {
 
         $taxicode_public =  $request['taxicode_public'];
         $taxicode_private =  $request['taxicode_private'];
+        $paypal_public = $request['paypal_public'];
         $stripe_public =  $request['stripe_public'];
         $stripe_private =  $request['stripe_private'];
         $stripe_cardform_css = $request['stripe_cardform_css'];
-        $paypal_public = $request['paypal_public'];
         $quote_type = $request['quote_type'];
         $complete_page_text = $request['complete_page_text'];
         $custom_css = $request['custom_css'];
@@ -63,18 +63,15 @@ class Settings extends WP_REST_Controller {
             update_option('tcplugin_taxicode_private', $taxicode_private);
         }
         
+        if(trim($paypal_public)!='') {
+            update_option('tcplugin_paypal_public', $paypal_public);
+        }
+        
         if(trim($stripe_public)!='') {
             update_option('tcplugin_stripe_public', $stripe_public);
         }
-        if(trim($stripe_private)!='') {
-            update_option('tcplugin_stripe_private', $stripe_private);
-        }
         if(trim($stripe_cardform_css)!='') {
             update_option('tcplugin_stripe_cardform_css', $stripe_cardform_css);
-        }
-        
-        if(trim($paypal_public)!='') {
-            update_option('tcplugin_paypal_public', $paypal_public);
         }
 
         if(trim($quote_type)!='') {
@@ -96,10 +93,9 @@ class Settings extends WP_REST_Controller {
         $response = [
             'taxicode_public'       => get_option('tcplugin_taxicode_public'),
             'taxicode_private'      => get_option('tcplugin_taxicode_private'),
-            'stripe_public'         => get_option('tcplugin_stripe_public'),
-            'stripe_private'        => get_option('tcplugin_stripe_private'),
-            'stripe_cardform_css'   => get_option('tcplugin_stripe_cardform_css'),
             'paypal_public'         => get_option('tcplugin_paypal_public'),
+            'stripe_public'         => get_option('tcplugin_stripe_public'),
+            'stripe_cardform_css'   => get_option('tcplugin_stripe_cardform_css'),
             'quote_type'            => get_option('tcplugin_quote_type'),
             'complete_page_text'    => get_option('tcplugin_complete_page_text'),
             'custom_css'            => get_option('tcplugin_custom_css'),

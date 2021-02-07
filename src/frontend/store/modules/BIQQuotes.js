@@ -1,5 +1,5 @@
 
-const BIQQuotesStore = {
+const BIQQuotes = {
     
     state : {
         quoting : false,
@@ -20,6 +20,12 @@ const BIQQuotesStore = {
         },
         journeyID : (state) => state.journey_id,
         journeyDetails : (state) => state.journey_details,
+        journeyDate : (state) => new Date(Date.parse(state.journey_details.date)).toDateString(),
+        journeyTime : (state) => new Date(Date.parse(state.journey_details.date)).toLocaleTimeString(),
+        journeyReturnDate : (state) => new Date(Date.parse(state.journey_details.return)).toDateString(),
+        journeyReturnTime : (state) => new Date(Date.parse(state.journey_details.return)).toLocaleTimeString(),
+        journeyHasReturn : (state) => !!state.journey_details.return,
+        journeyHasVias : (state) => (state.journey_details.vias.length > 0),
         journeyQuotes : (state) => state.journey_quotes
     },
     
@@ -48,16 +54,19 @@ const BIQQuotesStore = {
             console.groupEnd();
         },
         
-        quotes(state, journey) {
+        quotes(state, payload) {
             console.group("BIQQuotesStore quoted state");
-            console.log(journey);
-            console.groupEnd();
-            state.journey_id = journey.id;
-            state.journey_quotes = journey.quotes;
+            console.log({...state});
+            console.log({...payload});
+            state.journey_id = payload.journey_id;
+            state.journey_details = payload.journey_details;
+            state.journey_quotes = payload.quotes;
             state.quoting = false;
             state.quotes_loaded = true;
+            console.log({...state});
+            console.groupEnd();
         }
     }
 };
 
-export default BIQQuotesStore;
+export default BIQQuotes;

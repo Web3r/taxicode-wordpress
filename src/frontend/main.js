@@ -6,7 +6,6 @@ Vue.config.devtools = true;
 import Vuex from 'vuex'
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-//import {  } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue);
@@ -39,8 +38,13 @@ window.config = config.DEV;
 
 /* eslint-disable no-new */
 new Vue({
-  store : store,
-  render : h => h(BIQApp),
-  el : '#vue-frontend-app',
-  router : router
+  store,
+  render : h => h(BIQApp, {
+    props : {
+      biq_app_settings_url,
+      biq_config : config.DEV
+    }
+  }),
+  el : '#biq-vue-app',
+  router
 });
