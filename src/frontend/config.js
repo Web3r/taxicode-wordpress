@@ -1,5 +1,6 @@
 module.exports = {
     PLACES_URL          : 'https://api.stagingtaxis.co.uk/places/',
+    AUTH_URI            : '/auth/',
     QUOTE_URL           : 'https://api.stagingtaxis.co.uk/booking/quote/',
     JOURNEY_URL         : 'https://api.stagingtaxis.co.uk/booking/journey/?id=',
     CLIENT_SECRET_URL   : 'https://api.stagingtaxis.co.uk/booking/client_gateway_secret/',
@@ -19,6 +20,7 @@ module.exports = {
     },
     DEV                : {
         PLACES_URL          : 'https://api.local/places/',
+        AUTH_URI            : '/auth/',
         QUOTE_URL           : 'https://api.local/booking/quote/',
         JOURNEY_URL         : 'https://api.local/booking/journey/?id=',
         CLIENT_SECRET_URL   : 'https://api.local/booking/client_gateway_secret/',
@@ -29,6 +31,7 @@ module.exports = {
     },
     STAGING                : {
         PLACES_URL          : 'https://api.stagingtaxis.co.uk/places/',
+        AUTH_URI            : '/auth/',
         QUOTE_URL           : 'https://api.stagingtaxis.co.uk/booking/quote/',
         JOURNEY_URL         : 'https://api.stagingtaxis.co.uk/booking/journey/?id=',
         CLIENT_SECRET_URL   : 'https://api.stagingtaxis.co.uk/booking/client_gateway_secret/',
@@ -39,6 +42,7 @@ module.exports = {
     },
     LIVE                : {
         PLACES_URL          : 'https://api.taxicode.com/places/',
+        AUTH_URI            : '/auth/',
         QUOTE_URL           : 'https://api.taxicode.com/booking/quote/',
         JOURNEY_URL         : 'https://api.taxicode.com/booking/journey/?id=',
         CLIENT_SECRET_URL   : 'https://api.taxicode.com/booking/client_gateway_secret/',

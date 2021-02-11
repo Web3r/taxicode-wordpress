@@ -34,6 +34,7 @@ const BIQCheckout = {
              commit('emptyBasket');
         }
     },
+    
     mutations : {
         
         buildBasket(state, basket) {

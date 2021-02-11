@@ -8,16 +8,14 @@ Vue.use(Router);
 import Settings from 'admin/views/Settings.vue'
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Settings',
-      component: Settings,
-      props : {
-        biq_app_settings_url,
-        biq_save_app_settings_url,
-        tc_private_key
-      }
-    }
-  ]
+    routes: [
+        {
+            path: '/',
+            name: 'Settings',
+            component: Settings,
+            props: {
+                biq_sk
+            }
+        }
+    ]
 })

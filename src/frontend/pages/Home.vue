@@ -18,6 +18,7 @@
                 type : Object,
                 default : {}
             },
+            
             quote_type : {
                 type : String,
                 default : ''

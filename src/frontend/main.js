@@ -34,17 +34,18 @@ Vue.use(Vuex);
 
 const config = require('./config.js');
 // environment aware config
-window.config = config.DEV;
+window.config = config.STAGING;
 
 /* eslint-disable no-new */
 new Vue({
-  store,
-  render : h => h(BIQApp, {
-    props : {
-      biq_app_settings_url,
-      biq_config : config.DEV
-    }
-  }),
-  el : '#biq-vue-app',
-  router
+    store,
+    render: h => h(BIQApp, {
+        props: {
+            biq_app_url,
+            biq_app_debug_enabled,
+            biq_config: config.STAGING
+        }
+    }),
+    el: '#biq-vue-app',
+    router
 });

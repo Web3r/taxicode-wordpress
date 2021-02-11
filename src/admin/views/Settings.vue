@@ -1,36 +1,46 @@
 <template src="./templates/Settings.html"></template>
 
 <script>
-    import Form from "../../common/Form";
-    import axios from 'axios';
+    import Form from "@/common/Form";
 
     export default {
-        name: 'Settings',
+        name : 'Settings',
 
-        props: {
-            biq_app_settings_url : {
-                type : String,
-                default : ''
+        props : {
+            appSettings : {
+                type : Object,
+                required : true,
+                default : null
             },
-            biq_save_app_settings_url : {
+
+            appRESTBaseURL : {
                 type : String,
-                default : ''
+                default : '//'
             },
-            tc_private_key : {
+            
+            debugging : {
+                type : Boolean,
+                default : false
+            },
+            
+            biq_sk : {
                 type : String,
                 default : ''
             }
+
         },
 
-        data () {
+        data() {
             return {
-                message_class : '',
                 message : '',
+                message_extra : '',
+                message_class : '',
                 form : new Form({
                     taxicode_public : '',
                     taxicode_private : '',
+                    biq_api_host : 'https://api.taxicode.com/',
                     stripe_public : '',
-                    stripe_cardform_css : '',
+                    stripe_cardform_style : '',
                     paypal_public : '',
                     complete_page_text : '',
                     quote_type : '',
@@ -42,52 +52,65 @@
         },
 
         created() {
-            this.getAppSettings();
+            this.propogateSettingsToFormData();
             // passed as a prop because it's a private key & shouldn't be returned with the app settings
-            this.form.taxicode_private = this.tc_private_key;
+            this.form.taxicode_private = this.biq_sk;
         },
 
-        methods: {
-            getAppSettings : function() {
-                const page = this;
-                // get the app settings from the backend REST server
-                axios.get(this.biq_app_settings_url)
-                .then(response => {
-                    // set the app settings from the backend to the settings form
-                    page.form.taxicode_public = response.data.taxicode_public;
-                    page.form.stripe_public = response.data.stripe_public;
-                    page.form.stripe_cardform_css = response.data.stripe_cardform_css;
-                    page.form.paypal_public = response.data.paypal_public;
-                    page.form.quote_type = response.data.quote_type;
-                    page.form.complete_page_text = response.data.complete_page_text;
-                    page.form.custom_css = response.data.custom_css;
-                    page.form.test_mode = response.data.test_mode;
-                })
-                .catch(error => {
-                // yeah, something went wrong
-                    console.error(error);
-                    this.message_class = 'alternate';
-                    this.message = 'Failed to load settings';
-                });
+        methods : {
+            onReloadSettings : function() {
+                this.propogateSettingsToFormData();
             },
 
-            onReloadSettings : function() {
-                this.getAppSettings();
+            propogateSettingsToFormData : function() {
+                this.form.taxicode_public = this.appSettings.biq_pk;
+                this.form.biq_api_host = this.appSettings.biq_api_host;
+                this.form.paypal_public = this.appSettings.paypal_pk;
+                this.form.stripe_public = this.appSettings.stripe_pk;
+                // this is a string from the REST & doesn't parse to JSON well :(
+                this.form.stripe_cardform_style = this.appSettings.stripe_cardform_style;
+                this.form.quote_type = this.appSettings.quote_type;
+                this.form.complete_page_text = this.appSettings.complete_page_text;
+                this.form.custom_css = this.appSettings.custom_css;
+                this.form.test_mode = this.appSettings.booking_test_mode;
             },
 
             onSaveSettings : function() {
-                console.log(this.form.data());
-                this.form.post(this.biq_save_app_settings_url)
+                const page = this;
+                const biq_save_app_settings_url = `${this.appRESTBaseURL}settings-save/`;
+                if(this.debugging) {
+                    console.info(`Updating BIQ App Settings to '${biq_save_app_settings_url}'`);
+                    console.info({...this.form.data()});
+                    console.groupEnd();
+                }
+                // update the app settings from the form data
+                this.form.post(biq_save_app_settings_url)
                 .then(response => {
-                    this.message_class = 'updated';
-                    this.message = 'Settings Updated';
+                    page.message_class = 'updated';
+                    page.message = 'Settings Updated';
+                    page.$emit("appSettingsUpdated", { ...response,  });
                 })
                 .catch(error => {
-                    this.message_class = 'alternate';
-                    this.message = 'Failed to update settings!';
+                // yeah, something went wrong
+                    page.message_class = 'error';
+                    page.message = 'Failed to update settings!';
+                    if(error.hasOwnProperty('message') && error.message) {
+                        page.message_extra = error.message;
+                    }
+                    console.error(page.message_extra);
+                    console.info({...error});
+                })
+                .finally(() => {
+                // always get rid of the message after x seconds
+                    setTimeout(() => { 
+                        page.message = '' 
+                        page.message_extra = '';
+                        page.message_class = '' 
+                    }, 5000);
                 });
             }
         }
+
     };
 </script>
 
