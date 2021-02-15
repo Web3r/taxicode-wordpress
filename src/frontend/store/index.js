@@ -1,14 +1,27 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from 'vuex-persistedstate';
 
-import Journey from './modules/Journey';
-import BookingCheckout from './modules/BookingCheckout';
+import BIQSearchStore from './modules/BIQSearch';
+import BIQQuotesStore from './modules/BIQQuotes';
+import BIQCheckoutStore from './modules/BIQCheckout';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        Journey,
-        BookingCheckout
-    }
+        BIQSearchStore,
+        BIQQuotesStore,
+        BIQCheckoutStore
+    },
+    plugins: [
+       createPersistedState({
+        paths : [
+          'BIQSearchStore',
+          'BIQQuotesStore',
+          'BIQCheckoutStore'
+        ],
+        storage : window.localStorage
+      })
+    ]
 });

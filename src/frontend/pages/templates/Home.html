@@ -138,10 +138,10 @@
             Sorry, we could not find any quotes for the selected journey.  Please try a different journey.
         </div>
 
-        <div v-if="quote_settings!='type_class'" class="row">
+        <div v-if="quote_type!='type_class'" class="row">
             <div v-for="(quote, id) in displayQuotes" class="col-sm-auto">
                 
-                <div v-if="quote_settings=='best'">
+                <div v-if="quote_type=='best'">
                     <div v-if="quote.highlight" class="card" style="width: 18rem;">
                         <img :ref="id" :src="quote.vehicles[0].image" class="card-img-top" alt="Vehicle type image">
                         <div class="card-header">
