@@ -4,12 +4,17 @@
     import { mapGetters, mapActions } from 'vuex';
 
     export default {
-        name: 'SearchResults',
+        name : 'SearchResults',
 
-        props: {
+        props : {
             quote_type : {
                 type : String,
                 default : 'type_class'
+            },
+            
+            debugging : {
+                type : Boolean,
+                default : false
             }
         },
 
@@ -24,7 +29,7 @@
             }
         },
 
-        computed: mapGetters([
+        computed : mapGetters([
         // BIQ Quote Search state
             'displayQuotes',
         // BIQ Quoting state
@@ -34,13 +39,13 @@
             'journeyQuotes'
         ]),
 
-        methods: {
+        methods : {
             ...mapActions([
-            // Book Now Checkout state
+            // BIQ Book Now Checkout state
                 'bookNow'
             ]),
 
-            flipImage: function(id, event) {
+            flipImage : function(id, event) {
                 const vehicle = event.target.value;
                 const price = this.displayQuotes[id].vehicles[vehicle].price;
                 this.$refs[id][0].src = this.displayQuotes[id].vehicles[vehicle].image;
@@ -48,20 +53,21 @@
                 this.$refs[id][2].$el.setAttribute('data-vehicle', vehicle)
             },
 
-            onBookNowClicked: function(params, event) {
-                console.group("Book Now Clicked");
-                console.info(params);
-                console.info(this.journeyQuotes[params.quote]);
-                console.info(event);
-                console.groupEnd();
+            onBookNowClicked : function(params, event) {
+                if(this.debugging) {
+                    console.group("Book Now Clicked");
+                    console.info(params);
+                    console.info(this.journeyQuotes[params.quote]);
+                    console.info(event);
+                    console.groupEnd();
+                }
                 this.bookNow({
                     quote : this.journeyQuotes[params.quote], 
                     vehicle : params.vehicle,
                 });
-            },
-
+            }
         }
-    }
+    };
 </script>
 
 <style scoped>

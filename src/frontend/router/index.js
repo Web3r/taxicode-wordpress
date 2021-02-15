@@ -15,8 +15,7 @@ export default new Router({
             component: Home,
             props: {
                 searchFormData,
-                search_on_load,
-                quote_type
+                search_on_load
             }
         },
         {
@@ -25,8 +24,7 @@ export default new Router({
             component: Home,
             props: {
                 searchFormData,
-                search_on_load,
-                quote_type
+                search_on_load
             }
         },
         {
@@ -41,11 +39,7 @@ export default new Router({
         {
             path: '/complete/:booking_ref',
             name: 'Complete',
-            component: Complete,
-            props: {
-                pageText: complete_page_text,
-                restBookingDetails: `${biq_app_url}booking-details/`
-            }
+            component: Complete
         }
     ]
 });

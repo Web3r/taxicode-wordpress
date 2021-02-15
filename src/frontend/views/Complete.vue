@@ -5,7 +5,7 @@
             <div class="col">
                 <p>{{pageText}}</p>
             </div>
-            <JourneyDetails-Booked 
+            <JourneyDetails-Booked v-if="detailsLoaded"
                 :booking-ref="booking.ref"
                 :passenger-name="booking.name"
                 :passengers="booking.passengers"
@@ -31,18 +31,34 @@
         },
 
         props: {
-            pageText : {
-                type : String,
-                default : 'Thank you for booking with us.'
+            appConfig : {
+                type : Object,
+                required : true,
+                default : null
             },
-            restBookingDetails : {
+
+            appSettings : {
+                type : Object,
+                required : true,
+                default : null
+            },
+
+            appRESTBaseURL : {
                 type : String,
-                default : ''
+                default : '//'
+            },
+            
+            debugging : {
+                type : Boolean,
+                default : false
             }
         },
 
         data() {
             return {
+                detailsLoaded : false,
+                detailsLoadError : false,
+                pageText : 'Thank you for booking with us.',
                 booking : {
                     ref : '',
                     name : '',
@@ -59,12 +75,14 @@
         created() {
             const page = this;
             const booking_ref = this.$route.params.booking_ref;
-            const biq_booking_details_url = `${this.restBookingDetails}?booking_ref=${booking_ref}`;
+            const biq_booking_details_url = `${this.appRESTBaseURL}${this.appConfig.BOOKING_DETALS_URI}${booking_ref}`;
             axios.get(biq_booking_details_url)
             .then(response => {
-                console.group(`Loading Booking Details from '${biq_booking_details_url}'`);
-                console.info({...page.booking});
-                console.info({...response.data});
+                if(page.debugging) {
+                    console.group(`Loading Booking Details from '${biq_booking_details_url}'`);
+                    console.info({...page.booking});
+                    console.info({...response.data});
+                }
                 const booking = {
                     ref : booking_ref,
                     name : response.data.booking.passenger.name,
@@ -79,15 +97,25 @@
                     booking.return_date = new Date(Date.parse(response.data.booking.return));
                 }
                 page.booking = booking;
-                console.info({...booking});
-                console.info({...page.booking});
-                console.groupEnd();
+                page.detailsLoaded = true;
+                if(page.debugging) {
+                    console.info({...booking});
+                    console.info({...page.booking});
+                    console.groupEnd();
+                }
             })
             .catch(error => {
-                console.error(error);
+                let message = 'Unknown Booking Details Error';
+                if(error.hasOwnProperty('message') && error.message) {
+                    message = error.message;
+                }
+                console.error(message);
+                console.info({...error});
+                page.detailsLoadError = true;
             });
+            this.pageText = this.appSettings.complete_page_text;
         }
-    }
+    };
 </script>
 
 <style scoped>

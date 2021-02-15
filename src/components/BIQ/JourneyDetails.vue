@@ -1,5 +1,8 @@
 <template>
-    <div id="tcplugin-checkout-booking-details" class="col">
+    <div 
+        id="tcplugin-checkout-booking-details" 
+        class="col"
+    >
         <div class="card">
             <div class="card-header">
                 Booking Details
@@ -14,10 +17,14 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <strong>Going To:</strong> {{journeyDetails.destination.string}}
                 </li>
-                <li v-if="journeyHasVias" class="list-group-item d-flex justify-content-between align-items-center">
+                <li v-if="journeyHasVias" 
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                >
                     <strong>Via:</strong> {{journeyDetails.vias[0].string}}
                 </li>
-                <li v-if="journeyHasReturn" class="list-group-item d-flex justify-content-between align-items-center">
+                <li v-if="journeyHasReturn" 
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                >
                     <strong>Returning:</strong> {{journeyReturnDate}} at {{journeyReturnTime}}
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -32,7 +39,7 @@
     import { mapGetters } from 'vuex';
 
     export default {
-        name: "JourneyDetails",
+        name : "JourneyDetails",
 
         computed : mapGetters([
         // BIQ Quoting state
@@ -46,7 +53,7 @@
         // BIQ Book Now Checkout state
             'price'
         ])
-    }
+    };
 </script>
 
 <style scoped>

@@ -1,13 +1,17 @@
-
-const BIQCheckout = {
-    
-    state : {
-        quote_id : null,
+// define the default initial state structure & values
+const defaultState = () => {
+    return {
+        quote_id : '',
         vehicle_index : 0,
         amount : 0,
         quote : {},
         vehicle : {}
-    },
+    };
+};
+
+// define the state store module
+const BIQCheckout = {
+    state : defaultState(),
     
     getters : {
         basket : (state) => {
@@ -25,39 +29,48 @@ const BIQCheckout = {
     },
     
     actions : {
-        
+        resetCheckout({ commit }) {
+            // reset the checkout state
+            commit('resetCheckoutState');
+        },
+
         bookNow({ commit }, basket) {
+            // reset the checkout state
+            commit('resetCheckoutState');
+            // set the details to build the checkout basket content
             commit('buildBasket', basket);
         },
         
         booked({ commit }, ref) {
-             commit('emptyBasket');
+            // reset the checkout state
+            commit('resetCheckoutState');
         }
     },
     
     mutations : {
-        
-        buildBasket(state, basket) {
-            console.group("BIQCheckoutStore Build Basket");
+        resetCheckoutState(state) {
+            console.group("Resetting BIQCheckoutStore State");
             console.log({...state});
-            console.log({...basket});
-            state.quote_id = basket.quote.quote_id;
-            state.vehicle_index = basket.vehicle;
-            state.quote = basket.quote;
-            state.vehicle = basket.quote.vehicles[basket.vehicle];
-            state.amount = basket.quote.vehicles[basket.vehicle].price;
+            // reset the state to the initial state
+            Object.assign(state, defaultState());
             console.log({...state});
             console.groupEnd();
         },
-        
-        emptyBasket(state) {
-            console.group("BIQCheckoutStore Empty Checkout Basket");
+
+        buildBasket(state, basket) {
+            console.group("BIQCheckoutStore Build Basket state");
             console.log({...state});
-            state.quote_id = null;
-            state.vehicle_index = 0;
-            state.quote = {};
-            state.vehicle = {};
-            state.amount = 0;        
+            console.log({...basket});
+            // set the journey quote ID being booked
+            state.quote_id = basket.quote.quote_id;
+            // set the quote vehicle index
+            state.vehicle_index = basket.vehicle;
+            // set the journey quote details
+            state.quote = basket.quote;
+            // set the journey quote vehicle details
+            state.vehicle = basket.quote.vehicles[basket.vehicle];
+            // set the checkout amount based on the vehicle price returned for the quote
+            state.amount = basket.quote.vehicles[basket.vehicle].price;
             console.log({...state});
             console.groupEnd();
         }

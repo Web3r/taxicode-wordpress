@@ -18,10 +18,10 @@ import router from './router'
 /* eslint-disable no-new */
 new Vue({
     render: h => h(BIQAdminApp, {
-    props: {
-        biq_app_url,
-        biq_app_debug_enabled
-    }
+        props: {
+            biq_app_url,
+            biq_app_debug_enabled
+        }
     }),
     el: '#biq-admin-vue-app',
     router

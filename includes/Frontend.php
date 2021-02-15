@@ -62,15 +62,6 @@ class Frontend
     // this is a string from the REST & does not parse to JSON well :(
     // so use the supplied string as a direct JS object declaration to supply a valid prop version
     const stripe_cardform_style = ' . get_option('tcplugin_stripe_cardform_css') . ';
-
-    const biq_app_settings_url = \'' . get_rest_url('', '/taxicode/v1/settings-get/') . '\';
-    const tc_public_key = \'' . get_option('tcplugin_taxicode_public') . '\';
-    const biq_api_host = \'' . get_option('tcplugin_biq_api_host') . '\';
-    const paypal_key = \'' . $paypalGateway->clientToken()->generate() . '\';
-    const gateway_api_key = \'' . get_option('tcplugin_stripe_public') . '\';
-    const quote_type = \'' . get_option('tcplugin_quote_type') . '\';
-    const complete_page_text = \'' . get_option('tcplugin_complete_page_text') . '\';
-    const test_mode = ' . json_encode(boolval(get_option('tcplugin_test_mode'))) . ';
 </script>
 <div id="biq-vue-app"></div>';
 

@@ -38,25 +38,6 @@
                     CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
                     PAYMENT_URI : '/booking/pay/',
                 }
-            },
-
-            stripe_cardform_style : {
-                type : Object,
-                default : {
-                    base : {
-                        fontFamily : "'Muli', sans-serif",
-                        fontSize : '14px',
-                        color : '#333'
-                    },
-                    invalid : {
-                        color : 'red'
-                    }
-                 }
-            },
-            
-            paypal_client_token : {
-                type : String,
-                default : ''
             }
         },
 
@@ -66,7 +47,7 @@
 
                 settings : {
                     biq_api_host : 'https://api.taxicode.com/',
-                    tc_pk : '',
+                    biq_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
                     stripe_cardform_style : {
@@ -86,12 +67,13 @@
                 },
 
                 config : {
-                    PLACES_URI : '/places/',
+                    PLACES_URI : '/places/?term=',
                     AUTH_URI : '/auth/',
                     QUOTE_URI : '/booking/quote/',
                     JOURNEY_URI : '/booking/journey/?id=',
                     CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
-                    PAYMENT_URI : '/booking/pay/'
+                    PAYMENT_URI : '/booking/pay/',
+                    BOOKING_DETALS_URI : 'booking-details/?booking_ref='
                 }
 
             }
@@ -141,12 +123,16 @@
         methods : {
             ...mapActions([
             // BIQ Quote Search state
+                'resetSearch',
                 'searchingQuotes', 
                 'searchedQuotes',
             // BIQ Quoting state
+                'resetQuotes',
                 'quoting', 
+                'apiQuotesError',
                 'quoted',
             // BIQ Book Now Checkout state
+                'resetCheckout',
                 'bookNow',
                 'booked'
             ]),
@@ -154,30 +140,37 @@
             getAppSettings : function() {
                 const app = this;
                 const biq_app_settings_url = `${this.biq_app_url}settings-get/`;
+                if(this.biq_app_debug_enabled) {
+                    console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
+                }
                 axios.get(biq_app_settings_url)
                 .then(response => {
                     if(app.biq_app_debug_enabled) {
-                        console.group(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
+                        console.group("Loaded Settings");
                         console.info({...app.settings});
                         console.info({...response.data});
-                        console.log(response.data.stripe_cardform_style);
+                        // this is a string from the REST & doesn't parse to JSON well :(
+                        // but the echoed string inside the script tag to be supplied as a prop is an 
+                        // object. It's dirty, but needs must for now 2021
+                        console.log(typeof(app.stripe_cardform_style));
+                        console.log(app.stripe_cardform_style);
                         console.log(typeof(response.data.stripe_cardform_style));
+                        console.log(response.data.stripe_cardform_style);
                         try {
-                            // this is a string from the REST & doesn't parse to JSON well :(
-                            console.log(response.data.stripe_cardform_style);
-                            console.log(typeof(response.data.stripe_cardform_style));
                             console.log(JSON.parse(response.data.stripe_cardform_style));
                         } catch(e) {
                             console.error(e);
                         }
                     }
                     const settings = {
-                        tc_pk : response.data.taxicode_public,
+                        biq_pk : response.data.taxicode_public,
                         biq_api_host : response.data.biq_api_host,
                         paypal_pk : response.data.paypal_public,
                         stripe_pk : response.data.stripe_public,
                         // this is a string from the REST & doesn't parse to JSON well :(
-                        // so use the supplied prop version which is an object
+                        // but the echoed string inside the script tag to be supplied as a prop is an 
+                        // object. It's dirty, but needs must for now 2021 so use the supplied prop 
+                        // version which is an object
                         stripe_cardform_style : app.stripe_cardform_style,
                         quote_type : response.data.quote_type,
                         complete_page_text : response.data.complete_page_text,

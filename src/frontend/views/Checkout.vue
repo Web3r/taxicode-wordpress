@@ -6,6 +6,8 @@
     import StripeCardFormHandler from 'common/StripeCardFormHandler';
     import JourneyDetails from '@/components/BIQ/JourneyDetails.vue';
 
+    let cardFormHandler = null;
+
     export default {
         name : "Checkout",
 
@@ -30,10 +32,24 @@
                 type : Boolean,
                 default : false
             },
-            
-            cardFormHandler : {
+
+            stripe_cardform_style : {
                 type : Object,
-                default : null
+                default : {
+                    base : {
+                        fontFamily : "'Muli', sans-serif",
+                        fontSize : '14px',
+                        color : '#333'
+                    },
+                    invalid : {
+                        color : 'red'
+                    }
+                 }
+            },
+            
+            paypal_client_token : {
+                type : String,
+                default : ''
             }
         },
 
@@ -45,9 +61,9 @@
                 flight_number : null,
                 cardholder_name : '',
                 billing_postcode : '',
-                payment_method : 'Pay with card',
+                payment_method : 'Pay with Card',
                 payment_options : [
-                    'Pay with card', 
+                    'Pay with Card', 
                     'Pay with Paypal'
                 ],
                 loading : false,
@@ -60,12 +76,9 @@
             }
         },
 
-        created() {
-        },
-
         mounted() {
-            this.cardFormHandler = this.setupStripe();
-            this.cardFormHandler.mountElement();
+            this.setupStripe();
+            cardFormHandler.mountElement();
         },
 
         computed: mapGetters([
@@ -88,15 +101,15 @@
             ]),
 
             isCardPayment : function() {
-                return (this.payment_method == 'Pay with card');
+                return (this.payment_method == 'Pay with Card');
             },
 
             validate : function() {
                 // reset the common validation error flags
                 this.errors = {
-                    name: false,
-                    email: false,
-                    telephone: false
+                    name : false,
+                    email : false,
+                    telephone : false
                 }
                 // just keep a track of any errors
                 let errors = 0;
@@ -133,27 +146,37 @@
                 return (errors == 0);
             },
 
+            logFormValidateError : function(log_title, errors) {
+                if(this.debugging) {
+                    console.group(log_title);
+                    console.info({...errors});
+                    console.groupEnd();
+                }
+            },
+
             onMethodChanged : function() {
                 if(this.isCardPayment()) {
-                    const page = this;
                     this.$nextTick(function() {
-                        page.cardFormHandler.mountElement();
+                        cardFormHandler.mountElement();
                     });
                 } else {
-                    this.cardFormHandler.unmountElement();
+                    cardFormHandler.unmountElement();
                 }
             },
 
             onPaypalSubmit : function(payload) {
                 if(this.validate()) {
                     this.posterror = false;
+                    // set the flag to indicate the booking checkout transaction is in progress
                     this.loading = 1;
-                    this.makeBooking(payload.nonce, 'paypal')
+                    this.makeBooking(payload.nonce, 'paypal');
+                } else {
+                    this.logFormValidateError("BIQCheckoutForm Paypal Validation Error", this.errors);
                 }
             },
 
             onPaypalError : function(error) {
-                let message = 'Unknown Paypal Error';
+                let message = 'BIQCheckoutForm Unknown Paypal Error';
                 if(error.hasOwnProperty('message') && error.message) {
                     message = error.message;
                 }
@@ -162,7 +185,7 @@
             },
 
             onPaypalLoadFail : function(error) {
-                let message = 'Unknown Paypal Error';
+                let message = 'BIQCheckoutForm Unknown Paypal Loading Error';
                 if(error.hasOwnProperty('message') && error.message) {
                     message = error.message;
                 }
@@ -175,21 +198,28 @@
                     this.posterror = false;
                     this.loading = 1;
                     // the card form handler has a success & error callback set (see the created method)
-                    this.cardFormHandler.getSourceCardToken(this.appSettings.tc_pk, this.quoteID, this.vehicleIndex, this.cardholder_name, this.billing_postcode);
+                    cardFormHandler.getSourceCardToken(
+                        this.appSettings.biq_pk, 
+                        this.quoteID, 
+                        this.vehicleIndex, 
+                        this.cardholder_name, 
+                        this.billing_postcode
+                    );
+                } else {
+                    this.logFormValidateError("BIQCheckoutForm Stripe Validation Error", this.errors);
                 }
             },
 
             setupStripe : function() {
                 const page = this;
                 /** create a new stripe card form payment option */
-                console.log(this.appSettings);
-                const cardFormHandler = new StripeCardFormHandler(
+                cardFormHandler = new StripeCardFormHandler(
                 /** The Stripe public key */
                         this.appSettings.stripe_pk,
                 /** The transaction success handler */
                         function(handler, paymentIntent) {
                             page.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
-                                if(this.debugging) {
+                                if(page.debugging) {
                                     console.log(paymentIntent);
                                 }
                                 // add the API field values for additional payment related data
@@ -206,26 +236,36 @@
                         },
                 /** The transaction failed handler */
                         function(handler, error) {
+                            let message = 'Unknown Stripe Error';
+                            if(error.hasOwnProperty('message') && error.message) {
+                                message = error.message;
+                            }
+                            console.error(message);
+                            console.info({...error});
                             page.loading = 0;
                             page.hasCardErrors = true;
-                            page.posterror = error.message;
+                            page.posterror = message;
                             // Forcing the DOM to update so the Stripe Element can update.
                             page.$forceUpdate();
                         },
                 /** The URI to get the client secret from */
-                        this.appConfig.CLIENT_SECRET_URL
+                        `${this.appSettings.biq_api_host}${this.appConfig.CLIENT_SECRET_URI}`
                     );
-                cardFormHandler.setAmount(this.price, "Taxi journey");
-                cardFormHandler.initialise(this.$refs.card.id, this.stripe_cardform_style, this.appConfig.PGH_CONF.hidePostalCode);
-                return cardFormHandler;
+                cardFormHandler.setAmount(this.price, "Taxi Journey");
+                cardFormHandler.initialise(
+                    this.$refs.card.id, 
+                    this.stripe_cardform_style, 
+                    this.appConfig.PGH_CONF.hidePostalCode
+                );
             },
 
             makeBooking : function(token, method, formdataAppend) {
+                const page = this;
                 // this is a bit annoying - our API can't handle standard axios requests on POST
                 // for some reason, so I've had to abandon my form class and hand crank this
                 // request.
                 const formData = new FormData();
-                formData.append('key', this.appSettings.tc_pk);
+                formData.append('key', this.appSettings.biq_pk);
                 formData.append('quote', this.quoteID);
                 formData.append('vehicle', this.vehicleIndex);
                 formData.append('new_pay', true);
@@ -238,29 +278,44 @@
                 // allow the calling method to add payment method specific fields to the API call
                     formdataAppend(formData);
                 }
-                if(this.appSettings.test_mode) {
+                if(this.appSettings.booking_test_mode) {
                 // make the booking in test mode
                     formData.append('test', '1');
                 }
-                axios.post(this.appConfig.PAYMENT_URL, formData, {
+                const apiCheckoutURL = `${this.appSettings.biq_api_host}${this.appConfig.PAYMENT_URI}`;
+                if(this.debugging) {
+                    console.info(`BIQ Checkout transaction attempt to API '${apiCheckoutURL}'`);
+                }
+                axios.post(apiCheckoutURL, formData, {
                     headers: {
                         'Content-Type': 'application/application/x-www-form-urlencoded',
                     }
                 })
-                .then(function(response) {
+                .then(response => {
                     if(response.data.status == 'OK') {
-                        this.$router.push( { name: 'Complete', params: { booking_ref: response.data.reference } })
+                        page.$router.push({ 
+                            name: 'Complete', 
+                            params: { 
+                                booking_ref: response.data.reference 
+                            } 
+                        });
                     } else {
-                        this.posterror = response.data.error;
-                        this.loading=0;
+                        page.posterror = response.data.error;
+                        page.loading = 0;
                     }
-                }.bind(this))
+                })
                 .catch(function (error) {
-                    this.loading = 0;
-                }.bind(this));
+                    let message = 'Unknown BIQ Checkout API Error';
+                    if(error.hasOwnProperty('message') && error.message) {
+                        message = error.message;
+                    }
+                    console.error(message);
+                    console.info({...error});
+                    page.loading = 0;
+                });
             }
         }
-    }
+    };
 </script>
 
 <style scoped>

@@ -12,19 +12,20 @@
 
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
-            'SearchResults' : SearchResults,
+            'BIQ-SearchResults' : SearchResults,
         },
 
         props: {
-            appSettings : {
+            appConfig : {
                 type : Object,
                 required : true,
                 default : null
             },
 
-            appRESTBaseURL : {
-                type : String,
-                default : '//'
+            appSettings : {
+                type : Object,
+                required : true,
+                default : null
             },
             
             debugging : {
@@ -72,106 +73,133 @@
                     date : null,
                     time : null,
                     people : false
-                }
+                },
+                loading_quotes_error : 'Sorry, we could not find any quotes for the selected journey.  Please try a different journey.'
             }
         },
 
-        watch: {
-            // When the query  changes, fetch new results from
-            // the API - in practice this action should be debounced
-            pickup: _.debounce(function(newPickup) { this.locationSearch(newPickup,'pickup') }, 500),
-            destination: _.debounce(function(newDestination) { this.locationSearch(newDestination,'destination') }, 500),
-            via: _.debounce(function(newVia) { this.locationSearch(newVia,'via') }, 500),
-
-        },
-
-        created() {
-            if(this.searchFormData != null) {
-                // set the search form values from the supplied prop data
-                this.setSearchForm();
-                return;
-            }
-            // define a function to add leading zeros to the date time values for string value use
-            const az = i => (i<10) ? i="0"+i : i;
-            // create a new date to initialise the search form date & time fields
-            const d = new Date();
-            // just put the date & time forward a little
-            d.setDate(d.getDate() + 1);
-            d.setHours(d.getHours() + 2);
-            // getMonth is zero based, getDate is not
-            this.date = d.getFullYear() + "-" + az(d.getMonth() +1) + "-" + az(d.getDate());
-            this.time = az(d.getHours()) + ":" + az(d.getMinutes()) + ":" + az(d.getSeconds());
+        watch : {
+            // detect location / places lookup
+            pickup : _.debounce(function(newPickup) { this.locationSearch(newPickup, 'pickup') }, 500),
+            destination : _.debounce(function(newDestination) { this.locationSearch(newDestination, 'destination') }, 500),
+            via : _.debounce(function(newVia) { this.locationSearch(newVia, 'via') }, 500)
         },
 
         mounted() {
+            // populate the search form from the state
+            this.setSearchFormState();
+            if(this.searchFormData != null) {
+                // set the search form values from the supplied prop data
+                this.setSearchFormPropData();
+            }
+            // set the referenced input field values
             this.$refs.pickupfield.inputValue = this.pickup;
             this.$refs.destinationfield.inputValue = this.destination;
             this.$refs.viafield.inputValue = this.via;
             if(this.search_on_load) {
+                // submit the journey quote search
                 this.onSearchQuotesFormSubmit();
             }
         },
 
-        computed: mapGetters([
+        computed : mapGetters([
         // BIQ Quote Search state
             'searchDetails',
         // BIQ Quoting state
+            'loadingQuotes', 
             'quotesLoaded', 
             'journeyID', 
             'journeyQuotes'
         ]),
 
-        methods: {
+        methods : {
             ...mapActions([
             // BIQ Quote Search state
                 'searchingQuotes', 
-                'searchedQuotes'
+                'searchedQuotes', 
+            // BIQ Quoting state
+                'apiQuotesError'
             ]),
 
-            setSearchForm : function() {
-                if(typeof this.searchFormData.journey_type!='undefined') {
+            setSearchFormState : function() {
+                // first set the form to current search form state
+                const searchState = this.searchDetails;
+                console.log(searchState);
+                this.journey_type = searchState.journey_type;
+                this.pickup = searchState.pickup;
+                this.destination = searchState.destination;
+                if(searchState.vias.length) {
+                    // set the first via (as there is only 1 via but it's expected as a list)
+                    this.via = searchState.vias[0];
+                }
+                // @todo check that the date is in the future & adjust if not
+                this.date = searchState.date;
+                // @todo check that the date and time is in the future & adjust if not
+                this.time = searchState.time;
+                this.people = searchState.people;
+                if(this.journey_type === 'Return' && searchState.returning.date !== null) {
+                // @todo check that the date is in the future and after the outbound date & adjust if not
+                    this.return_date = searchState.returning.date;
+                }
+                if(this.journey_type === 'Return' && searchState.returning.time !== null) {
+                // @todo check that the date and time is in the future and after the outbound date time & adjust if not
+                    this.return_time = searchState.returning.time;
+                }
+            },
+
+            setSearchFormPropData : function() {
+                // overwrite the search form details with any POSTed values from the server side generation
+                if(typeof this.searchFormData.journey_type != 'undefined') {
                     this.journey_type = this.searchFormData.journey_type
                 }
-                if(typeof this.searchFormData.pickup!='undefined') {
+                if(typeof this.searchFormData.pickup != 'undefined') {
                     this.pickup = this.searchFormData.pickup
                 }
-                if(typeof this.searchFormData.destination!='undefined') {
+                if(typeof this.searchFormData.destination != 'undefined') {
                     this.destination = this.searchFormData.destination
                 }
-                if(typeof this.searchFormData.via!='undefined') {
+                if(typeof this.searchFormData.via != 'undefined') {
                     this.via = this.searchFormData.via
                 }
-                if(typeof this.searchFormData.date!='undefined') {
+                if(typeof this.searchFormData.date != 'undefined') {
+                // @todo check that the date is in the future & adjust if not
                     this.date = this.searchFormData.date
                 }
-                if(typeof this.searchFormData.time!='undefined') {
+                if(typeof this.searchFormData.time != 'undefined') {
+                // @todo check that the date and time is in the future & adjust if not
                     this.time = this.searchFormData.time
                 }
-                if(typeof this.searchFormData.people!='undefined') {
+                if(typeof this.searchFormData.people != 'undefined') {
                     this.people = this.searchFormData.people
                 }
-                if(typeof this.searchFormData.return_date!='undefined') {
+                if(typeof this.searchFormData.return_date != 'undefined') {
+                // @todo check that the date is in the future and after the outbound date & adjust if not
                     this.return_date = this.searchFormData.return_date
                 }
-                if(typeof this.searchFormData.return_time!='undefined') {
+                if(typeof this.searchFormData.return_time != 'undefined') {
+                // @todo check that the date and time is in the future and after the outbound date time & adjust if not
                     this.return_time = this.searchFormData.return_time
                 }
             },
 
-            locationSearch(string, type='pickup') {
-                if(string.length < 3) {
+            locationSearch(term, type='pickup') {
+                if(term === null || typeof(term) !== 'string' || term.length < 3) {
                     return;
                 }
                 let airports = [];
                 let stations = [];
                 let locations = [];
-                const places_api_lookup = `${this.appSettings.biq_api_host}${config.PLACES_URL}?term=${string}`;
-                axios.get(places_api_lookup)
+                const apiPlacesURL = `${this.appSettings.biq_api_host}${this.appConfig.PLACES_URI}`;
+                if(this.debugging) {
+                    console.info(`BIQ Places lookup to API '${apiPlacesURL}'`);
+                    console.log(term);
+                }
+                axios.get(`${apiPlacesURL}${term}`)
                 .then((res) => {
                     if(typeof(res.data.results.STATION) != 'undefined') {
                         stations = res.data.results.STATION.map(value => { 
                             return {
-                                string: value,
+                                string : value,
                                 type : 'station'
                             }
                         });
@@ -180,7 +208,7 @@
                     if(typeof(res.data.results.AIRPORT) != 'undefined') {
                         airports = res.data.results.AIRPORT.map(value => { 
                             return {
-                                string: value,
+                                string : value,
                                 type : 'airport'
                             };
                         });
@@ -189,7 +217,7 @@
                     if(typeof(res.data.results.LOCATION) != 'undefined') {
                         locations = res.data.results.LOCATION.map(value => { 
                             return {
-                                string: value,
+                                string : value,
                                 type : 'location'
                             };
                         });
@@ -207,51 +235,72 @@
                             this.destinationlocations = results;
                     }
                 })
+                .catch((error) => {
+                    let message = 'Unknown BIQ Places API Error';
+                    if(error.hasOwnProperty('message') && error.message) {
+                        message = error.message;
+                    }
+                    console.error(message);
+                    console.info({...error});
+                });
             },
 
-            onSearchQuotesFormSubmit : function() {
+            onSearchQuotesFormSubmit : function(evt) {
+                evt.preventDefault();
                 if(this.validSearchForm()) {
                     this.searchApiQuotes();
-                };
+                } else {
+                    if(this.debugging) {
+                        console.group("BIQSearchForm Validation Error");
+                        console.info({...this.errors});
+                        console.groupEnd();
+                    }
+                }
             },
 
             validSearchForm() {
-                var errors = true;
-                if(this.pickup == '') {
+                // reset the common validation error flags
+                this.errors = {
+                    pickup : false,
+                    destination : false,
+                    date : null,
+                    time : null,
+                    people : false
+                }
+                // just keep a track of any errors
+                let errors = 0;
+                if(this.pickup == null || this.pickup == '') {
                     this.errors.pickup = 'Pickup location must be set';
-                    errors = false;
-                } else {
-                    this.errors.pickup = false;
+                    errors++;
                 }
 
-                if(this.destination == '') {
+                if(this.destination == null || this.destination == '') {
                     this.errors.destination = 'Destination location must be set';
-                    errors = false;
-                } else {
-                    this.errors.destination = false;
+                    errors++;
                 }
-                if(this.date == '') {
-                    this.errors.date = false;
-                    errors = false;
-                } else {
-                    this.errors.date = null;
-                }
-                if(this.time=='') {
-                    this.errors.time=false;
-                    errors = false;
-                } else {
-                    this.errors.time = null;
-                }
+                // @todo validate input value is an integer between 1 & 99
                 if(this.people == '') {
-                    this.errors.people == true;
-                    errors = false;
-                } else {
-                    this.errors.people = false;
+                    this.errors.people = "Number of passengers must be between 1 and 99";
+                    errors++;
                 }
-                return errors;
+                // @todo validate date is not in the past
+                if(this.date == null || this.date == '') {
+                    this.errors.date = "Journey date is invalid";
+                    errors++;
+                }
+                // @todo validate that the date time is not in the past
+                if(this.time == null || this.time == '') {
+                    this.errors.time = "Journey time is invalid";
+                    errors++;
+                }
+                // @todo validate the return date time are not before the 
+                //       outbound date time if there is a return journey included
+                // only valid if no errors encountered
+                return (errors == 0);
             },
 
             searchApiQuotes : function() {
+                const page = this;
                 const journey_details = {
                     journey_type : this.journey_type,
                     pickup : this.pickup,
@@ -262,63 +311,96 @@
                 };
                 let quotes = [];
                 let journey_id = null;
-                let url = `${this.appSettings.biq_api_host}${config.QUOTE_URL}?key=${this.appSettings.biq_pk}&pickup=${this.pickup}&destination=${this.destination}&date=${this.date} ${this.time}&people=${this.people}`;
+                let apiQuotesURI = `pickup=${this.pickup}&destination=${this.destination}&date=${this.date} ${this.time}&people=${this.people}`;
                 if(this.journey_type == 'Return') {
                 // add the optional return journey details
-                    url = `${url}&return=${this.return_date} ${this.return_time}`;
+                    apiQuotesURI = `${apiQuotesURI}&return=${this.return_date} ${this.return_time}`;
                     journey_details.returning = {
                         date : this.return_date, 
                         time : this.return_time, 
                     };
+                } else {
+                    // make sure the state doesn't have previous return date & time still included
+                    journey_details.returning = {
+                        date : null, 
+                        time : null, 
+                    };
                 }
-                if(this.via!='') {
+                if(this.via != '') {
                 // add the optional journey via location(s)
-                    url = `${url}&via=${this.via}`;
-                    journey_details.via = this.via;
+                    apiQuotesURI = `${apiQuotesURI}&via=${this.via}`;
+                    // vias is expected as a list but only 1 via is available
+                    journey_details.vias = [this.via];
+                } else {
+                    // make sure the state doesn't have previous via still included
+                    journey_details.vias = [];
                 }
                 // update the state with the journey details being quoted for
                 // also updates the state flag for loading quotes
                 this.searchingQuotes(journey_details);
+                const apiQuotesURL = `${this.appSettings.biq_api_host}${this.appConfig.QUOTE_URI}`;
+                if(this.debugging) {
+                    console.info(`Loading BIQ Quotes from API '${apiQuotesURL}'`);
+                }
                 // get the quotes for the specified journey details
-                axios.get(url)
-                .then(function (response) {
+                axios.get(`${apiQuotesURL}?key=${this.appSettings.biq_pk}&${apiQuotesURI}`)
+                .then((response) => {
+                    if(page.debugging) {
+                        console.log(response);
+                    }
+                    if(response.data.status != "OK") {
+                        page.apiQuotesError(response.error);
+                        return;
+                    }
                     if(Object.keys(response.data.quotes).length > 0) {
-                        if(this.quote_type == 'type_class') {
+                        if(page.appSettings.quote_type == 'type_class') {
                         // sort the quotes first
-                            quotes = this.reduceToTypeAndClass(response.data.quotes);
+                            quotes = page.reduceToTypeAndClass(response.data.quotes);
                         } else {
                         // raw unsorted API quotes results
                             quotes = response.data.quotes;
                         }
-                        journey_id = response.data.journey_id;
+                    } else {
+                        // @todo check the warnings from the API response for reason
                     }
+                    journey_id = response.data.journey_id;
                     // update the state with the journey ID and the quote results
                     // also updates the state flags for loading quotes, quotes loaded & zero quotes
-                    this.searchedQuotes({ 
+                    page.searchedQuotes({ 
                         journey_id : journey_id, 
                         journey_details : response.data.journey, 
                         quotes : response.data.quotes, 
                         display : quotes 
                     });
-                    this.$router.push({ 
-                        name : 'HomeSearched', 
-                        params : { 
-                            journey : journey_id 
-                        } 
-                    });
-                }.bind(this));
-                // @todo add an error catch for when the API throws a fit
+                    // not for this release, too much extra is needed to function
+                    // push the journey ID on to the URL so it can be directly linked to
+                    // page.$router.push({ 
+                    //     name : 'HomeSearched', 
+                    //     params : { 
+                    //         journey : journey_id 
+                    //     } 
+                    // });
+                })
+                .catch((error) => {
+                    let message = 'Unknown BIQ Quotes API Error';
+                    if(error.hasOwnProperty('message') && error.message) {
+                        message = error.message;
+                    }
+                    console.error(message);
+                    console.info({...error});
+                    page.apiQuotesError(message);
+                });
             },
 
             reduceToTypeAndClass: function(quotes) {
-                //sorting taking from app, but needs further reconstructing for web UI
+                // sorting taking from app, but needs further reconstructing for web UI
                 const sorted_quotes = this.formatQuotes(quotes);
                 if(this.debugging) {
                     console.log(sorted_quotes);
                 }
                 const sorted = sorted_quotes.sorted;
                 const display = {};
-                if(sorted.hasOwnProperty('recommended') && sorted.length) {
+                if(sorted.hasOwnProperty('recommended') && sorted.recommended.length) {
                     display['cheapest'] = sorted.recommended[0];
                 }
                 if(sorted.hasOwnProperty('executive') && sorted.executive.length) {
@@ -427,7 +509,6 @@
                         return quotes;
                 }
             }
-
         }
     }
 </script>

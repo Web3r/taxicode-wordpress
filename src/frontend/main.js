@@ -1,7 +1,7 @@
 import Vue from 'vue'
 Vue.config.productionTip = false;
 // allow the use of dev tools before the vuex store is created
-Vue.config.devtools = true;
+//Vue.config.devtools = true;
 
 import Vuex from 'vuex'
 
@@ -32,9 +32,8 @@ import router from './router'
 import store from './store'
 Vue.use(Vuex);
 
-const config = require('./config.js');
 // environment aware config
-window.config = config.STAGING;
+const config = require('./config.js');
 
 /* eslint-disable no-new */
 new Vue({
@@ -43,7 +42,7 @@ new Vue({
         props: {
             biq_app_url,
             biq_app_debug_enabled,
-            biq_config: config.STAGING
+            biq_config: config.LIVE
         }
     }),
     el: '#biq-vue-app',

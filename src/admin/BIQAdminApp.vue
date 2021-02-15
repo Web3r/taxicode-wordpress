@@ -25,7 +25,6 @@
                 type : Boolean,
                 default : false
             }
-
         },
 
         data() {
@@ -62,18 +61,17 @@
             appSettings : function() {
                 return { ...this.settings };
             }
-
         },
 
         methods : {
             getAppSettings : function() {
                 const app = this;
                 const biq_app_settings_url = `${this.biq_app_url}settings-get/`;
+                if(this.biq_app_debug_enabled) {
+                    console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
+                }
                 axios.get(biq_app_settings_url)
                 .then(response => {
-                    if(app.biq_app_debug_enabled) {
-                        console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
-                    }
                     app.appSettingsUpdated(response.data);
                     app.initialised = true;
                 })
@@ -120,9 +118,7 @@
                     console.groupEnd();
                 }
             }
-
         }
-
     };
 </script>
 

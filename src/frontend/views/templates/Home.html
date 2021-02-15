@@ -1,27 +1,42 @@
 <div>
-    <form id="searchform">
+    <form 
+        id="searchform"
+    >
         <div class="row">
-            <div class="col-6" id="tcplugin-journey-type">
+            <div 
+                id="tcplugin-journey-type" 
+                class="col-6"
+            >
                 <div class="form-group">
                     <label>Journey type</label>
-                    <b-form-select v-model="journey_type" :options="journey_options"></b-form-select>
+                    <b-form-select 
+                        v-model="journey_type" 
+                        :options="journey_options"
+                    ></b-form-select>
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
-                <div class="form-group" id="tcplugin-pickup">
+                <div 
+                    id="tcplugin-pickup" 
+                    class="form-group"
+                >
                     <label>Pickup</label>
                     <vue-bootstrap-typeahead
-                            v-model="pickup"
-                            :inputClass="errors.pickup? 'is-invalid' : ''"
-                            :data="pickuplocations"
-                            :serializer="item => item.string"
-                            @hit="selectedLocation = $event"
-                            placeholder="Pickup postcode or place name"
-                            ref="pickupfield"
+                        v-model="pickup"
+                        :inputClass="errors.pickup? 'is-invalid' : ''"
+                        :data="pickuplocations"
+                        :serializer="item => item.string"
+                        @hit="selectedLocation = $event"
+                        placeholder="Pickup postcode or place name"
+                        ref="pickupfield"
                     >
-                        <template slot="suggestion" slot-scope="{ data, htmlText }">
+                        <template 
+                            slot="suggestion" 
+                            slot-scope="{ data, htmlText }"
+                        >
                             <div class="d-flex align-items-center">
                                 <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
                                 <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
@@ -33,18 +48,24 @@
                 </div>
             </div>
             <div class="col">
-                <div class="form-group" id="tcplugin-destination">
+                <div 
+                    id="tcplugin-destination" 
+                    class="form-group"
+                >
                     <label>Destination</label>
                     <vue-bootstrap-typeahead
-                            ref="destinationfield"
-                            v-model="destination"
-                            :inputClass="errors.destination? 'is-invalid' : ''"
-                            :data="destinationlocations"
-                            :serializer="item => item.string"
-                            @hit="selectedLocation = $event"
-                            placeholder="Destination postcode or place name"
+                        ref="destinationfield"
+                        v-model="destination"
+                        :inputClass="errors.destination? 'is-invalid' : ''"
+                        :data="destinationlocations"
+                        :serializer="item => item.string"
+                        @hit="selectedLocation = $event"
+                        placeholder="Destination postcode or place name"
                     >
-                        <template slot="suggestion" slot-scope="{ data, htmlText }">
+                        <template 
+                            slot="suggestion" 
+                            slot-scope="{ data, htmlText }"
+                        >
                             <div class="d-flex align-items-center">
                                 <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
                                 <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
@@ -57,19 +78,26 @@
             </div>
 
         </div>
+
         <div class="row">
-            <div class="col" id="tcplugin-via">
+            <div 
+                id="tcplugin-via" 
+                class="col"
+            >
                 <label>(Optional) Via</label>
                 <vue-bootstrap-typeahead
-                        ref="viafield"
-                        v-model="via"
-                        :inputClass="errors.via? 'is-invalid' : ''"
-                        :data="vialocations"
-                        :serializer="item => item.string"
-                        @hit="selectedLocation = $event"
-                        placeholder="Via postcode or place name"
+                    ref="viafield"
+                    v-model="via"
+                    :inputClass="errors.via? 'is-invalid' : ''"
+                    :data="vialocations"
+                    :serializer="item => item.string"
+                    @hit="selectedLocation = $event"
+                    placeholder="Via postcode or place name"
                 >
-                    <template slot="suggestion" slot-scope="{ data, htmlText }">
+                    <template 
+                        slot="suggestion" 
+                        slot-scope="{ data, htmlText }"
+                    >
                         <div class="d-flex align-items-center">
                             <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
                             <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
@@ -79,54 +107,119 @@
                     </template>
                 </vue-bootstrap-typeahead>
             </div>
-            <div class="col" id="tcplugin-people">
+            <div 
+                id="tcplugin-people" 
+                class="col"
+            >
                 <div class="form-group">
                     <label>Number of People</label>
-                    <input type="number" class="form-control" :class=" errors.people ? 'is-invalid' : ''" placeholder="People" v-model="people">
+                    <input 
+                        v-model="people" 
+                        :class=" errors.people ? 'is-invalid' : ''" 
+                        type="number" 
+                        min="1"
+                        max="99"
+                        class="form-control" 
+                        placeholder="People"
+                    >
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
-                <div class="form-group" id="tcplugin-date">
+                <div 
+                    id="tcplugin-date" 
+                    class="form-group"
+                >
                     <label>Date</label>
-                    <b-form-datepicker locale="en" class="form-control" :state="errors.date"  v-model="date"></b-form-datepicker>
+                    <b-form-datepicker 
+                        v-model="date" 
+                        :state="errors.date" 
+                        locale="en" 
+                        class="form-control"
+                    ></b-form-datepicker>
                 </div>
             </div>
             <div class="col">
-                <div class="form-group" id="tcplugin-time">
+                <div 
+                    id="tcplugin-time" 
+                    class="form-group"
+                >
                     <label>Time</label>
-                    <b-form-timepicker locale="en" v-model="time" :state="errors.time"></b-form-timepicker>
+                    <b-form-timepicker 
+                        v-model="time" 
+                        :state="errors.time" 
+                        locale="en"
+                    ></b-form-timepicker>
                 </div>
             </div>
         </div>
-        <div class="row" v-if="journey_type=='Return'">
-            <div class="col" id="tcplugin-return-date">
+
+        <div v-if="journey_type=='Return'"
+            class="row"
+        >
+            <div 
+                id="tcplugin-return-date" 
+                class="col"
+            >
                 <div class="form-group">
                     <label>Return Date</label>
-                    <b-form-datepicker locale="en" class="form-control" :state="errors.return_date"  v-model="return_date"></b-form-datepicker>
+                    <b-form-datepicker 
+                        v-model="return_date" 
+                        :state="errors.return_date" 
+                        locale="en" 
+                        class="form-control"
+                    ></b-form-datepicker>
                 </div>
             </div>
             <div class="col">
-                <div class="form-group" id="tcplugin-return-time">
+                <div 
+                    id="tcplugin-return-time" 
+                    class="form-group"
+                >
                     <label>Return Time</label>
-                    <b-form-timepicker locale="en" v-model="return_time" :state="errors.return_time"></b-form-timepicker>
+                    <b-form-timepicker 
+                        v-model="return_time" 
+                        :state="errors.return_time" 
+                        locale="en"
+                    ></b-form-timepicker>
                 </div>
             </div>
 
         </div>
-        <div class="row">
-            <div class="col">
 
-            </div>
-            <div class="col" id="tcplugin-search-submit">
+        <div class="row">
+            <div class="col"></div>
+            <div 
+                id="tcplugin-search-submit" 
+                class="col"
+            >
                 <div class="form-group">
+                    <button 
+                        @click="onSearchQuotesFormSubmit"
+                        class="form-control btn btn-primary"
+                    >
+                        <div v-if="loadingQuotes" class="spinner-border spinner-border-sm"></div>
+                        Search
+                    </button>
                     <label></label>
-                    <input type="button" class="form-control" value="Search" @click="onSearchQuotesFormSubmit">
+                    <input 
+                        @click="onSearchQuotesFormSubmit" 
+                        type="button" 
+                        class="form-control" 
+                        value="Search"
+                    >
                 </div>
             </div>
         </div>
     </form>
     
-    <SearchResults v-if="quotesLoaded" :quote_type='quote_type' />
+    <BIQ-SearchResults v-if="loadingQuotes || quotesLoaded" 
+        :quote_type="appSettings.quote_type"
+        :debugging="debugging"
+    >
+        <template #loading-quotes>Generating Quotes...</template>
+        <template #zero-quotes>{{loading_quotes_error}}</template>
+    </BIQ-SearchResults>
 </div>

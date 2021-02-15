@@ -1,5 +1,8 @@
 <template>
-    <div id="biq-journey-details-booked" class="col">
+    <div 
+        id="biq-journey-details-booked" 
+        class="col"
+    >
         <div class="card">
             <div class="card-header">
                 Booking Details
@@ -26,31 +29,35 @@
 </template>
 
 <script>
-
     export default {
-        name: "JourneyDetailsBooked",
+        name : "JourneyDetailsBooked",
 
-        props: {
+        props : {
             bookingRef : {
                 type : String,
                 default : ''
             },
+
             passengerName : {
                 type : String,
                 default : ''
             },
+
             passengers : {
                 type : Number,
                 default : 1
             },
+
             journeyPickup : {
                 type : String,
                 default : ''
             },
+
             journeyDestination : {
                 type : String,
                 default : ''
             },
+
             journeyVias : {
                 type : Array,
                 required : false,
@@ -58,12 +65,14 @@
                     return [];
                 }
             },
+
             journeyDate : {
                 type : Date,
                 default : function() {
                     return new Date();
                 }
             },
+
             journeyReturnDate : {
                 type : Date,
                 required : false,
@@ -90,7 +99,7 @@
                 return (this.journeyReturnDate !== null) ? this.journeyReturnDate.toLocaleTimeString() : '';
             }
         }
-    }
+    };
 </script>
 
 <style scoped>
