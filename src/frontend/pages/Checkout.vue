@@ -7,12 +7,30 @@
 
     export default {
         name: "Checkout",
+
         props: {
             cardFormHandler : {
                 type : Object,
                 default : null
+            },
+            tc_public_key : {
+                type : String,
+                default : ''
+            },
+            paypal_key : {
+                type : String,
+                default : ''
+            },
+            gateway_api_key : {
+                type : String,
+                default : ''
+            },
+            test_mode : {
+                type : Boolean,
+                default : false
             }
         },
+
         data() {
             return {
                 name: '',
@@ -26,7 +44,6 @@
                     email: false,
                     telephone: false,
                 },
-                test_mode: 0,
                 loading: false,
                 payment_method: 'Pay with card',
                 payment_options: ['Pay with card','Pay with Paypal'],
@@ -36,21 +53,12 @@
 
         created() {
             const checkout = this;
-            //paypayl token and test mode are set in page JS
-            // before vue load, and imported here
-            this.paypal_token = paypal_token;
-            this.test_mode = test_mode;
-            axios.get(config.JOURNEY_URL+this.journeyID+'&include_quote=true')
-            .then(function(response) {
-                console.log(response.data);
-                checkout.journey_data = response.data.journey;
-            }.bind(this));
             /** create a new stripe card form payment option */
             this.cardFormHandler = new StripeCardFormHandler(
             /** The Stripe public key */
                     // Stripe public key is set in the page JS 
                     // before vue load, and imported here
-                    gateway_api_key,
+                    this.gateway_api_key,
             /** The transaction success handler */
                     function(handler, paymentIntent) {
                         checkout.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
@@ -77,26 +85,27 @@
             /** The URI to get the client secret from */
                     config.CLIENT_SECRET_URL
                 );
-            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, config.PGH_CONF.hidePostalCode);
             console.log("created");
         },
 
         mounted: function () {
             this.cardFormHandler.setAmount(this.price, "Taxi journey");
+            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, config.PGH_CONF.hidePostalCode);
             this.cardFormHandler.mountElement();
             console.log("mounted");
         },
 
         computed: mapGetters([
-            // Journey quoting state
-            'loadingQuotes', 
-            'quotesLoaded', 
-            'zeroQuotes', 
+        // Journey quoting state
             'journeyID', 
-            'journeyDetails', 
-            'journeyQuotes',
-            'displayQuotes',
-            // Book Now Checkout state
+            'journeyDetails',
+            'journeyDate', 
+            'journeyTime', 
+            'journeyHasReturn', 
+            'journeyReturnDate', 
+            'journeyReturnTime', 
+            'journeyHasVias', 
+        // Book Now Checkout state
             'basket',
             'quoteID',
             'vehicleIndex',
@@ -107,10 +116,10 @@
 
         methods: {
             ...mapActions([
-                // Journey quoting state
+            // Journey quoting state
                 'quoting', 
                 'quoted',
-                // Book Now Checkout state
+            // Book Now Checkout state
                 'bookNow'
             ]),
 
@@ -162,9 +171,9 @@
 
             onMethodChanged : function() {
                 if(this.isCardPayment()) {
-                    const self = this;
+                    const checkout = this;
                     this.$nextTick(function() {
-                        self.cardFormHandler.mountElement();
+                        checkout.cardFormHandler.mountElement();
                     });
                 } else {
                     this.cardFormHandler.unmountElement();
@@ -183,7 +192,7 @@
                 console.error(error);
             },
 
-            onLoadFail: function(error){
+            onPaypalLoadFail: function(error){
                 console.error(error);
             },
 
@@ -200,12 +209,10 @@
                 // this is a bit annoying - our API can't handle standard axios requests on POST
                 // for some reason, so I've had to abandon my form class and hand crank this
                 // request.
-                const self = this;
                 const formData = new FormData();
-                formData.append('key',tc_public_key);
+                formData.append('key', this.tc_public_key);
                 formData.append('quote', this.quoteID);
                 formData.append('vehicle', this.vehicleIndex);
-                formData.append('test', this.test_mode);
                 formData.append('new_pay', true);
                 formData.append('email', this.email);
                 formData.append('name', this.name);
@@ -213,10 +220,14 @@
                 formData.append('payment_token', token);
                 formData.append('method', method);
                 if(typeof(formdataAppend) == 'function') {
-                    // allow the calling method to add payment method specific fields to the API call
+                // allow the calling method to add payment method specific fields to the API call
                     formdataAppend(formData);
                 }
-                axios.post(config.PAYMENT_URL,formData,{
+                if(this.test_mode) {
+                // make the booking in test mode
+                    formData.append('test', '1');
+                }
+                axios.post(config.PAYMENT_URL, formData, {
                     headers: {
                         'Content-Type': 'application/application/x-www-form-urlencoded',
                     }

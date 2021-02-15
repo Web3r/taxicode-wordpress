@@ -1,5 +1,6 @@
 <div>
     <form id="purchaseform">
+
         <div class="row">
             <div class="col">
                 <h4 id="tc_plugin-passenger-heading">Passenger Details</h4>
@@ -37,6 +38,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
                 <h4 id="tc_plugin-payment-heading">Payment Details</h4>
@@ -47,11 +49,17 @@
                 Select Payment Method:
             </div>
             <div class="col">
-                <b-form-select v-model="payment_method" :options="payment_options" @change="onMethodChanged"></b-form-select>
+                <b-form-select 
+                    v-model="payment_method" 
+                    :options="payment_options" 
+                    @change="onMethodChanged"
+                ></b-form-select>
             </div>
         </div>
         
-        <div v-if="payment_method=='Pay with card'" class="row">
+        <div v-if="payment_method=='Pay with Card'" 
+            class="row"
+        >
             <div id="tcplugin-cardholder-name" class="col">
                 <div class="form-group">
                     <label for="card-holder-name" class="control-label">Cardholder Name</label>
@@ -70,22 +78,30 @@
                 </div>
             </div>
                 <div class="form-group">
-                    <input @click="onStripeSubmit" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1" type="button" class="btn btn-primary">
+                    <input 
+                        @click="onStripeSubmit" 
+                        :value="loading==0 ? 'Book Now' : 'Processing'" 
+                        :disabled="loading == 1" 
+                        type="button" 
+                        class="btn btn-primary"
+                    >
                 </div>
             </div>
 
         </div>
         
-        <div v-else class="row">
+        <div v-else 
+            class="row"
+        >
             <div class="col"></div>
             <div id="tcplugin-paypal-plugin" class="col">
                 <div class="form-group">
                     <label for="paypal" class="control-label">Or Pay With Paypal</label>
                     <v-braintree
-                        :authorization="paypal_key"
+                        :authorization="paypal_client_token"
                         :paypal="{
                                 flow:'checkout',
-                                amount: basket.price,
+                                amount: price,
                                 currency: 'GBP'
                             }"
                         @success="onPaypalSubmit"
@@ -94,7 +110,13 @@
                     >
                         <template v-slot:button="slotProps">
                             <div class="form-group">
-                                <input @click="slotProps.submit" :value="loading==0 ? 'Book Now' : 'Processing'" :disabled="loading == 1" type="button" class="btn btn-primary">
+                                <input 
+                                    @click="slotProps.submit" 
+                                    :value="loading==0 ? 'Book Now' : 'Processing'" 
+                                    :disabled="loading == 1" 
+                                    type="button" 
+                                    class="btn btn-primary"
+                                >
                             </div>
                         </template>
                     </v-braintree>
@@ -102,40 +124,16 @@
             </div>
         </div>
         
-        <div v-if="posterror" class="row">
-            <div class="col" id="tcplugin-payment-error">
+        <div v-if="posterror" 
+            class="row"
+        >
+            <div id="tcplugin-payment-error" class="col">
                 {{posterror}}
             </div>
         </div>
         
         <div class="row">
-            <div class="col" id="tcplugin-checkout-booking-details">
-                <div class="card">
-                    <div class="card-header">
-                        Booking Details
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Date:</strong> {{journeyDate}} at {{journeyTime}}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Travelling From:</strong> {{journeyDetails.pickup.string}}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Going To:</strong> {{journeyDetails.destination.string}}
-                        </li>
-                        <li v-if="journeyHasVias" class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Via:</strong> {{journeyDetails.vias[0].string}}
-                        </li>
-                        <li v-if="journeyHasReturn" class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Returning:</strong> {{journeyReturnDate}} at {{journeyReturnTime}}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Price:</strong> &pound;{{basket.price}}
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <JourneyDetails/>
         </div>
     </form>
 </div>

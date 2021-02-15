@@ -1,0 +1,146 @@
+<div 
+    id="biq-search-results"
+>
+    
+    <div v-if="loadingQuotes">
+        <slot name="loading-quotes">Loading...</slot>
+    </div>
+    
+    <div v-if="zeroQuotes">
+        <slot name="zero-quotes">Sorry, we could not find any quotes for the selected journey.  Please try a different journey.</slot>
+    </div>
+
+    <div v-if="quote_type!='type_class'" 
+        class="row"
+    >
+        <div v-for="(quote, id) in displayQuotes" 
+            class="col-sm-auto"
+        >
+            <div v-if="quote_type=='best'">
+                <div v-if="quote.highlight" 
+                    class="card" 
+                    style="width: 18rem;"
+                >
+                    <img 
+                        :ref="id" 
+                        :src="quote.vehicles[0].image" 
+                        class="card-img-top" 
+                        alt="Vehicle type image"
+                    >
+                    <div class="card-header">
+                        {{quote.highlight}}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{quote.company_name}}</h5>
+                        <p 
+                            :ref="id" 
+                            id="selected_price" 
+                            class="card-text text-center display-4"
+                        >&pound;{{quote.vehicles[0].price}}.00</p>
+                        <select 
+                            @change="flipImage(id, $event)" 
+                            class="custom-select"
+                        >
+                            <option
+                                v-for="(vehicle, id) in quote.vehicles"
+                                v-model="quote.selected_vehicle"
+                                :value="id"
+                                :data-image="vehicle.image"
+                                :data-price="vehicle.price"
+                            >{{vehicle.name}}</option>
+                        </select>
+                        <router-link 
+                            :ref="id" 
+                            :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
+                            @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
+                            :data-quote="quote.quote_id" 
+                            :data-vehicle="quote.vehicle.index" 
+                            class="btn btn-primary btn-block" 
+                        >Book Now</router-link>
+                    </div>
+                </div>
+            </div>
+            
+            <div v-else class="card" 
+                style="width: 18rem;"
+            >
+                <img 
+                    :ref="id" 
+                    :src="quote.vehicles[0].image" 
+                    class="card-img-top" 
+                    alt="Vehicle type image"
+                >
+                <div class="card-body">
+                    <h5 class="card-title">{{quote.company_name}}</h5>
+                    <p 
+                        :ref="id" 
+                        id="selected_price" 
+                        class="card-text text-center display-4"
+                    >&pound;{{quote.vehicles[0].price}}.00</p>
+                    <select 
+                        @change="flipImage(id, $event)" 
+                        class="custom-select"
+                    >
+                        <option
+                            v-for="(vehicle, id) in quote.vehicles"
+                            v-model="quote.selected_vehicle"
+                            :value="id"
+                            :data-image="vehicle.image"
+                            :data-price="vehicle.price"
+                        >{{vehicle.name}}</option>
+                    </select>
+                    <router-link 
+                        :ref="id" 
+                        :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
+                        @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
+                        :data-quote="quote.quote_id" 
+                        :data-vehicle="quote.vehicle.index" 
+                        class="btn btn-primary btn-block" 
+                    >Book Now</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div v-else 
+        class="row"
+    >
+        <div v-for="(quote, type) in displayQuotes" 
+            class="col-sm-auto"
+        >
+            <div class="card" style="width: 18rem;">
+                <img 
+                    :ref="quote.quote_id" 
+                    :src="quote.vehicle.image" 
+                    class="card-img-top" 
+                    alt="Vehicle type image"
+                >
+                <div class="card-header">
+                    {{type_map[type]}}
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{quote.vehicle.name}}</h6>
+                    <div class="card-text d-flex justify-content-center align-items-center">
+                        <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="users" /> {{quote.vehicle.passengers}}</div>
+                        <div>&nbsp;</div>
+                        <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="suitcase" /> {{quote.vehicle.luggage_small}}</div>
+                    </div>
+                    <p 
+                        :ref="quote.quote_id" 
+                        id="selected_price" 
+                        class="card-text text-center display-4"
+                    >&pound;{{quote.price}}.00</p>
+                    <router-link 
+                        :ref="quote.quote_id" 
+                        :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
+                        @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
+                        :data-quote="quote.quote_id" 
+                        :data-vehicle="quote.vehicle.index" 
+                        class="btn btn-primary btn-block" 
+                    >Book Now</router-link>
+                </div>
+            </div>
+        </div>
+        <!--the type_class structure and markup are unavoidably quite different -->
+    </div>
+</div>
