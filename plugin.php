@@ -59,7 +59,7 @@ final class Taxicode {
      *
      * @var string
      */
-    public $version = '0.1.0';
+    public $version = '0.1.1';
 
     /**
      * Holds various class instances

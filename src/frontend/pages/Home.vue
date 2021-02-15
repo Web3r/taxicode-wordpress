@@ -7,44 +7,55 @@
     import _ from 'underscore'
 
     export default {
-        name: 'search',
+        name: 'Search',
+
         components : {
             'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
         },
+
         props: {
-            postData: []
+            postData : {
+                type : Object,
+                default : {}
+            },
+            
+            quote_type : {
+                type : String,
+                default : ''
+            }
         },
+
         data() {
             return {
-                journey_options: ['One Way','Return'],
+                journey_options : [
+                    'One Way',
+                    'Return'
+                ],
                 type_map : {
-                    cheapest: 'Cheapest Price',
-                    exec: 'Best Executive',
-                    luxury: 'Best Luxury',
+                    cheapest : 'Cheapest Price',
+                    exec : 'Best Executive',
+                    luxury : 'Best Luxury',
                     chauffeur :'Best Chauffeur'
                 },
-                journey_type: 'One Way',
-                pickup: '',
-                via: '',
-                vialocations: [],
-                pickuplocations: [],
-                destinationlocations: [],
-                destination: '',
-                date: '',
-                time: '',
-                return_date: '',
-                return_time: '',
-                people: '1',
-                quotes: [],
-                journey_id: '',
-                errors: {
-                    pickup: false,
-                    destination: false,
-                    date: null,
-                    time: null,
-                    people: false
-                },
-                quote_settings: ''
+                journey_type : 'One Way',
+                pickup : '',
+                via : '',
+                vialocations : [],
+                pickuplocations : [],
+                destinationlocations : [],
+                destination : '',
+                date : '',
+                time : '',
+                return_date : '',
+                return_time : '',
+                people : '1',
+                errors : {
+                    pickup : false,
+                    destination : false,
+                    date : null,
+                    time : null,
+                    people : false
+                }
             }
         },
 
@@ -59,10 +70,16 @@
 
         created() {
             //set in page js before load, and imported here
-            this.postData = postData;
             this.mapPostToForm();
-            this.quote_settings = quote_settings;
-
+            // define a function to add leading zeros to the date time values for string value use
+            const az = i => (i<10) ? i="0"+i : i;
+            const d = new Date();
+            // just put the date & time forward a little
+            d.setDate(d.getDate() + 1);
+            d.setHours(d.getHours() + 2);
+            // getMonth is zero based, getDate is not
+            this.date = d.getFullYear() + "-" + az(d.getMonth() +1) + "-" + az(d.getDate());
+            this.time = az(d.getHours()) + ":" + az(d.getMinutes()) + ":" + az(d.getSeconds());
         },
 
         mounted() {
@@ -75,43 +92,72 @@
         },
 
         computed: mapGetters([
-            // Journey quoting state
+        // BIQ Quote Search state
+            'searchDetails',
+            'displayQuotes',
+        // BIQ Quoting state
             'loadingQuotes', 
             'quotesLoaded', 
-            'zeroQuotes', 
+            'zeroQuotes',
             'journeyID', 
-            'journeyDetails', 
-            'journeyQuotes',
-            'displayQuotes',
-            // Book Now Checkout state
-            'basket',
-            'quoteID',
-            'vehicleIndex',
-            'price',
-            'quoteData',
-            'quoteVehicleData',
+            'journeyQuotes'
         ]),
 
         methods: {
             ...mapActions([
-                // Journey quoting state
-                'quoting', 
-                'quoted',
-                // Book Now Checkout state
+            // BIQ Quote Search state
+                'searchingQuotes', 
+                'searchedQuotes',
+            // Book Now Checkout state
                 'bookNow'
             ]),
 
-            onBookNowClicked: function(params, event) {
-                console.group("Book Now Clicked");
-                console.info(params);
-                console.info(this.journeyQuotes[params.quote]);
-                console.info(event);
-                console.groupEnd();
-                this.bookNow({
-                    quote : this.journeyQuotes[params.quote], 
-                    vehicle : params.vehicle,
-                    
-                });
+            locationSearch(string,type='pickup') {
+                let airports = [];
+                let stations = [];
+                let locations = [];
+                axios.get(`${config.PLACES_URL}?term=${string}`)
+                .then((res) => {
+
+                    if(typeof(res.data.results.STATION)!='undefined') {
+                        stations = res.data.results.STATION.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'station'
+                            };
+                            return output;
+                        });
+                    }
+
+                    if(typeof(res.data.results.AIRPORT)!='undefined') {
+                        airports = res.data.results.AIRPORT.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'airport'
+                            };
+                            return output;
+                        });
+                    }
+
+                    if(typeof(res.data.results.LOCATION)!='undefined') {
+                        locations = res.data.results.LOCATION.map(function(value){
+                            const output = {
+                                string: value,
+                                type : 'location'
+                            };
+                            return output;
+                        });
+                    }
+
+                    const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
+                    if(type=='pickup') {
+                        this.pickuplocations = results;
+                    } else if(type=='via') {
+                        this.vialocations = results;
+                    } else {
+                        this.destinationlocations = results;
+                    }
+                })
             },
 
             mapPostToForm: function() {
@@ -144,10 +190,6 @@
                 }
             },
 
-            setPrice : function(price) {
-                this.$store.commit('setPrice',price)
-            },
-
             queryApi: function() {
                 const journey_details = {
                     journey_type : this.journey_type,
@@ -159,10 +201,10 @@
                 };
                 let quotes = [];
                 let journey_id = null;
-                let url = config.QUOTE_URL+'?key='+tc_public_key+'&pickup=' + this.pickup + '&destination=' + this.destination + '&date=' + this.date + ' ' + this.time + '&people=' + this.people
+                let url = `${config.QUOTE_URL}?key=${tc_public_key}&pickup=${this.pickup}&destination=${this.destination}&date=${this.date} ${this.time}&people=${this.people}`;
                 if(this.journey_type=='Return') {
                 // add the optional return journey details
-                    url = url +'&return='+this.return_date+' '+this.return_time;
+                    url = `${url}&return=${this.return_date} ${this.return_time}`;
                     journey_details.returning = {
                         date : this.return_date, 
                         time : this.return_time, 
@@ -170,17 +212,17 @@
                 }
                 if(this.via!='') {
                 // add the optional journey via location(s)
-                    url = url + '&via='+this.via;
+                    url = `${url}&via=${this.via}`;
                     journey_details.via = this.via;
                 }
                 // update the state with the journey details being quoted for
                 // also updates the state flag for loading quotes
-                this.quoting(journey_details);
+                this.searchingQuotes(journey_details);
                 // get the quotes for the specified journey details
                 axios.get(url)
                 .then(function (response) {
                     if(Object.keys(response.data.quotes).length > 0) {
-                        if(this.quote_settings=='type_class') {
+                        if(this.quote_type=='type_class') {
                         // sort the quotes first
                             quotes = this.reduceToTypeAndClass(response.data.quotes);
                         } else {
@@ -189,13 +231,73 @@
                         }
                         journey_id = response.data.journey_id;
                     }
-                    this.journey_id = journey_id;
-                    this.quotes = quotes;
                     // update the state with the journey ID and the quote results
                     // also updates the state flags for loading quotes, quotes loaded & zero quotes
-                    this.quoted({ id : journey_id, quotes : response.data.quotes, display : quotes });
+                    this.searchedQuotes({ journey_id : journey_id, journey_details : response.data.journey, quotes : response.data.quotes, display : quotes });
                 }.bind(this));
                 // @todo add an error catch for when the API throws a fit
+            },
+
+            submitForm: function() {
+                if(this.validQuote()) {
+                    this.queryApi();
+                };
+            },
+
+            validQuote() {
+                var errors = true;
+                if(this.pickup=='') {
+                    this.errors.pickup='Pickup location must be set';
+                    errors = false;
+                } else {
+                    this.errors.pickup = false;
+                }
+
+                if(this.destination=='') {
+                    this.errors.destination='Pickup location must be set';
+                    errors = false;
+                } else {
+                    this.errors.destination = false;
+                }
+                if(this.date=='') {
+                    this.errors.date = false;
+                    errors = false;
+                } else {
+                    this.errors.date = null;
+                }
+                if(this.time=='') {
+                    this.errors.time=false;
+                    errors = false;
+                } else {
+                    this.errors.time = null;
+                }
+                if(this.people=='') {
+                    this.errors.people==true;
+                    errors = false;
+                } else {
+                    this.errors.people = false;
+                }
+                return errors;
+            },
+
+            flipImage: function(id,event) {
+                let price = this.displayQuotes[id].vehicles[event.target.value].price;
+                this.$refs[id][2].$el.setAttribute('data-price', price)
+                this.$refs[id][0].src = this.displayQuotes[id].vehicles[event.target.value].image;
+                this.$refs[id][1].innerHTML = '&pound;'+price+'.00';
+            },
+
+            onBookNowClicked: function(params, event) {
+                console.group("Book Now Clicked");
+                console.info(params);
+                console.info(this.journeyQuotes[params.quote]);
+                console.info(event);
+                console.groupEnd();
+                this.bookNow({
+                    quote : this.journeyQuotes[params.quote], 
+                    vehicle : params.vehicle,
+                    
+                });
             },
 
             reduceToTypeAndClass: function(quotes) {
@@ -310,110 +412,12 @@
                     default:
                         return quotes;
                 }
-            },
-
-            submitForm: function() {
-                if(this.validQuote()) {
-                    this.queryApi();
-                };
-            },
-
-            validQuote() {
-                var errors = true;
-                if(this.pickup=='') {
-                    this.errors.pickup='Pickup location must be set';
-                    errors = false;
-                } else {
-                    this.errors.pickup = false;
-                }
-
-                if(this.destination=='') {
-                    this.errors.destination='Pickup location must be set';
-                    errors = false;
-                } else {
-                    this.errors.destination = false;
-                }
-                if(this.date=='') {
-                    this.errors.date = false;
-                    errors = false;
-                } else {
-                    this.errors.date = null;
-                }
-                if(this.time=='') {
-                    this.errors.time=false;
-                    errors = false;
-                } else {
-                    this.errors.time = null;
-                }
-                if(this.people=='') {
-                    this.errors.people==true;
-                    errors = false;
-                } else {
-                    this.errors.people = false;
-                }
-                return errors;
-            },
-
-            flipImage: function(id,event) {
-                let price = this.quotes[id].vehicles[event.target.value].price;
-                this.$refs[id][2].$el.setAttribute('data-price',price)
-                this.$refs[id][0].src = this.quotes[id].vehicles[event.target.value].image;
-                this.$refs[id][1].innerHTML = '&pound;'+price+'.00';
-                this.setPrice(price+'.00');
-            },
-
-            setPriceBeforeTransition: function(id,event) {
-                this.setPrice(event.target.dataset.price+'.00');
-            },
-
-            locationSearch(string,type='pickup') {
-                let airports = [];
-                let stations = [];
-                let locations = [];
-                axios.get(`${config.PLACES_URL}?term=${string}`)
-                .then((res) => {
-
-                    if(typeof(res.data.results.STATION)!='undefined') {
-                        stations = res.data.results.STATION.map(function(value){
-                            const output = {
-                                string: value,
-                                type : 'station'
-                            };
-                            return output;
-                        });
-                    }
-
-                    if(typeof(res.data.results.AIRPORT)!='undefined') {
-                        airports = res.data.results.AIRPORT.map(function(value){
-                            const output = {
-                                string: value,
-                                type : 'airport'
-                            };
-                            return output;
-                        });
-                    }
-
-                    if(typeof(res.data.results.LOCATION)!='undefined') {
-                        locations = res.data.results.LOCATION.map(function(value){
-                            const output = {
-                                string: value,
-                                type : 'location'
-                            };
-                            return output;
-                        });
-                    }
-
-                    const results = airports.concat(stations.concat(locations.concat(res.data.results.GOOGLE)));
-                    if(type=='pickup') {
-                        this.pickuplocations = results;
-                    } else if(type=='via') {
-                        this.vialocations = results;
-                    } else {
-                        this.destinationlocations = results;
-                    }
-                })
             }
 
         }
     }
 </script>
+
+<style scoped>
+
+</style>
