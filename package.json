@@ -1,13 +1,13 @@
 {
-  "name": "vue-wp-starter",
-  "version": "1.0.0",
-  "description": "A WordPress Vue.js starter plugin",
-  "author": "Tareq Hasan <tareq@wedevs.com>",
+  "name": "biq-vue-wp",
+  "version": "1.0.1",
+  "description": "Booking Instant Quotes Vue JS Wordpress Plugin",
+  "author": "Web3 Resource <developers@web3r.co.uk>",
   "license": "GPLv2",
   "private": true,
   "scripts": {
     "dev": "webpack --watch --progress --hide-modules",
-    "dev-build": "webpack -d --mode development",
+    "build-dev": "webpack -d --mode development",
     "build": "webpack -p --mode production"
   },
   "dependencies": {
@@ -20,7 +20,6 @@
     "bootstrap-vue": "^2.15.0",
     "browserslist": "^4.16.1",
     "caniuse-lite": "^1.0.30001178",
-    "js-cookie": "^2.2.1",
     "qs": "^6.9.4",
     "svgo": "^1.3.2",
     "underscore": "^1.10.2",
@@ -35,6 +34,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "latest",
     "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.6.0",
     "file-loader": "^4.3.0",
     "html-webpack-plugin": "^3.2.0",

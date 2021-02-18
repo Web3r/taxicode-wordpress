@@ -196,15 +196,16 @@
                 class="col"
             >
                 <div class="form-group">
-                    <button 
+                    <button v-if="appConfig.useButtons"
                         @click="onSearchQuotesFormSubmit"
                         class="form-control btn btn-primary"
                     >
-                        <div v-if="loadingQuotes" class="spinner-border spinner-border-sm"></div>
+                        <div v-if="loadingQuotes" 
+                            class="spinner-border spinner-border-sm"
+                        ></div>
                         Search
                     </button>
-                    <label></label>
-                    <input 
+                    <input v-else 
                         @click="onSearchQuotesFormSubmit" 
                         type="button" 
                         class="form-control" 
@@ -216,8 +217,9 @@
     </form>
     
     <BIQ-SearchResults v-if="loadingQuotes || quotesLoaded" 
-        :quote_type="appSettings.quote_type"
         :debugging="debugging"
+        :appConfig=appConfig 
+        :quote_type="appSettings.quote_type"
     >
         <template #loading-quotes>Generating Quotes...</template>
         <template #zero-quotes>{{loading_quotes_error}}</template>

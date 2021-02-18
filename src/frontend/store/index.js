@@ -2,9 +2,9 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from 'vuex-persistedstate';
 
-import BIQSearchStore from './modules/BIQSearch';
-import BIQQuotesStore from './modules/BIQQuotes';
-import BIQCheckoutStore from './modules/BIQCheckout';
+import BIQSearchStore from 'frontend/store/modules/BIQSearch';
+import BIQQuotesStore from 'frontend/store/modules/BIQQuotes';
+import BIQCheckoutStore from 'frontend/store/modules/BIQCheckout';
 
 Vue.use(Vuex);
 

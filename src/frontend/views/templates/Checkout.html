@@ -57,37 +57,49 @@
             </div>
         </div>
         
-        <div v-if="payment_method=='Pay with Card'" 
-            class="row"
-        >
-            <div id="tcplugin-cardholder-name" class="col">
-                <div class="form-group">
-                    <label for="card-holder-name" class="control-label">Cardholder Name</label>
-                    <input v-model="cardholder_name" :class="errors.cardholder_name ? 'is-invalid' : ''" id="card-holder-name" class="form-control" type="text" placeholder="Cardholder name">
+        <div v-if="payment_method=='Pay with Card'">
+            <div class="row">
+                <div id="tcplugin-cardholder-details" class="col">
+                    <div class="form-group">
+                        <label for="card-holder-name" class="control-label">Cardholder Name</label>
+                        <input v-model="cardholder_name" :class="errors.cardholder_name ? 'is-invalid' : ''" id="card-holder-name" class="form-control" type="text" placeholder="Cardholder name">
+                    </div>
+                    <div class="form-group">
+                        <label for="billing-postcode" class="control-label">Billing Postcode</label>
+                        <input v-model="billing_postcode" :class="errors.billing_postcode ? 'is-invalid' : ''" id="billing-postcode" class="form-control" type="text" placeholder="Billing Postcode">
+                    </div>
                 </div>
-            </div>
-            <div id="tcplugin-stripe-card-details" class="col">
-                <div class="form-group">
-                    <label for="card" class="control-label">Card Details</label>
-                    <div ref="card" id="card" class="form-control"></div>
-                </div>
-            <div id="tcplugin-billing_postcode" class="col">
-                <div class="form-group">
-                    <label for="billing-postcode" class="control-label">Billing Postcode</label>
-                    <input v-model="billing_postcode" :class="errors.billing_postcode ? 'is-invalid' : ''" id="billing-postcode" class="form-control" type="text" placeholder="Billing Postcode">
-                </div>
-            </div>
-                <div class="form-group">
-                    <input 
-                        @click="onStripeSubmit" 
-                        :value="loading==0 ? 'Book Now' : 'Processing'" 
-                        :disabled="loading == 1" 
-                        type="button" 
-                        class="btn btn-primary"
-                    >
-                </div>
-            </div>
+                <div id="tcplugin-stripe-card-details" class="col">
+                    <div class="form-group">
+                        <label for="card" class="control-label">Card Details</label>
+                        <div 
+                            ref="card" 
+                            id="card" 
+                            class="form-control stripe-card-container"
+                        ></div>
+                    </div>
+                    <div class="form-group">
+                        <button v-if="appConfig.useButtons"
+                            @click="onStripeSubmit"
+                            class="form-control btn btn-primary"
+                            :disabled="loading == 1" 
+                        >
+                            <div v-if="loading" 
+                                class="spinner-border spinner-border-sm"
+                            ></div>
+                            {{loading==0 ? 'Book Now' : 'Processing'}}
+                        </button>
 
+                        <input v-else 
+                            @click="onStripeSubmit" 
+                            :value="loading==0 ? 'Book Now' : 'Processing'" 
+                            :disabled="loading == 1" 
+                            type="button" 
+                            class="btn btn-primary"
+                        >
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div v-else 
@@ -110,7 +122,18 @@
                     >
                         <template v-slot:button="slotProps">
                             <div class="form-group">
-                                <input 
+                                <button v-if="appConfig.useButtons"
+                                    @click="slotProps.submit"
+                                    class="form-control btn btn-primary"
+                                    :disabled="loading == 1" 
+                                >
+                                    <div v-if="loading" 
+                                        class="spinner-border spinner-border-sm"
+                                    ></div>
+                                    {{loading==0 ? 'Book Now' : 'Processing'}}
+                                </button>
+
+                                <input v-else 
                                     @click="slotProps.submit" 
                                     :value="loading==0 ? 'Book Now' : 'Processing'" 
                                     :disabled="loading == 1" 
@@ -133,7 +156,7 @@
         </div>
         
         <div class="row">
-            <JourneyDetails/>
+            <BIQ-JourneyDetails></BIQ-JourneyDetails>
         </div>
     </form>
 </div>
