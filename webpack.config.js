@@ -6,15 +6,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-//const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
 // Naming and path settings
 const entryPoints = {
-  frontend: './src/frontend/main.js',
-  admin: './src/admin/main.js',
-  style: './assets/less/style.less'
+  frontend : './src/frontend/main.js',
+  admin : './src/admin/main.js'
 };
 const exportPath = path.resolve(__dirname, './assets/js');
 
@@ -22,7 +21,10 @@ const exportPath = path.resolve(__dirname, './assets/js');
 const plugins = [];
 
 // add the vue loader plugin
-//plugins.push(new CleanWebpackPlugin(['assets']));
+plugins.push(new webpack.ProgressPlugin());
+
+// add the vue loader plugin
+plugins.push(new CleanWebpackPlugin());
 
 // add the vue loader plugin
 plugins.push(new VueLoaderPlugin());
