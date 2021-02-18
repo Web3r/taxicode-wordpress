@@ -1,9 +1,13 @@
 // define the default initial state structure & values
 const defaultState = () => {
     return {
-        quote_id : '',
-        vehicle_index : 0,
-        amount : 0,
+        processing : false,
+        processed : false,
+        basket : {
+            quote_id : '',
+            vehicle_index : 0,
+            amount : 0,
+        },
         quote : {},
         vehicle : {}
     };
@@ -14,16 +18,18 @@ const BIQCheckout = {
     state : defaultState(),
     
     getters : {
+        processed : (state) => state.processed,
+        processing : (state) => state.processing,
         basket : (state) => {
             return {
-                quote : state.quote_id,
-                vehicle : state.vehicle_index,
-                price : state.amount
+                quote : state.basket.quote_id,
+                vehicle : state.basket.vehicle_index,
+                price : state.basket.amount
             };
         },
-        quoteID : (state) => state.quote_id,
-        vehicleIndex : (state) => state.vehicle_index,
-        price : (state) => state.amount,
+        quoteID : (state) => state.basket.quote_id,
+        vehicleIndex : (state) => state.basket.vehicle_index,
+        price : (state) => state.basket.amount,
         quoteData : (state) => state.quote,
         quoteVehicleData : (state) => state.vehicle
     },
@@ -44,6 +50,8 @@ const BIQCheckout = {
         booked({ commit }, ref) {
             // reset the checkout state
             commit('resetCheckoutState');
+            // set the journey booked checkout state
+            commit('booked');
         }
     },
     
@@ -62,15 +70,26 @@ const BIQCheckout = {
             console.log({...state});
             console.log({...basket});
             // set the journey quote ID being booked
-            state.quote_id = basket.quote.quote_id;
+            state.basket.quote_id = basket.quote;
             // set the quote vehicle index
-            state.vehicle_index = basket.vehicle;
-            // set the journey quote details
-            state.quote = basket.quote;
-            // set the journey quote vehicle details
-            state.vehicle = basket.quote.vehicles[basket.vehicle];
+            state.basket.vehicle_index = basket.vehicle;
             // set the checkout amount based on the vehicle price returned for the quote
-            state.amount = basket.quote.vehicles[basket.vehicle].price;
+            state.basket.amount = basket.quote_data.vehicles[basket.vehicle].price;
+            // set the journey quote details
+            state.quote = basket.quote_data;
+            // set the journey quote vehicle details
+            state.vehicle = basket.quote_data.vehicles[basket.vehicle];
+            console.log({...state});
+            console.groupEnd();
+        },
+
+        booked(state) {
+            console.group("BIQCheckoutStore journey quote booked & paid state");
+            console.log({...state});
+            // set the flags to indicaate the checkout process has 
+            // finished & should not be attempted again
+            state.processed = true;
+            state.processing = false;
             console.log({...state});
             console.groupEnd();
         }

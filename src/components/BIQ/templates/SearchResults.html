@@ -22,7 +22,7 @@
                     style="width: 18rem;"
                 >
                     <img 
-                        :ref="id" 
+                        :ref="`vehicle_image_${id}`" 
                         :src="quote.vehicles[0].image" 
                         class="card-img-top" 
                         alt="Vehicle type image"
@@ -33,28 +33,35 @@
                     <div class="card-body">
                         <h5 class="card-title">{{quote.company_name}}</h5>
                         <p 
-                            :ref="id" 
+                            :ref="`price_${id}`" 
                             id="selected_price" 
                             class="card-text text-center display-4"
                         >&pound;{{quote.vehicles[0].price}}.00</p>
                         <select 
-                            @change="flipImage(id, $event)" 
+                            @change="onQuoteVehicleChange(id, $event)" 
                             class="custom-select"
                         >
                             <option
-                                v-for="(vehicle, id) in quote.vehicles"
+                                v-for="(vehicle, idx) in quote.vehicles"
                                 v-model="quote.selected_vehicle"
-                                :value="id"
+                                :value="idx"
                                 :data-image="vehicle.image"
                                 :data-price="vehicle.price"
                             >{{vehicle.name}}</option>
                         </select>
-                        <router-link 
-                            :ref="id" 
-                            :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
-                            @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
-                            :data-quote="quote.quote_id" 
-                            :data-vehicle="quote.vehicle.index" 
+                        <button v-if="appConfig.useButtons"
+                            :ref="`book_now_c2a_${id}`" 
+                            :data-quote="id" 
+                            @click="onBookNowClicked"
+                            data-vehicle="0" 
+                            class="form-control btn btn-primary"
+                        >Book Now</button>
+                        <router-link v-else 
+                            :ref="`book_now_c2a_${id}`" 
+                            :to="{ name: 'Checkout', params: { journey : journeyID, quote : id, vehicle : 0 } }" 
+                            :data-quote="id" 
+                            @click.native="onBookNowClicked({ quote : id }, $event)"
+                            data-vehicle="0" 
                             class="btn btn-primary btn-block" 
                         >Book Now</router-link>
                     </div>
@@ -65,7 +72,7 @@
                 style="width: 18rem;"
             >
                 <img 
-                    :ref="id" 
+                    :ref="`vehicle_image_${id}`" 
                     :src="quote.vehicles[0].image" 
                     class="card-img-top" 
                     alt="Vehicle type image"
@@ -73,28 +80,35 @@
                 <div class="card-body">
                     <h5 class="card-title">{{quote.company_name}}</h5>
                     <p 
-                        :ref="id" 
+                        :ref="`price_${id}`" 
                         id="selected_price" 
                         class="card-text text-center display-4"
                     >&pound;{{quote.vehicles[0].price}}.00</p>
                     <select 
-                        @change="flipImage(id, $event)" 
+                        @change="onQuoteVehicleChange(id, $event)" 
                         class="custom-select"
                     >
                         <option
-                            v-for="(vehicle, id) in quote.vehicles"
+                            v-for="(vehicle, idx) in quote.vehicles"
                             v-model="quote.selected_vehicle"
-                            :value="id"
+                            :value="idx"
                             :data-image="vehicle.image"
                             :data-price="vehicle.price"
                         >{{vehicle.name}}</option>
                     </select>
-                    <router-link 
-                        :ref="id" 
-                        :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
-                        @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
-                        :data-quote="quote.quote_id" 
-                        :data-vehicle="quote.vehicle.index" 
+                    <button v-if="appConfig.useButtons"
+                        :ref="`book_now_c2a_${id}`" 
+                        :data-quote="id" 
+                        @click="onBookNowClicked"
+                        data-vehicle="0" 
+                        class="form-control btn btn-primary"
+                    >Book Now</button>
+                    <router-link v-else 
+                        :ref="`book_now_c2a_${id}`" 
+                        :to="{ name: 'Checkout', params: { journey : journeyID, quote : id, vehicle : 0 } }" 
+                        :data-quote="id" 
+                        @click.native="onBookNowClicked({ quote : id }, $event)"
+                        data-vehicle="0" 
                         class="btn btn-primary btn-block" 
                     >Book Now</router-link>
                 </div>
@@ -102,6 +116,7 @@
         </div>
     </div>
     
+    <!--the type_class structure and markup are unavoidably quite different -->
     <div v-else 
         class="row"
     >
@@ -110,7 +125,7 @@
         >
             <div class="card" style="width: 18rem;">
                 <img 
-                    :ref="quote.quote_id" 
+                    :ref="`vehicle_image_${quote.quote_id}_${quote.vehicle.index}`" 
                     :src="quote.vehicle.image" 
                     class="card-img-top" 
                     alt="Vehicle type image"
@@ -126,21 +141,27 @@
                         <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="suitcase" /> {{quote.vehicle.luggage_small}}</div>
                     </div>
                     <p 
-                        :ref="quote.quote_id" 
+                        :ref="`price_${quote.quote_id}_${quote.vehicle.index}`" 
                         id="selected_price" 
                         class="card-text text-center display-4"
                     >&pound;{{quote.price}}.00</p>
-                    <router-link 
-                        :ref="quote.quote_id" 
-                        :to="{ name: 'Checkout', params: { journey: journeyID, quote: quote.quote_id, vehicle: quote.vehicle.index } }" 
-                        @click.native="onBookNowClicked({ quote: quote.quote_id, vehicle: quote.vehicle.index }, $event)"
+                    <button v-if="appConfig.useButtons"
+                        :ref="`book_now_c2a_${id}_${quote.vehicle.index}`" 
                         :data-quote="quote.quote_id" 
                         :data-vehicle="quote.vehicle.index" 
+                        @click="onBookNowClicked"
+                        class="form-control btn btn-primary"
+                    >Book Now</button>
+                    <router-link v-else 
+                        :ref="`book_now_c2a_${quote.quote_id}_${quote.vehicle.index}`" 
+                        :to="{ name: 'Checkout', params: { journey : journeyID, quote : quote.quote_id, vehicle : quote.vehicle.index } }" 
+                        :data-quote="quote.quote_id" 
+                        :data-vehicle="quote.vehicle.index" 
+                        @click.native="onBookNowClicked({ quote : quote.quote_id }, $event)"
                         class="btn btn-primary btn-block" 
                     >Book Now</router-link>
                 </div>
             </div>
         </div>
-        <!--the type_class structure and markup are unavoidably quite different -->
     </div>
 </div>

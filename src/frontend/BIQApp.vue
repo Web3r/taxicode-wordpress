@@ -2,9 +2,9 @@
   <div id="biq-vue-app">
     <router-view v-if="initialised" 
         :debugging=biq_app_debug_enabled
-        :appRESTBaseURL=biq_app_url
         :appConfig=appConfig 
         :appSettings=appSettings 
+        :appRESTBaseURL=biq_app_url
     />
   </div>
 </template>
@@ -18,14 +18,14 @@
         version : '1.0.1',
 
         props : {
-            biq_app_url : {
-                type : String,
-                default : ''
-            },
-
             biq_app_debug_enabled : {
                 type : Boolean,
                 default : false
+            },
+
+            biq_app_url : {
+                type : String,
+                default : ''
             },
 
             biq_config : {
@@ -103,6 +103,8 @@
                 'journeyHasVias', 
                 'journeyQuotes',
             // BIQ Book Now Checkout state
+                'processed',
+                'processing',
                 'basket',
                 'quoteID',
                 'vehicleIndex',
@@ -150,10 +152,11 @@
                         console.info({...app.settings});
                         console.info({...response.data});
                         // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop is an 
-                        // object. It's dirty, but needs must for now 2021
-                        console.log(typeof(app.stripe_cardform_style));
-                        console.log(app.stripe_cardform_style);
+                        // but the echoed string inside the script tag to be supplied as a prop to the
+                        // Checkout Page view via the global window variable is an object.
+                        // It's dirty, but needs must for now 2021
+                        console.log(typeof(stripe_cardform_style));
+                        console.log(stripe_cardform_style);
                         console.log(typeof(response.data.stripe_cardform_style));
                         console.log(response.data.stripe_cardform_style);
                         try {
@@ -168,14 +171,14 @@
                         paypal_pk : response.data.paypal_public,
                         stripe_pk : response.data.stripe_public,
                         // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop is an 
-                        // object. It's dirty, but needs must for now 2021 so use the supplied prop 
-                        // version which is an object
+                        // but the echoed string inside the script tag to be supplied as a prop to the
+                        // Checkout Page view via the global window variable is an object.
+                        // It's dirty, but needs must for now 2021
                         stripe_cardform_style : app.stripe_cardform_style,
                         quote_type : response.data.quote_type,
                         complete_page_text : response.data.complete_page_text,
                         custom_css : response.data.custom_css,
-                        booking_test_mode : response.data.test_mode
+                        booking_test_mode : (response.data.test_mode == '1')
                     };
                     app.settings = settings;
                     app.initialised = true;

@@ -3,7 +3,7 @@
 <script>
     import axios from 'axios';
     import { mapGetters, mapActions } from 'vuex';
-    import StripeCardFormHandler from 'common/StripeCardFormHandler';
+    import StripeCardFormHandler from '@/common/StripeCardFormHandler.js';
     import JourneyDetails from '@/components/BIQ/JourneyDetails.vue';
 
     let cardFormHandler = null;
@@ -12,10 +12,15 @@
         name : "Checkout",
 
         components : {
-            'JourneyDetails' : JourneyDetails,
+            'BIQ-JourneyDetails' : JourneyDetails,
         },
 
         props : {
+            debugging : {
+                type : Boolean,
+                default : false
+            },
+
             appConfig : {
                 type : Object,
                 required : true,
@@ -28,11 +33,6 @@
                 default : null
             },
             
-            debugging : {
-                type : Boolean,
-                default : false
-            },
-
             stripe_cardform_style : {
                 type : Object,
                 default : {
@@ -319,5 +319,9 @@
 </script>
 
 <style scoped>
-
+    .stripe-card-container {
+        font-size : 1.6rem !important;
+        letter-spacing: -0.015em !important;
+        padding: 8px !important;
+    }
 </style>
