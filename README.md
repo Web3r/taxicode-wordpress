@@ -49,7 +49,7 @@ After making any modifications, while in the plugin base folder
 (ie. wp-content/plugins/taxicode) simply:
 
 1. Run `npm install`
-1. On a dev system, run `npm run dev` 🤘
+1. On a dev system, run `npm run build-dev` 🤘
 1. On a production system, run `npm run build` 👍
 
 ## Noteable Additonal Packages used

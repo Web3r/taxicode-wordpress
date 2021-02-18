@@ -1,7 +1,11 @@
+// determine if the app is in dev or production mode
+const devMode = process.env.NODE_ENV !== 'production';
+
+// start importing & setting up the vue app
 import Vue from 'vue'
 Vue.config.productionTip = false;
 // allow the use of dev tools before the vuex store is created
-//Vue.config.devtools = true;
+Vue.config.devtools = devMode;
 
 import Vuex from 'vuex'
 
@@ -27,13 +31,11 @@ import vuebraintree from 'vue-braintree'
 Vue.use(vuebraintree);
 
 // start the import of the app code 
-import BIQApp from './BIQApp.vue'
-import router from './router'
-import store from './store'
+import BIQApp from 'frontend/BIQApp.vue'
+import router from 'frontend/router'
+import store from 'frontend/store'
+import conf from 'frontend/config'
 Vue.use(Vuex);
-
-// environment aware config
-const config = require('./config.js');
 
 /* eslint-disable no-new */
 new Vue({
@@ -41,8 +43,8 @@ new Vue({
     render: h => h(BIQApp, {
         props: {
             biq_app_url,
-            biq_app_debug_enabled,
-            biq_config: config.LIVE
+            biq_app_debug_enabled : devMode || biq_app_debug_enabled,
+            biq_config : conf.LIVE
         }
     }),
     el: '#biq-vue-app',

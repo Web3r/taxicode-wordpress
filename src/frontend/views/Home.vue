@@ -1,11 +1,11 @@
 <template src="./templates/Home.html"></template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex';
-    import SearchResults from '@/components/BIQ/SearchResults.vue';
     import axios from 'axios';
-    import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
+    import { mapGetters, mapActions } from 'vuex';
+    import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
+    import SearchResults from '@/components/BIQ/SearchResults.vue';
 
     export default {
         name: 'Home',
@@ -16,6 +16,11 @@
         },
 
         props: {
+            debugging : {
+                type : Boolean,
+                default : false
+            },
+
             appConfig : {
                 type : Object,
                 required : true,
@@ -28,11 +33,6 @@
                 default : null
             },
             
-            debugging : {
-                type : Boolean,
-                default : false
-            },
-
             searchFormData : {
                 type : Object,
                 default : {}
@@ -41,11 +41,6 @@
             search_on_load : {
                 type : Boolean,
                 default : false
-            },
-
-            quote_type : {
-                type : String,
-                default : ''
             }
         },
 

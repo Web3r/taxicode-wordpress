@@ -110,6 +110,9 @@ class Assets {
                 'src' =>  TAXICODE_ASSETS . '/css/style.css'
             ],
             'taxicode-frontend' => [
+                'src' =>  TAXICODE_ASSETS . '/css/frontend.css'
+            ],
+            'taxicode-vendors' => [
                 'src' =>  TAXICODE_ASSETS . '/css/vendors.css'
             ],
             'taxicode-admin' => [
