@@ -5,19 +5,20 @@ export default class StripeCardFormHandler {
     /**
      * Create a new Stripe card form elements
      * @param {string} public_key the stripe public key
+     * @param {string} client_secret_from_uri the URI to create the payment intent to get the client secret from
      * @param {function} transactionSuccessCB A transaction success callback handler
      * @param {function} transactionFailCB A transaction failed callback handler
-     * @param {string} client_secret_from_uri the URI to create the payment intent to get the client secret from
      * @returns {StripeCardFormHandler}
      */
-    constructor(public_key, transactionSuccessCB, transactionFailCB, client_secret_from_uri) {
+    constructor(public_key, client_secret_from_uri, transactionSuccessCB, transactionFailCB, debugging) {
         // because of safai we can't have nice things & have to bind these anyway
         this.initialise = this.initialise.bind(this);
+        this.getPublicHandler = this.getPublicHandler.bind(this);
         this.mountElement = this.mountElement.bind(this);
         this.unmountElement = this.unmountElement.bind(this);
         this.getHandlerName = this.getHandlerName.bind(this);
         this.getAmount = this.getAmount.bind(this);
-        this.getDescription = this.getDescription.bind(this);
+        this.getDescriptor = this.getDescriptor.bind(this);
         this.setAmount = this.setAmount.bind(this);
         this.updateAmount = this.updateAmount.bind(this);
         this.getCustomerToken = this.getCustomerToken.bind(this);
@@ -27,40 +28,23 @@ export default class StripeCardFormHandler {
         this.paymentHandlerName = 'jstoken_stripe';
         this.country = 'GB';
         this.currency = 'gbp';
-        // set the initial state
-        this.amount = 0;
-        this.description = '';
-        this.customer_token = null;
         // set the gateway public key
         this.pk = public_key;
+        // set the URI to create the payment intent to get the client secret from
+        this.intent_secret_uri = client_secret_from_uri;
         // set the callback functions to allow for adaption 
         this.transactionSuccessCB = transactionSuccessCB;
         this.transactionFailCB = transactionFailCB;
-        // set the URI to create the payment intent to get the client secret from
-        this.intent_secret_uri = client_secret_from_uri;
-       // set the stripe library resources
+        this.debugging = debugging;
+        // set the stripe library resources
         this.stripe = Stripe(this.pk);
         this.stripeElements = this.stripe.elements();
-        this.elementCreated = false;
+        // set the initial state
+        this.amount = 0;
+        this.descriptor = '';
+        this.customer_token = null;
         this.elementMounted = false;
-        this.elementMountedOn = 'card';
-        // define a privae version of the handler methods
-        this.handler = {
-            transactionSuccess      : this.transactionSuccessCB,
-            transactionFail         : this.transactionFailCB,
-            getClientSecretIntent   : this.getClientSecretIntent,
-            stripe                  : this.stripe,
-            stripeElements          : this.stripeElements
-        };
-        // define the public access handler methods
-        this.publicHandler = {
-            getHandlerName      : this.getHandlerName,
-            getAmount           : this.getAmount,
-            getDescription      : this.getDescription,
-            updateAmount        : this.updateAmount,
-            getCustomerToken    : this.getCustomerToken,
-            setCustomerToken    : this.setCustomerToken
-        };
+        this.elementMountedOn = 'stripe-card-form';
     }
 	
 	/** 
@@ -69,21 +53,45 @@ export default class StripeCardFormHandler {
 	 * @param {Object} options the payment intent card form element config options
 	 */
 	initialise(mount_on, style_options, hide_postcode) {
-        console.group("Stripe card form handler initialising...");
-        console.info(mount_on);
-        console.info(style_options);
-        console.info(hide_postcode);
+        if(this.debugging) {
+            console.group('Stripe card form handler initialising...');
+            console.info(mount_on);
+            console.info(style_options);
+            console.info(hide_postcode);
+        }
         const options = {
             style           : style_options,
             hidePostalCode  : (typeof hide_postcode !== 'undefined') ? !!hide_postcode : false
         };
-        console.info(options);
+        if(this.debugging) {
+            console.info(options);
+        }
 		// create the Stripe card form elements
 		this.card = this.stripeElements.create('card', options);
         // set where / on what the card form section will be mounted in the DOM
         this.elementMountedOn = mount_on;
-        console.log("Stripe card form handler initialised");
-        console.groupEnd();
+        if(this.debugging) {
+            console.log('Stripe card form handler initialised');
+            console.groupEnd();
+        }
+    }
+
+    /**
+     * Get the exposable public handler interface
+     * @returns {Object}
+     */
+     getPublicHandler() {
+        return {
+            mountElement        : this.mountElement,
+            unmountElement      : this.unmountElement,
+            getHandlerName      : this.getHandlerName,
+            getAmount           : this.getAmount,
+            getDescriptor       : this.getDescriptor,
+            updateAmount        : this.updateAmount,
+            getCustomerToken    : this.getCustomerToken,
+            setCustomerToken    : this.setCustomerToken,
+            getSourceCardToken  : this.getSourceCardToken
+        };
     }
     
     /**
@@ -93,7 +101,9 @@ export default class StripeCardFormHandler {
         if(this.elementMounted) {
             return;
         }
-        console.log('Mounting Stripe card element on ' + this.elementMountedOn);
+        if(this.debugging) {
+            console.log(`Mounting Stripe card element on ${this.elementMountedOn}`);
+        }
         this.card.mount(document.getElementById(this.elementMountedOn));
         this.elementMounted = true;
     }
@@ -105,7 +115,9 @@ export default class StripeCardFormHandler {
         if(!this.elementMounted) {
             return;
         }
-        console.log('Unmounting Stripe card element from ' + this.elementMountedOn);
+        if(this.debugging) {
+            console.log(`Unmounting Stripe card element from ${this.elementMountedOn}`);
+        }
         this.card.unmount(document.getElementById(this.elementMountedOn));
         this.elementMounted = false;
     }
@@ -127,22 +139,22 @@ export default class StripeCardFormHandler {
     }
     
     /**
-     * Get the transaction description set
+     * Get the transaction descriptor set
      * @returns {String}
      */
-    getDescription() {
-        return this.description;
+    getDescriptor() {
+        return this.descriptor;
     }
     
     /**
      * Set the transaction details
      * @param {Float} amount the transaction amount
-     * @param {String} description the transaction description
+     * @param {String} descriptor the transaction descriptor
      */
-    setAmount(amount, description) {
+    setAmount(amount, descriptor) {
         // set the transaction details
         this.amount = (amount * 100);
-        this.description = description;
+        this.descriptor = descriptor;
     }
     
     /**
@@ -178,41 +190,52 @@ export default class StripeCardFormHandler {
      * @returns {Promise}
      */
     getClientSecretIntent(key, quote, vehicle) {
-        const handler = this.getHandlerName();
+        const handler = this.getPublicHandler();
         const intent_secret_uri = this.intent_secret_uri;
-        return new Promise(function(resolve, reject) {
+        const debugging = this.debugging;
+        if(this.debugging) {
+            console.group(`Getting client secret from ${intent_secret_uri}`);
+        }
+        return new Promise((resolve, reject) => {
 			// need to have at least 1 POSTed input value to trigger the POST method
             const formData = new FormData();
-            formData.append('handler', handler);
+            formData.append('handler', handler.getHandlerName());
             formData.append('key', key);
             formData.append('quote', quote);
             formData.append('vehicle', vehicle);
             // make the request to create a payment intent for the transaction
 			axios({
 				url             : intent_secret_uri,
-				method          : "post",
+				method          : 'post',
 				data            : formData,
-				responseType    : "json",
+				responseType    : 'json',
                 headers: {
                     'Content-Type': 'application/application/x-www-form-urlencoded',
                 }
-            }).then(function(response) {
+            })
+            .then(response => {
                 // resolve the client secret as promised
-                console.log(response);
-                resolve(response.data.response.intent.client_secret);
-            }).catch(function(error) {
-                if(error.response) {
-                    const reason = error.response;
-                } else if(error.request) {
-                    const reason = error.request;
-                } else {
-                    const reason = error.message;
+                if(debugging) {
+                    console.log(response);
+                    console.groupEnd();
                 }
-                console.group('Failed to get a client secret response from `${intent_secret_uri}`.');
-                console.warn(`The error message received was: '${reason}'`);
-                console.info(formData);
-                console.info(error);
-                console.groupEnd();
+                resolve(response.data.response.intent.client_secret);
+            })
+            .catch(error => {
+                let reason = error;
+                if(error.response) {
+                    reason = error.response;
+                } else if(error.request) {
+                    reason = error.request;
+                } else {
+                    reason = error.message;
+                }
+                console.error(error);
+                if(debugging) {
+                    console.warn(`The error message received was: '${reason}'`);
+                    console.info(formData);
+                    console.groupEnd();
+                }
                 // reject the response as an error
                 reject(reason);
             });
@@ -228,53 +251,58 @@ export default class StripeCardFormHandler {
      * @param {String} billing_postcode The card billing address post code
      */
     getSourceCardToken(key, quote, vehicle, cardholder_name, billing_postcode) {
-        // define a localised handler object referenced to the callbacks required
-        const handler = this.handler;
-        const publicHandler = this.publicHandler;
+        // define a localised handler object reference to pass to the callbacks required
+        const publicHandler = this.getPublicHandler();
+        const Stripe = this.stripe;
+        // get a local reference to transaction success & error callbacks
+        const onTransactionSuccess = this.transactionSuccessCB;
+        const onTransactionFail = this.transactionFailCB;
         const card = this.card;
-        this.getClientSecretIntent(key, quote, vehicle).then(function(clientSecret) {
+        this.getClientSecretIntent(key, quote, vehicle)
+        .then(clientSecret => {
             // Confirm the PaymentIntent without handling potential next actions (yet).
-            handler.stripe.confirmCardPayment(
-              clientSecret,
-              { payment_method  : {
-                      card              : card,
-                      billing_details   : { 
-                          name      : cardholder_name,
-                          address   : {
-                              postal_code   : billing_postcode
-                          }
-                      }
-              }},
-              { handleActions   : false }
-            ).then(function(confirmResult) {
+            Stripe.confirmCardPayment(
+                clientSecret,
+                { payment_method  : {
+                        card              : card,
+                        billing_details   : { 
+                            name      : cardholder_name,
+                            address   : {
+                                postal_code   : billing_postcode
+                            }
+                        }
+                }},
+                { handleActions   : false }
+            ).then(confirmResult => {
                 if (confirmResult.error) {
                     // Report to the browser that the payment failed, prompting it to
                     // re-show the payment interface, or show an error message and close
                     // the payment interface.
-                    handler.transactionFail(publicHandler, confirmResult.error);
+                    onTransactionFail(publicHandler, confirmResult.error);
                 } else {
                     // Report to the browser that the confirmation was successful, prompting
                     // it to close the browser payment method collection interface.
-                    if(confirmResult.paymentIntent.hasOwnProperty("status") && confirmResult.paymentIntent.status === 'succeeded') {
+                    if(confirmResult.paymentIntent.hasOwnProperty('status') && confirmResult.paymentIntent.status === 'succeeded') {
                         // The payment has succeeded.
-                        handler.transactionSuccess(publicHandler, confirmResult.paymentIntent);
+                        onTransactionSuccess(publicHandler, confirmResult.paymentIntent);
                         return;
                     }
                     // Let Stripe.js handle the rest of the payment flow.
-                    handler.stripe.confirmCardPayment(clientSecret).then(function(result) {
+                    Stripe.confirmCardPayment(clientSecret)
+                    .then(result => {
                         if (result.error) {
                           // The payment failed -- ask your customer for a new payment method.
-                          handler.transactionFail(publicHandler, result.error);
+                          onTransactionFail(publicHandler, result.error);
                         } else {
                           // The payment has succeeded.
-                          handler.transactionSuccess(publicHandler, result.paymentIntent);
+                          onTransactionSuccess(publicHandler, result.paymentIntent);
                         }
                     });
                 }
-            }).catch(function(error) {
-                handler.transactionFail(publicHandler, error);
+            })
+            .catch(error => {
+                onTransactionFail(publicHandler, error);
             });
         });
     }
-
 }

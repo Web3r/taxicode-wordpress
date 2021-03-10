@@ -2,11 +2,11 @@
   <div id="biq-admin-vue-app">
     <h1>Taxicode Booking Instant Quotes Admin</h1>
     <router-view v-if="initialised" 
-        :debugging=biq_app_debug_enabled
-        :appSettings=appSettings 
-        :appRESTBaseURL=biq_app_url
-        @appSettingsUpdated=appSettingsUpdated 
-    />
+        :debugging="biq_app_debug_enabled"
+        :appSettings="appSettings"
+        :appRESTBaseURL="biq_app_url"
+        @appSettingsUpdated="appSettingsUpdated" 
+    ></router-view>
   </div>
 </template>
 
@@ -18,7 +18,8 @@
         props : {
             biq_app_url : {
                 type : String,
-                default : '',
+                required : true,
+                default : '//',
             },
 
             biq_app_debug_enabled : {
@@ -54,6 +55,7 @@
         },
 
         created() {
+            // get the app settings from the backend
             this.getAppSettings();
         },
 
@@ -76,12 +78,12 @@
                     app.initialised = true;
                 })
                 .catch(error => {
-                    let message = 'Unknown Error';
-                    if(error.hasOwnProperty('message') && error.message) {
-                        message = error.message;
+                    if(this.biq_app_debug_enabled) {
+                        console.info('Updated Settings');
+                        console.log(error);
+                        console.groupEnd();
                     }
-                    console.error(message);
-                    console.info({...error});
+                    console.error(error);
                 });
             },
 
@@ -89,7 +91,7 @@
                 if(this.biq_app_debug_enabled) {
                     console.group('Updating BIQ App Settings');
                     console.info({...this.settings});
-                    console.info({...new_settings});
+                    console.info(new_settings);
                     try {
                         // this is a string from the REST & doesn't parse to JSON well :(
                         console.log(new_settings.stripe_cardform_style);
@@ -113,7 +115,8 @@
                 };
                 this.settings = settings;
                 if(this.biq_app_debug_enabled) {
-                    console.info({...settings});
+                    console.info('Updated Settings');
+                    console.info(settings);
                     console.info({...this.settings});
                     console.groupEnd();
                 }
@@ -121,7 +124,3 @@
         }
     };
 </script>
-
-<style scoped>
-
-</style>

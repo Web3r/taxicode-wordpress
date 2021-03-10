@@ -13095,11 +13095,24 @@ input[type="color"].form-control:disabled {
   vertical-align: text-bottom;
 }
 
-.vbt-autcomplete-list[data-v-9a21a6f4] {
+a[data-v-2c067ca5]:not(.disabled){
+  cursor: pointer;
+}
+a.disabled[data-v-2c067ca5]{
+  cursor: default;
+  pointer-events: none;
+}
+
+
+.vbt-autcomplete-list[data-v-b4119798] {
   padding-top: 5px;
   position: absolute;
   max-height: 350px;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
   overflow-y: auto;
   z-index: 999;
+}
+.vbt-autcomplete-list[data-v-b4119798] .vbt-matched-text{
+  font-weight: bold;
 }
 

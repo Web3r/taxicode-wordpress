@@ -1,5 +1,10 @@
 
-.stripe-card-container[data-v-18d4fc8a] {
+[data-v-6a9b041c] .quote-card {
+    width: 18rem;
+}
+
+
+[data-v-094eb7bb] .stripe-card-container {
     font-size : 1.6rem !important;
     letter-spacing: -0.015em !important;
     padding: 8px !important;

@@ -46,8 +46,13 @@ class Frontend
             $searchFormData = null;
             $search_on_load = false;
         }
-        // get a Braintree paypal gateway client token
-        $paypalGateway = new Gateway(['accessToken' => get_option('tcplugin_paypal_public')]);
+        try {
+            // get a Braintree paypal gateway client token
+            $paypalGateway = new Gateway(['accessToken' => get_option('tcplugin_paypal_public')]);
+            $paypalClientToken = $paypalGateway->clientToken()->generate();
+        } catch(Exception $ex) {
+            $paypalClientToken = $ex->getMessage();
+        }
         // define the plugin HTML content
         $content .= '
 <style>
@@ -55,11 +60,11 @@ class Frontend
 </style>
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    const biq_app_debug_enabled = false;
-    const biq_app_url = \'' . get_rest_url('', '/taxicode/v1/') . '\';
-    const paypal_client_token = \'' . $paypalGateway->clientToken()->generate() . '\';
-    const search_on_load = ' . json_encode($search_on_load) . ';
+    const biqAppURL = \'' . get_rest_url('', '/taxicode/v1/') . '\';
+    const searchOnLoad = ' . json_encode($search_on_load) . ';
     const searchFormData = ' . json_encode($searchFormData) . ';
+    const paypalClientToken = \'' . $paypalClientToken . '\';
+    const biq_app_debug_enabled = false;
 
     // this is a string from the REST & doesn\'t parse to JSON well :(
     // but the echoed string here to be supplied as a prop to the
