@@ -2,24 +2,25 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from 'vuex-persistedstate';
 
-import BIQSearchStore from './modules/BIQSearch';
-import BIQQuotesStore from './modules/BIQQuotes';
-import BIQCheckoutStore from './modules/BIQCheckout';
+import BIQSearchStateStore from 'BIQ/store/modules/SearchStateStore';
+import BIQQuotesStateStore from 'BIQ/store/modules/QuotesStateStore';
+import BIQCheckoutStateStore from 'BIQ/store/modules/CheckoutStateStore';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        BIQSearchStore,
-        BIQQuotesStore,
-        BIQCheckoutStore
+        BIQSearchStateStore,
+        BIQQuotesStateStore,
+        BIQCheckoutStateStore
     },
+
     plugins: [
        createPersistedState({
         paths : [
-          'BIQSearchStore',
-          'BIQQuotesStore',
-          'BIQCheckoutStore'
+            'BIQSearchStateStore',
+            'BIQQuotesStateStore',
+            'BIQCheckoutStateStore'
         ],
         storage : window.localStorage
       })

@@ -1,12 +1,12 @@
 {
-    "name": "tareq1988/vue-wp-starter",
-    "description": "A WordPress Vue.js starter plugin",
+    "name": "biq/vue-wp",
+    "description": "Booking Instant Quotes Vue JS Wordpress Plugin",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "Tareq Hasan",
-            "email": "tareq@wedevs.com"
+            "name": "Web3 Resource",
+            "email": "developers@web3r.co.uk"
         }
     ],
     "minimum-stability": "dev",

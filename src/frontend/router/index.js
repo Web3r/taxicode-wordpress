@@ -1,45 +1,47 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 Vue.use(Router);
 
 // import the app page components
-import Home from 'frontend/views/Home.vue'
-import Checkout from 'frontend/views/Checkout.vue'
-import Complete from 'frontend/views/Complete.vue'
+import HomePage from 'frontend/views/HomePage.vue';
+import CheckoutPage from 'frontend/views/CheckoutPage.vue';
+// @todo make the component load async to reduce chunk size
+import CompletePage from 'frontend/views/CompletePage.vue';
 
 export default new Router({
     routes: [
         {
             path: '/',
-            name: 'Home',
-            component: Home,
+            name: 'HomePage',
+            component: HomePage,
             props: {
                 searchFormData,
-                search_on_load
+                searchOnLoad
             }
         },
         {
             path: '/:journey',
-            name: 'HomeSearched',
-            component: Home,
+            name: 'HomePageSearched',
+            component: HomePage,
             props: {
                 searchFormData,
-                search_on_load
+                searchOnLoad
             }
         },
         {
             path: '/checkout/:journey/:quote/:vehicle',
-            name: 'Checkout',
-            component: Checkout,
+            name: 'CheckoutPage',
+            component: CheckoutPage,
             props: {
                 stripe_cardform_style,
-                paypal_client_token
+                paypalClientToken
             }
         },
         {
             path: '/complete/:booking_ref',
-            name: 'Complete',
-            component: Complete
+            name: 'CompletePage',
+            // @todo make the component load async to reduce chunk size
+            component: CompletePage
         }
     ]
 });
