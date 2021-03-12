@@ -104,8 +104,8 @@
                 },
                 // create a new paypal payment option element
                 paymentHandler : new PaypalHandler(
-                    this.onTransactionSuccess,
-                    this.onTransactionError,
+                    this.onHandlerSuccess,
+                    this.onHandlerError,
                     this.debugging
                 ),
                 error : false,
@@ -123,42 +123,44 @@
 
         methods: {
             onSubmit(event) {
+                // @todo this is where the manual initiation & transaction 
+                //       response event handling & dispatching should go, but we're just
+                //       using a handler for frameworked flow consitency for now.
+                if(this.debugging) {
+                    console.group('Paypal submit event');
+                    console.log(event);
+                    console.groupEnd();
+                }
                 console.log(event);
             },
 
-            onTransactionSuccess : function(event) {
-                console.log(event);
-                // just make sure no double submit
-                if(this.processing) {
-                    return;
-                }
-                // reset the error flags
-                this.card_error = false;
-                this.card_error_message = '';
-                // add the source name so data can be accessed correctly
-                event.data = {
-                    source : this.name,
-                    paymentHandler : this.paymentHandler,
-                    paymentIntent : {
-                        // set the paypal transaction token ID
-                        id : event.nonce
-                    },
-                    formdataAppend : (formData) => formData
-                };
-                // trigger the submit event to allow for full form validation
-                this.$emit('submit', event);
-            },
-
-            onTransactionError : function(error) {
-                // @todo check if the onSubmit validation event needs to be triggered
-                console.log(error);
-                if(!error.hasOwnProperty('message') || !error.message) {
-                    error.message = 'Unknown Paypal Error';
-                }
+            onHandlerSuccess : function(paymentHandler, paymentIntent) {
+                // add the success event data, including the completed payment intent transaction
+                // we have the money, but no booking created yet!
                 const event = {
                     data : {
                         source : this.name,
                         type : 'transaction',
+                        paymentHandler,
+                        paymentIntent,
+                        formdataAppend : (formData) => formData
+                    }
+                };
+                // trigger the transaction success event
+                this.$emit('transactionSuccess', event);
+            },
+
+            onHandlerError : function(paymentHandler, error) {
+                // make sure the error has a message
+                if(!error.hasOwnProperty('message') || !error.message) {
+                    error.message = 'Unknown Paypal Error';
+                }
+                // add the error event data
+                const event = {
+                    data : {
+                        source : this.name,
+                        type : 'transaction',
+                        paymentHandler,
                         error
                     }
                 };
@@ -166,8 +168,52 @@
                 this.$emit('transactionError', event);
             },
 
+            onTransactionSuccess : function(event) {
+                // @todo this is automatically called by the braintree component, but our form
+                //       validation hasn't been run yet
+                if(this.debugging) {
+                    console.group('Paypal transaction succeeded event');
+                    console.log(event);
+                    console.groupEnd();
+                }
+                // just make sure no double submit
+                if(this.processing) {
+                    return;
+                }
+                // reset the error flags
+                this.card_error = false;
+                this.card_error_message = '';
+                // add the data structure needed for the form submit event to be triggered & consitent
+                // flow restored
+                event.data = {
+                    source : this.name,
+                    paymentHandler : this.paymentHandler.getPublicHandler(),
+                    // just inject the success event to the data payload to allow for flow consistency
+                    //paypalSuccessEvent : event
+                };
+                // trigger the submit event to allow for full form validation & flow consistency
+                this.$emit('submit', event);
+            },
+
+            onTransactionError : function(error) {
+                // @todo this is automatically called by the braintree component, but our form
+                //       validation hasn't been run yet.
+                // just pass the responsibility to the error handler to setup & trigger the 
+                // consistent error event
+                if(this.debugging) {
+                    console.group('Paypal transaction error event');
+                    console.log(error);
+                    console.groupEnd();
+                }
+                this.onHandlerError(this.paymentHandler.getPublicHandler(), error);
+            },
+
             onLoadFail : function(error) {
-                console.log(error);
+                if(this.debugging) {
+                    console.group('Paypal loading error event');
+                    console.log(error);
+                    console.groupEnd();
+                }
                 if(!error.hasOwnProperty('message') || !error.message) {
                     error.message = 'Unknown Paypal Loading Error';
                 }
@@ -175,6 +221,7 @@
                     data : {
                         source : this.name,
                         type : 'loading',
+                        paymentHandler : this.paymentHandler.getPublicHandler(),
                         error
                     }
                 };

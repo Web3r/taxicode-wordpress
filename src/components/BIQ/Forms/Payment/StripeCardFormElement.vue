@@ -128,8 +128,8 @@
                 has_errors : false,
                 // create a new stripe card form payment option element
                 paymentHandler : new StripeElementsHandler(
-                    this.onTransactionSuccess,
-                    this.onTransactionError,
+                    this.onHandlerSuccess,
+                    this.onHandlerError,
                     this.debugging
                 )
             };
@@ -183,7 +183,7 @@
                 this.$emit('submit', event);
             },
             
-            onTransactionSuccess : function(paymentHandler, paymentIntent) {
+            onHandlerSuccess : function(paymentHandler, paymentIntent) {
                 // add the success event data, including the completed payment intent transaction
                 // we have the money, but no booking created yet!
                 const event = {
@@ -196,7 +196,7 @@
                 this.$emit('transactionSuccess', event);
             },
 
-            onTransactionError : function(paymentHandler, error) {
+            onHandlerError : function(paymentHandler, error) {
                 // make sure the error has a message
                 if(!error.hasOwnProperty('message') || !error.message) {
                     error.message = 'Unknown Stripe Error';

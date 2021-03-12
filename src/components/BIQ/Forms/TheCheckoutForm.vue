@@ -50,6 +50,7 @@
                 :debugging="debugging"
                 :useButtons="appConfig.useButtons"
                 @submit="onSubmit"
+                @transactionSuccess="onTransactionSuccess"
                 @transactionError="onTransactionError"
                 id="tcplugin-paypal-plugin"
                 label="Or Pay With Paypal"
@@ -226,31 +227,43 @@
                     this.bookingFailed();
                     return false;
                 }
+                if(this.debugging) {
+                    console.group(`BIQ CheckoutForm '${event.data.source}' Submit Event`);
+                    console.log(event);
+                    console.groupEnd();
+                }
+                this.error_message = '';
+                this.has_errors = false;
+                let setup = null;
                 // determine which payment handler was used
                 switch(event.data.source) {
                     case 'paypal' :
-                    // yeah, paypal only get's this far is it has the money lol so just
-                        // move on to the transaction success event
-                        // return this.onTransactionSuccess(event);
+                        // yeah, paypal only get's this far is it has the money lol so just
+                        // add the success event so the event flow is consistent again
+                        setup = { 
+                            ...event 
+                        };
                         // the payment handler has a success & error event callbacks assigned
                         // (see the component for details)
                         return event.data.paymentHandler.getTransactionToken(
                             this.appSettings.biq_pk, 
                             this.quoteID, 
                             this.vehicleIndex, 
-                            { ...event.data }
+                            setup
                         );
                     case 'stripe' : 
                     // hook in & get the stripe client secret for the backend created payment intent
                     // to allow the front end client to SCA the transaction
-                        const cardDetails = this.$refs.cardForm.inputValues();
+                        setup = { 
+                            ...this.$refs.cardForm.inputValues() 
+                        };
                         // the payment handler has a success & error event callbacks assigned
                         // (see the component for details)
                         return event.data.paymentHandler.getTransactionToken(
                             this.appSettings.biq_pk, 
                             this.quoteID, 
                             this.vehicleIndex, 
-                            { ...cardDetails }
+                            setup
                         );
                     default :
                     // just allow the event to bubble
@@ -260,7 +273,11 @@
             },
             
             onTransactionSuccess : function(event) {
-                const { paymentHandler, paymentIntent, formdataAppend } = event.data;
+                const { 
+                    paymentHandler, 
+                    paymentIntent, 
+                    formdataAppend 
+                } = event.data;
                 // we have all the details now to make the booking through the API pay method
                 this.makeBooking(paymentIntent.id, paymentHandler.getHandlerName(), formdataAppend)
             },

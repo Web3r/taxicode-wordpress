@@ -302,7 +302,7 @@
                     console.group(`Searching BIQ API Quotes from '${this.apiQuotesFrom}'`);
                 }
                 // get the quotes for the specified journey details
-                axios.get(`${this.apiQuotesFrom}?key=${this.PublicKey}&${apiQuotesURI}`)
+                axios.get(`${this.apiQuotesFrom}?key=${this.apiPublicKey}&${apiQuotesURI}`)
                 .then(response => {
                     if(self.debugging) {
                         console.log(response);

@@ -26,11 +26,30 @@ export default class PaypalHandler extends BasePaymentHandler {
      * @param {Object} setup Additional setup / options for the payment handler 
      */
     handle(publicHandler, onTransactionSuccess, onTransactionFail, setup) {
+        // @todo this is where the manual initiation & transaction 
+        // response event handling & dispatching should go, but we're just
+        // using the handler for frameworked flow consitency for now.
         const {
             key, 
             quote, 
-            vehicle
+            vehicle,
+            // @todo for now use the already suceeded papypal event supplied as is.
+            nonce
         } = setup;
-        console.log(setup);
+        if(this.debugging) {
+            console.group('Paypal payment transaction handler');
+            console.log(setup);
+            console.log(key);
+            console.log(quote);
+            console.log(vehicle);
+            console.log(nonce);
+            console.groupEnd();
+        }
+        // @todo for now just call the on success callback
+        const paymentIntent = {
+            // set the paypal transaction token ID
+            id : nonce
+        };
+        onTransactionSuccess(publicHandler(), paymentIntent);
     }
 }
