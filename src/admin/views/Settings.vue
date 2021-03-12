@@ -1,7 +1,7 @@
 <template src="./templates/Settings.html"></template>
 
 <script>
-    import Form from "@/common/Form";
+    import Form from '@/common/Form';
 
     export default {
         name : 'Settings',
@@ -113,7 +113,3 @@
 
     };
 </script>
-
-<style scoped>
-
-</style>

@@ -1,33 +1,48 @@
+const location = {
+    string : '',
+    postcode : '',
+    position : [0,0]
+};
 // define the default initial state structure & values
 const defaultState = () => {
     return {
         quoting : false,
         quotes_loaded : false,
-        // @todo impliment the API Error / Warnings
-        api_error : null,
+        api_error : false,
         journey_id : '',
-        // @todo define the details sub structure
-        journey_details : {},
-        journey_quotes : []
+        journey_details : {
+            pickup : location,
+            destination : location,
+            vias : [],
+            people : 1,
+            return : false,
+            date : '',
+            distance : 1,
+            duration : 116,
+            duration_text : '1 min',
+            quote_type : 'mileage',
+            is_airport : false,
+            hourly : false
+        },
+        journey_quotes : {}
     };
 };
 
 // define the state store module
-const BIQQuotes = {
+const QuotesStateStore = {
     state : defaultState(),
     
     getters : {
         loadingQuotes : (state) => state.quoting,
-        // @todo impliment the API Error / Warnings
+        quotesError : (state) => state.api_error,
         quotesLoaded : (state) => state.quotes_loaded,
         zeroQuotes : (state) => {
             if(!state.quotes_loaded) {
                 return false;
             }
-            return (state.journey_quotes.length === 0);
+            return (Object.keys(state.journey_quotes).length === 0);
         },
         journeyID : (state) => state.journey_id,
-        // @todo define the details sub structure
         journeyDetails : (state) => state.journey_details,
         journeyDate : (state) => new Date(Date.parse(state.journey_details.date)).toDateString(),
         journeyTime : (state) => new Date(Date.parse(state.journey_details.date)).toLocaleTimeString(),
@@ -71,58 +86,49 @@ const BIQQuotes = {
     
     mutations : {
         resetQuotesState(state) {
-            console.group("Resetting BIQQuotesStore State");
-            console.log({...state});
             // reset the state to the initial state
             Object.assign(state, defaultState());
-            console.log({...state});
-            console.groupEnd();
         },
 
         searching(state) {
-            console.group("BIQQuotesStore searching quotes state");
-            console.log({...state});
             // set the flag to indicate API quotes are being loading / searching has started
             state.quoting = true;
-            console.log({...state});
-            console.groupEnd();
         },
 
         quotesError(state, payload) {
-            console.group("BIQQuotesStore API Error state");
-            console.log({...state});
             // set the error / warning messages returned from the API quotes search
             state.api_error = payload.api_error;
-            console.log({...state});
-            console.groupEnd();
         },
 
         searched(state) {
-            console.group("BIQQuotesStore searched quotes state");
-            console.log({...state});
             // reset the flag to indicate API quotes search has finished
             state.quoting = false;
-            console.log({...state});
-            console.groupEnd();
         },
         
         quotes(state, payload) {
-            console.group("BIQQuotesStore quoted state");
-            console.log({...state});
-            console.log({...payload});
             // set the API journey ID
             state.journey_id = payload.journey_id;
-            // set the API journey details
-            // @todo define the details sub structure
-            state.journey_details = payload.journey_details;
             // set the quotes returned from the API
             state.journey_quotes = payload.quotes;
+           // set the API journey details
+            state.journey_details = {
+                pickup : payload.journey.pickup,
+                destination : payload.journey.destination,
+                vias : payload.journey.vias,
+                people : payload.journey.people,
+                return : payload.journey.return,
+                date : payload.journey.date,
+                distance : payload.journey.distance,
+                duration : payload.journey.duration,
+                duration_text : payload.journey.duration_text,
+                quote_type : payload.journey.quote_type,
+                is_airport : payload.journey.is_airport,
+                hourly : payload.journey.hourly
+            };
             // set a flag to indicate API quotes have been loaded for use
             state.quotes_loaded = true;
-            console.log({...state});
-            console.groupEnd();
         }
     }
 };
 
-export default BIQQuotes;
+export default QuotesStateStore;

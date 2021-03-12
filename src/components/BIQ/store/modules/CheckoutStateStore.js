@@ -9,12 +9,13 @@ const defaultState = () => {
             amount : 0,
         },
         quote : {},
-        vehicle : {}
+        vehicle : {},
+        booking_ref : ''
     };
 };
 
 // define the state store module
-const BIQCheckout = {
+const CheckoutStateStore = {
     state : defaultState(),
     
     getters : {
@@ -31,7 +32,8 @@ const BIQCheckout = {
         vehicleIndex : (state) => state.basket.vehicle_index,
         price : (state) => state.basket.amount,
         quoteData : (state) => state.quote,
-        quoteVehicleData : (state) => state.vehicle
+        quoteVehicleData : (state) => state.vehicle,
+        bookingRef : (state) => state.booking_ref
     },
     
     actions : {
@@ -46,29 +48,49 @@ const BIQCheckout = {
             // set the details to build the checkout basket content
             commit('buildBasket', basket);
         },
+
+        booking({ commit }) {
+            // set the processing flags to prevent multiple procesing
+            const payload = {
+                processing : true,
+                processed : false
+            };
+            // set the checkout processing state
+            commit('processing', payload);
+        },
+
+        bookingFailed({ commit }) {
+            // reset the processing flags to allow further procesing attempts
+            const payload = {
+                processing : false,
+                processed : false
+            };
+            // set the checkout processing state
+            commit('processing', payload);
+        },
         
-        booked({ commit }, ref) {
+        booked({ commit }, booking_ref) {
             // reset the checkout state
             commit('resetCheckoutState');
-            // set the journey booked checkout state
-            commit('booked');
+            // set the processing flags to prevent further procesing attempts
+            const payload = {
+                processing : false,
+                processed : false
+            };
+            // set the checkout processing state
+            commit('processing', payload);
+            // set the booking ref
+            commit('booked', { booking_ref });
         }
     },
     
     mutations : {
         resetCheckoutState(state) {
-            console.group("Resetting BIQCheckoutStore State");
-            console.log({...state});
             // reset the state to the initial state
             Object.assign(state, defaultState());
-            console.log({...state});
-            console.groupEnd();
         },
 
         buildBasket(state, basket) {
-            console.group("BIQCheckoutStore Build Basket state");
-            console.log({...state});
-            console.log({...basket});
             // set the journey quote ID being booked
             state.basket.quote_id = basket.quote;
             // set the quote vehicle index
@@ -79,21 +101,19 @@ const BIQCheckout = {
             state.quote = basket.quote_data;
             // set the journey quote vehicle details
             state.vehicle = basket.quote_data.vehicles[basket.vehicle];
-            console.log({...state});
-            console.groupEnd();
         },
 
-        booked(state) {
-            console.group("BIQCheckoutStore journey quote booked & paid state");
-            console.log({...state});
-            // set the flags to indicaate the checkout process has 
-            // finished & should not be attempted again
-            state.processed = true;
-            state.processing = false;
-            console.log({...state});
-            console.groupEnd();
+        processing(state, payload) {
+            // set the flags to indicate the checkout processing state
+            state.processing = payload.processing;
+            state.processed = payload.processed;
+        },
+
+        booked(state, payload) {
+            // set the booking reference
+            state.booking_ref = payload.booking_ref
         }
     }
 };
 
-export default BIQCheckout;
+export default CheckoutStateStore;

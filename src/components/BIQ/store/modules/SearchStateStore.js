@@ -1,10 +1,14 @@
-// define a function to add leading zeros to the date time values for string value use
-const az = i => (i<10) ? i="0"+i : i;
+import { DEFAULT_SORT, formatQuotes, reduceToTypeAndClass } from '@/common/BIQ/QuotesFormatter';
+
 // create a new date to initialise the search form date & time fields
 const d = new Date();
 // just put the date & time forward a little
 d.setDate(d.getDate() + 1);
 d.setHours(d.getHours() + 2);
+
+// define a function to add leading zeros to the date time values for string value use
+const az = i => (i<10) ? i="0"+i : i;
+
 // define the default initial state structure & values
 const defaultState = () => {
     return {
@@ -22,19 +26,20 @@ const defaultState = () => {
                 time : '', 
             }
         },
-        validation_errors : {
-
-        },
+        results : false,
+        display_type : '',
         display_quotes : []
     };
 };
 
 // define the state store module
-const BIQSearch = {
+const SearchStateStore = {
     state : defaultState(),
     
     getters : {
         searchDetails : (state) => state.search_details,
+        hasSearchResults : (state) => state.results,
+        displayType : (state) => state.display_type,
         displayQuotes : (state) => state.display_quotes
     },
     
@@ -59,40 +64,49 @@ const BIQSearch = {
             // inform the quotes store module of the API journey quotes response
             dispatch('quoted', journey, { root : true });
             // set the quotes to be displayed in the results
-            commit('displaying', journey.display);
+            if(Object.keys(journey.quotes).length > 0) {
+                const payload = {
+                    type : journey.display_type,
+                    // determine the quotes to display from the quote results based on the setting type
+                    quotes : (journey.display_type == 'type_class')
+                        ? reduceToTypeAndClass(journey.quotes) 
+                        : formatQuotes(journey.quotes, journey.display_type, DEFAULT_SORT)
+                };
+                commit('displaying', payload);
+            }
+        },
+
+        changeDisplayType({ commit, rootGetters }, type) {
+            const payload = {
+                type,
+                // determine the quotes to display from the quote results based on the setting type
+                quotes : (type == 'type_class')
+                    ? reduceToTypeAndClass(rootGetters.journeyQuotes) 
+                    : formatQuotes(rootGetters.journeyQuotes, type, DEFAULT_SORT)
+            };
+            commit('displaying', payload);
         }
     },
 
     mutations : {
         resetSearchState(state) {
-            console.group("Resetting BIQSearchStore State");
-            console.info({...state});
             // reset the state to the initial state
             Object.assign(state, defaultState());
-            console.info({...state});
-            console.groupEnd();
         },
 
         searchingQuotesFor(state, details) {
-            console.group("BIQSearchStore search details state");
-            console.info({...state});
-            console.info(details);
             // set the search form state details
             state.search_details = details;
-            console.info({...state});
-            console.groupEnd();
         },
         
-        displaying(state, quotes) {
-            console.group("BIQSearchStore displaying quotes state");
-            console.info({...state});
-            console.info({...quotes});
+        displaying(state, payload) {
             // set the search results quotes to display 
-            state.display_quotes = quotes;
-            console.info({...state});
-            console.groupEnd();
+            state.display_quotes = payload.quotes;
+            state.display_type = payload.type;
+            // set the flag to indicate quote results can be displayed
+            state.results = true;
         }
     }
 };
 
-export default BIQSearch;
+export default SearchStateStore;

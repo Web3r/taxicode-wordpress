@@ -1,0 +1,84 @@
+<div>
+    <form id="purchaseform">
+        <biq-passenger-details-form-section
+            ref="passengerForm"
+            :debugging="debugging"
+        ></biq-passenger-details-form-section>
+
+        <div class="row">
+            <div class="col">
+                <h4 id="tc_plugin-payment-heading">Payment Details</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div id="tcplugin-payament-select" class="col">
+                Select Payment Method:
+            </div>
+            <div class="col">
+                <b-form-select 
+                    v-model="payment_method" 
+                    :options="payment_options" 
+                ></b-form-select>
+            </div>
+        </div>
+        
+        <stripe-card-payment v-if="isCardPayment"
+            ref="card"
+            :app-config="appConfig"
+            :app-settings="appSettings" 
+            :amount="price"
+            :stripe-card-form-style="stripe_cardform_style"
+            :debugging="debugging"
+            @submit.prevent="onStripeSubmit"
+            @transactionSuccess="onStripeSuccess"
+            @transactionError="onStripeError"
+            id="tcplugin-stripe-card-details"
+            label="Card Details"
+            descriptor="Taxi Journey"
+        ></stripe-card-payment>
+        
+        <div v-else 
+            class="row"
+        >
+            <div class="col"></div>
+            <div id="tcplugin-paypal-plugin" class="col">
+                <div class="form-group">
+                    <label for="paypal" class="control-label">Or Pay With Paypal</label>
+                    <v-braintree
+                        :authorization="paypalClientToken"
+                        :paypal="paypal_setup"
+                        @success="onPaypalSubmit"
+                        @error="onPaypalError"
+                        @loadFail="onPaypalLoadFail"
+                    >
+                        <template v-slot:button="slotProps">
+                            <div class="form-group">
+                                <biq-process-form-submit 
+                                    :processing="loading == 1"
+                                    :useButtons="appConfig.useButtons"
+                                    @click.prevent="slotProps.submit"
+                                    label="Book Now"
+                                ></biq-process-form-submit>
+                            </div>
+                        </template>
+                    </v-braintree>
+                </div>
+            </div>
+        </div>
+    </form>
+        
+    <div v-if="posterror" 
+        class="row"
+    >
+        <div id="tcplugin-payment-error" class="col">
+            {{posterror}}
+        </div>
+    </div>
+    
+    <div class="row">
+        <biq-quoted-journey-details
+            :price="price"
+        ></biq-quoted-journey-details>
+    </div>
+</div>
