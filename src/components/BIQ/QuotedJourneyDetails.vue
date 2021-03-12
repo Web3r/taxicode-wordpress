@@ -27,7 +27,9 @@
                 >
                     <strong>Returning:</strong> {{journeyReturnDate}} at {{journeyReturnTime}}
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li v-if="price > 0" 
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                >
                     <strong>Price:</strong> &pound;{{price.toFixed(2)}}
                 </li>
             </ul>
@@ -39,7 +41,14 @@
     import { mapGetters } from 'vuex';
 
     export default {
-        name : "JourneyDetails",
+        name : "QuotedJourneyDetails",
+
+        props : {
+            price : {
+                type : Number,
+                default : 0
+            }
+        },
 
         computed : mapGetters([
         // BIQ Quoting state
@@ -49,13 +58,7 @@
             'journeyHasReturn', 
             'journeyReturnDate', 
             'journeyReturnTime', 
-            'journeyHasVias', 
-        // BIQ Book Now Checkout state
-            'price'
+            'journeyHasVias'
         ])
     };
 </script>
-
-<style scoped>
-
-</style>

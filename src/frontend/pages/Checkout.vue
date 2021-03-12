@@ -56,35 +56,35 @@
             /** create a new stripe card form payment option */
             this.cardFormHandler = new StripeCardFormHandler(
             /** The Stripe public key */
-                    // Stripe public key is set in the page JS 
-                    // before vue load, and imported here
-                    this.gateway_api_key,
+                // Stripe public key is set in the page JS 
+                // before vue load, and imported here
+                this.gateway_api_key,
             /** The transaction success handler */
-                    function(handler, paymentIntent) {
-                        checkout.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
-                            console.log(paymentIntent);
-                            // add the API field values for additional payment related data
-                            formData.append('card_cardholder', checkout.cardholder_name);
-                            // @todo Add the additional card field values from the 
-                            // payment intent response
-                            // - card_type
-                            // - card_number (xxxxxxxxxxxx1234)
-                            // - card_expiry
-                            // - card_address1 (if available?)
-                            formData.append('postcode', checkout.billing_postcode);
-                            // - city (if available?)
-                        });
-                    },
+                function(handler, paymentIntent) {
+                    checkout.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
+                        console.log(paymentIntent);
+                        // add the API field values for additional payment related data
+                        formData.append('card_cardholder', checkout.cardholder_name);
+                        // @todo Add the additional card field values from the 
+                        // payment intent response
+                        // - card_type
+                        // - card_number (xxxxxxxxxxxx1234)
+                        // - card_expiry
+                        // - card_address1 (if available?)
+                        formData.append('postcode', checkout.billing_postcode);
+                        // - city (if available?)
+                    });
+                },
             /** The transaction failed handler */
-                    function(handler, error) {
-                        checkout.loading = 0;
-                        checkout.hasCardErrors = true;
-                        checkout.posterror = error.message;
-                        checkout.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
-                    },
+                function(handler, error) {
+                    checkout.loading = 0;
+                    checkout.hasCardErrors = true;
+                    checkout.posterror = error.message;
+                    checkout.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
+                },
             /** The URI to get the client secret from */
-                    config.CLIENT_SECRET_URL
-                );
+                config.CLIENT_SECRET_URL
+            );
             console.log("created");
         },
 
