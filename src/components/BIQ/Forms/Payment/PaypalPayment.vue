@@ -102,7 +102,7 @@
                     amount : this.amount,
                     currency : 'GBP'
                 },
-                // create a new paypal payment option element
+                // create a new paypal payment option handler
                 paymentHandler : new PaypalHandler(
                     this.onHandlerSuccess,
                     this.onHandlerError,
@@ -122,18 +122,6 @@
         },
 
         methods: {
-            onSubmit(event) {
-                // @todo this is where the manual initiation & transaction 
-                //       response event handling & dispatching should go, but we're just
-                //       using a handler for frameworked flow consitency for now.
-                if(this.debugging) {
-                    console.group('Paypal submit event');
-                    console.log(event);
-                    console.groupEnd();
-                }
-                console.log(event);
-            },
-
             onHandlerSuccess : function(paymentHandler, paymentIntent) {
                 // add the success event data, including the completed payment intent transaction
                 // we have the money, but no booking created yet!
@@ -188,8 +176,6 @@
                 event.data = {
                     source : this.name,
                     paymentHandler : this.paymentHandler.getPublicHandler(),
-                    // just inject the success event to the data payload to allow for flow consistency
-                    //paypalSuccessEvent : event
                 };
                 // trigger the submit event to allow for full form validation & flow consistency
                 this.$emit('submit', event);
