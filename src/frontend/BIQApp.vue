@@ -153,18 +153,18 @@
                 axios.get(biq_app_settings_url)
                 .then(response => {
                     if(app.biqAppDebugEnabled) {
-                        console.log(response);
-                        console.log({...app.settings});
+                        console.log('response', response);
+                        console.log('App Settings', {...app.settings});
                         // this is a string from the REST & doesn't parse to JSON well :(
                         // but the echoed string inside the script tag to be supplied as a prop to the
                         // Checkout Page view via the global window variable is an object.
                         // It's dirty, but needs must for now 2021
-                        console.info(typeof(stripe_cardform_style));
-                        console.log(stripe_cardform_style);
-                        console.info(typeof(response.data.stripe_cardform_style));
-                        console.log(response.data.stripe_cardform_style);
+                        console.log('stripe_cardform_style', stripe_cardform_style);
+                        console.info('type', typeof(stripe_cardform_style));
+                        console.log('response.data.stripe_cardform_style', response.data.stripe_cardform_style);
+                        console.info('type', typeof(response.data.stripe_cardform_style));
                         try {
-                            console.log(JSON.parse(response.data.stripe_cardform_style));
+                            console.log('parse attempt', JSON.parse(response.data.stripe_cardform_style));
                         } catch(e) {
                             console.error(e);
                         }
@@ -192,7 +192,7 @@
                     app.initialised = true;
                     if(app.biqAppDebugEnabled) {
                         console.info('Loaded Settings');
-                        console.log({...app.settings});
+                        console.log('App Settings', {...app.settings});
                         console.groupEnd();
                     }
                 })

@@ -165,9 +165,7 @@
                 // first set the form to current search form state
                 const searchState = this.searchDetails;
                 if(this.debugging) {
-                    console.group('Setting BIQ Search Form from State');
-                    console.log(searchState);
-                    console.groupEnd();
+                    console.log('BIQ Search Form from State', searchState);
                 }
                 this.fields.journey_type.selected = searchState.journey_type;
                 this.fields.pickup.value = searchState.pickup;

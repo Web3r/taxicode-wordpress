@@ -37,6 +37,8 @@
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/TheSearchForm.vue';
     import TheSearchResults from 'BIQ/TheSearchResults.vue';
+    // import the Stripe elements card form payment handler
+    import QuotesRecommendedUpgrade from '@/common/BIQ/QuotesRecommendedUpgrade';
 
     export default {
         name: 'HomePage',
@@ -64,6 +66,16 @@
             }
         },
 
+        data() {
+            return {
+                quotesRecommendedUpgrade : new QuotesRecommendedUpgrade(
+                    () => this.journeyQuotes, 
+                    () => this.journeyDetails, 
+                    this.debugging
+                )
+            };
+        },
+
         created() {
             if(this.searchOnLoad) {
                 // overwrite the search form details state with any POSTed values from 
@@ -88,6 +100,7 @@
                 'quotesError', 
                 'quotesLoaded', 
                 'journeyID', 
+                'journeyDetails', 
                 'journeyQuotes', 
             // BIQ Book Now Checkout state
                 'quoteID',
@@ -112,9 +125,7 @@
 
             searchFormPropData : function() {
                 if(this.debugging) {
-                    console.group('BIQ Search Form POST prop data');
-                    console.log(this.searchFormData);
-                    console.groupEnd();
+                    console.log('BIQ Search Form POST prop data', this.searchFormData);
                 }
                 const journey_details = {
                     journey_type : (typeof(this.searchFormData.journey_type) != 'undefined')
@@ -218,9 +229,18 @@
                     selectedVehicleIndex 
                 } = event.data;
                 if(this.debugging) {
-                    console.log(quoteID);
-                    console.log(selectedVehicleIndex);
-                    console.log(this.journeyQuotes[quoteID]);
+                    console.log('Quote ID', quoteID);
+                    console.log('Vehicle Index', selectedVehicleIndex);
+                    console.log('Quote', this.journeyQuotes[quoteID]);
+                    console.log('Vehicle', this.journeyQuotes[quoteID].vehicles[selectedVehicleIndex]);
+                    console.groupEnd();
+                }
+                // @todo determine if to offer the quote vehicle upgrade recommendation
+                const quoteUpgradeOption = this.quotesRecommendedUpgrade.getRecommendationFor(this.journeyQuotes[quoteID], selectedVehicleIndex);
+                if(this.debugging) {
+                    console.group('Quote Upgrade Recommendation');
+                    console.log('quoteUpgradeOption', quoteUpgradeOption);
+                    console.log('props', quoteUpgradeOption.props());
                     console.groupEnd();
                 }
                 // update the state with the selected journey quote & vehicle
@@ -243,8 +263,8 @@
             updateSearchState : function(data) {
                 if(this.debugging) {
                     console.group('BIQ Quotes Search State Updated');
-                    console.log(data);
-                    console.log(this.appSettings.quote_type);
+                    console.log('Search data', data);
+                    console.log('Quote type', this.appSettings.quote_type);
                     console.groupEnd();
                 }
                 // update the search state with the quote search results so the display 

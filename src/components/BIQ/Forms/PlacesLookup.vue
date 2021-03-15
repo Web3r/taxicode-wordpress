@@ -151,8 +151,8 @@
                     return;
                 }
                 if(this.debugging) {
-                    console.info(`BIQ Places ${this.label} lookup to API '${this.apiPlacesLookup}'`);
-                    console.log(term);
+                    console.info();
+                    console.log(`BIQ Places ${this.label} lookup to API '${this.apiPlacesLookup}'`, term);
                 }
                 this.force_lookup = false;
                 this.$refs.locationfield.inputValue = term;
@@ -165,8 +165,7 @@
                 .then(response => {
                     // @todo make sure results are usable
                     if(self.debugging) {
-                        console.info(`BIQ Places ${this.label} response`);
-                        console.log(response);
+                        console.log(`BIQ Places ${this.label} response`, response);
                     }
                     if(response.data.status != 'OK') {
                     // throw new error event & let the catch() handle creating the event
