@@ -79,8 +79,8 @@ const ValidatesMixin = {
             const self = this;
             if(this.debugging) {
                 console.group(`Setting ${this.$options._componentTag} values`);
-                console.log(this.fields);
-                console.log(this.values);
+                console.log('Fields Before', {...this.fields});
+                console.log('Values', this.values);
             }
             Object.keys(this.values).forEach(fieldname => {
                 if(!self.fields.hasOwnProperty(fieldname)) {
@@ -93,7 +93,7 @@ const ValidatesMixin = {
                 self.fields[fieldname][prop] = self.values[fieldname];
             });
             if(this.debugging) {
-                console.log(this.fields);
+                console.log('Fields After', {...this.fields});
                 console.groupEnd();
             }
         },

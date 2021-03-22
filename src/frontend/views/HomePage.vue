@@ -16,7 +16,7 @@
             :display-results-type="appSettings.quote_type"
             :debugging="debugging"
             :use-buttons="appConfig.useButtons" 
-            @c2aClick="onBookNowClicked"
+            @biqQuoteBookNow="onBookNowClicked"
         >
             <template #loading-quotes>
                 <div class="row">
@@ -27,18 +27,34 @@
                 <p>{{error.message}}</p>
             </template>
         </the-biq-search-results>
+
+        <!-- use the modal component, pass in the prop -->
+        <modal v-if="showRecommendedUpgrade" 
+            :header-text="recommended_upgrade_header"
+            @cancel="onCancelModal"
+            @confirm="onConfirmModal"
+            cancel-action-text="Don't Upgrade"
+            confirm-action-text="Upgrade"
+        >
+            <!-- you can use custom content here to overwrite default content -->
+            <p slot="body">{{recommended_upgrade_description}}</p>
+        </modal>
+
     </div>
 </template>
 
 <script>
+    // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
     import PagesMixin from 'mixins/PagesMixin';
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/TheSearchForm.vue';
     import TheSearchResults from 'BIQ/TheSearchResults.vue';
-    // import the Stripe elements card form payment handler
-    import QuotesRecommendedUpgrade from '@/common/BIQ/QuotesRecommendedUpgrade';
+    // import the popup dialog component for the recommended quote upgrade
+    import BasicConfirmModal from '@/components/BasicConfirmModal.vue';
+    // import the recommended quote upgrade calculator
+    import QuotesRecommendedUpgradeCalculator from '@/common/BIQ/QuotesRecommendedUpgradeCalculator';
 
     export default {
         name: 'HomePage',
@@ -49,7 +65,8 @@
 
         components : {
             'the-biq-search-form' : TheSearchForm,
-            'the-biq-search-results' : TheSearchResults
+            'the-biq-search-results' : TheSearchResults,
+            'modal' : BasicConfirmModal
         },
 
         props: {
@@ -68,7 +85,15 @@
 
         data() {
             return {
-                quotesRecommendedUpgrade : new QuotesRecommendedUpgrade(
+                selected : {
+                    id : '',
+                    vehicle : 0,
+                    data : {}
+                },
+                show_upgrade : false,
+                recommended_upgrade_header : 'No Upgrade',
+                recommended_upgrade_description : 'No Upgrade',
+                quotesRecommendedUpgrade : new QuotesRecommendedUpgradeCalculator(
                     () => this.journeyQuotes, 
                     () => this.journeyDetails, 
                     this.debugging
@@ -109,6 +134,10 @@
 
             showResults : function() {
                 return (this.loadingQuotes || this.quotesError || this.quotesLoaded);
+            },
+
+            showRecommendedUpgrade : function() {
+                return (this.appSettings.recommend_upgrade && this.show_upgrade);
             }
         },
 
@@ -235,21 +264,96 @@
                     console.log('Vehicle', this.journeyQuotes[quoteID].vehicles[selectedVehicleIndex]);
                     console.groupEnd();
                 }
-                // @todo determine if to offer the quote vehicle upgrade recommendation
-                const quoteUpgradeOption = this.quotesRecommendedUpgrade.getRecommendationFor(this.journeyQuotes[quoteID], selectedVehicleIndex);
+                // set the selected quote details
+                const selected = {
+                    id : quoteID,
+                    vehicle : selectedVehicleIndex,
+                    data : this.journeyQuotes[quoteID]
+                };
+                // check if there is a recommended quote upgrade available being offered
+                if(!this.recommendAvailableUpgrade(selected)) {
+                // no quote upgrade to offer
+                    // we're done, next page
+                    return this.gotoCheckout();
+                }
+            },
+
+            onCancelModal : function(event) {
                 if(this.debugging) {
-                    console.group('Quote Upgrade Recommendation');
-                    console.log('quoteUpgradeOption', quoteUpgradeOption);
-                    console.log('props', quoteUpgradeOption.props());
+                    console.log('Cancel Modal Event', event);
+                }
+                // the upgrade offer was declined, use the selected quote and ...
+                // we're done, next page
+                this.gotoCheckout();
+                // flag the modal popup to close
+                this.show_upgrade = false;
+            },
+
+            onConfirmModal : function(event) {
+                if(this.debugging) {
+                    console.log('Confirm Modal Event', event);
+                }
+                // get the recommended upgrade 
+                const upgrade = this.quotesRecommendedUpgrade.getRecommendedUpgrade();
+                if(this.debugging) {
+                    console.group('Quote Upgrade Recommendation Accepted');
+                    console.log('quoteUpgradeOption', upgrade);
                     console.groupEnd();
                 }
+                // the upgrade offer was accepted, so ...
+                // set the upgrade quote as the selected quote and ...
+                this.selected = {
+                    id : upgrade.upgradeQuoteId,
+                    vehicle : upgrade.upgradeVehicleIndex,
+                    data : upgrade.upgradeQuote
+                };
+                // we're done, next page
+                this.gotoCheckout();
+                // flag the modal popup to close
+                this.show_upgrade = false;
+            },
+
+            recommendAvailableUpgrade : function(selected) {
+                if(!this.appSettings.recommend_upgrade) {
+                // recommended upgrade is not being used but the selected still needs to be set
+                    // set the selected quote
+                    this.selected = selected;
+                    return false;
+                }
+                // see if there is an quote avalaible for upgrade recommendation
+                this.quotesRecommendedUpgrade.makeRecommendationFor(selected.data, selected.vehicle);
+                // get the recommended upgrade
+                const quoteRecommendedUpgrade = this.quotesRecommendedUpgrade.getRecommendedUpgrade();
+                if(this.debugging) {
+                    console.group('Book Now Upgrade Recommendation');
+                    console.log('quoteUpgradeOption', quoteRecommendedUpgrade);
+                    console.log('props', quoteRecommendedUpgrade.props());
+                    console.groupEnd();
+                }
+                // set the selected quote
+                this.selected = selected;
+                // determine if to offer the quote vehicle upgrade recommendation
+                if(!quoteRecommendedUpgrade.exists) {
+                // no quote upgrade to offer
+                    return false;
+                }
+                // there is a quote upgrade recommendation to offer
+                const upgradeProps = quoteRecommendedUpgrade.props();
+                this.recommended_upgrade_header = upgradeProps.title;
+                this.recommended_upgrade_description = upgradeProps.description;
+                // flag the modal popup to display the recommended upgrade offer
+                this.show_upgrade = true;
+                return this.show_upgrade;
+            },
+
+            gotoCheckout : function() {
                 // update the state with the selected journey quote & vehicle
                 this.bookNow({
-                    quote : quoteID, 
-                    vehicle : selectedVehicleIndex,
-                    quote_data : this.journeyQuotes[quoteID]
+                    quote : this.selected.id, 
+                    vehicle : this.selected.vehicle,
+                    quote_data : this.selected.data
                 });
-                // move to the checkout page to book the selected journey quote
+                // move to the checkout page to book the selected journey quote using the state bound values
                 this.$router.push({ 
                     name : 'CheckoutPage', 
                     params : { 
@@ -258,7 +362,7 @@
                         vehicle : this.vehicleIndex 
                     }
                 });
-            },
+            }, 
 
             updateSearchState : function(data) {
                 if(this.debugging) {

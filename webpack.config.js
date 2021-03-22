@@ -15,7 +15,14 @@ const entryPoints = {
   frontend : './src/frontend/main.js',
   admin : './src/admin/main.js'
 };
+// @NOTE __dirname is coming from node & not from this files location
+// set the location where the compiled output will be
 const exportPath = path.resolve(__dirname, './assets/js');
+// this is where the wordpress website root should be???
+const webRoot = '/wp-content';
+// set the public access (web) path by removing the base of the absolute export path
+// so the lazy component loading can work out where to load the compiled assets in browser
+const publicPath = webRoot + exportPath.split(webRoot)[1];
 
 // create an array of plugins being used
 const plugins = [];
@@ -45,6 +52,7 @@ module.exports = {
 
     output: {
         path: exportPath,
+        publicPath: `${publicPath}/`,
         // Differ settings based on production flag
         filename: devMode ? '[name].js' : '[name].min.js'
     },

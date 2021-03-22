@@ -121,20 +121,6 @@ const classUpgradeProps = upgradeRecommendation => {
 };
 
 /**
- * Create a mapped object of available tier type category upgrades
- * @param {string} type the upgrade category tier type
- * @returns {Object} An object defining the tier type, the upgrade criteria needed & if it exists
- */
-const mapAvailableCategoryUpgrades = type => {
-    return ({
-        type,
-        exists : false,
-        // use a callback to defer value until needed
-        upgradeCriteria
-    });
-};
-
-/**
  * Create no upgrade available object 
  * @param {string} categoryType the upgrade category tier type
  * @returns {Object} An object defining the structure for continued processing
@@ -147,14 +133,27 @@ const mapAvailableCategoryUpgrades = type => {
     });
 };
 
-export default class QuotesRecommendedUpgrade {
+/**
+ * Create a mapped object of available tier type category upgrades
+ * @param {string} type the upgrade category tier type
+ * @returns {Object} An object defining the tier type, the upgrade criteria needed & if it exists
+ */
+ const mapAvailableCategoryUpgrades = type => {
+    return ({
+        type,
+        // use a callback to defer value until needed
+        upgradeCriteria
+    });
+};
+
+export default class QuotesRecommendedUpgradeCalculator {
          
     /**
      * Form the base for transaction payment handlers
      * @param {function} getQuotesCB A callback that will provide the list of quotes to get recommendations from
      * @param {function} getJourneyCB A callback that will provide the quoted journey details
 	 * @param {Boolean} debugging flag to indicate if debugging is enabled
-     * @returns {QuotesRecommendedUpgrade}
+     * @returns {QuotesRecommendedUpgradeCalculator}
      */
     constructor(getQuotesCB, getJourneyCB, debugging) {
         // because of safai we can't have nice things & have to bind these anyway
@@ -165,7 +164,9 @@ export default class QuotesRecommendedUpgrade {
         this._mapCategoryUpgradesForSelected = this._mapCategoryUpgradesForSelected.bind(this);
         this._mapQuoteUpgradesForSelected = this._mapQuoteUpgradesForSelected.bind(this);
         this._commonUpgradeProps = this._commonUpgradeProps.bind(this);
-        this.getRecommendationFor = this.getRecommendationFor.bind(this);
+        this.makeRecommendationFor = this.makeRecommendationFor.bind(this);
+        this.setRecommendedUpgrade = this.setRecommendedUpgrade.bind(this);
+        this.getRecommendedUpgrade = this.getRecommendedUpgrade.bind(this);
         // map the callback to get the quotes & journey details when they're needed
         this.getQuotes = getQuotesCB;
         this.getJourney = getJourneyCB;
@@ -198,12 +199,44 @@ export default class QuotesRecommendedUpgrade {
             data : {
                 key : null,
                 quoteId : null,
+                quote : {},
                 vehicleIndex : null,
                 vehicle : {
                     price : this.priceDifference
                 },
                 priceDifference : this.priceDifference
             }
+        }
+    }
+
+    /**
+     * Set the recommended upgrade quote
+     * @param {Object} upgradeOption the upgrade recommendation option
+     */
+    setRecommendedUpgrade(upgradeOption) {
+        this.recommendedUpgrade = {
+            ...upgradeOption,
+            // override the original common props method with the specifc props if the upgrade exists
+            props : (upgradeOption.exists) 
+                ? upgradeOptionProps(upgradeOption)
+                : () => ({}),
+            selectedQuoteId : this.selectedQuoteId,
+            selectedQuote : this.selectedQuote,
+            selectedVehicleIndex : this.selectedVehicleIndex,
+            selectedVehicle : this.selectedVehicle
+        };
+        if(this.debugging) {
+            console.log('Recommended Upgrade Set', this.recommendedUpgrade);
+        }
+    }
+
+    /**
+     * Get the recommended quote upgrade
+     * @returns {object}
+     */
+    getRecommendedUpgrade() {
+        return {
+            ...this.recommendedUpgrade
         }
     }
 
@@ -216,12 +249,12 @@ export default class QuotesRecommendedUpgrade {
     }
     
     /**
-     * Get a vehicle upgrade option for the quote
+     * Determine a quote upgrade recommendation for the specified quote if there is one
      * @param {Object} quote the quote to recommend an upgrade for
      * @param {Number} vehicle the the selected vehicle index for the selected quote
      * @returns {object}
      */
-    getRecommendationFor(quote, vehicle) {
+    makeRecommendationFor(quote, vehicle) {
         // reset / initialise the recommendation data
         this._resetRecommendation();
         // check the quote exists & the vehicle
@@ -231,33 +264,21 @@ export default class QuotesRecommendedUpgrade {
         this.selectedQuoteId = quote.quote_id;
         this.selectedVehicleIndex = vehicle;
         if(this.debugging) {
-            console.group('-- Getting recommended upgrade for selected quote --');
+            console.group('-- Making upgrade recommendation for selected quote --');
+            console.log('availableCategoryUpgrades', this.availableCategoryUpgrades);
             console.log('selectedQuoteId', this.selectedQuoteId);
             console.log('selectedVehicleIndex', this.selectedVehicleIndex);
             console.log('selectedQuote', this.selectedQuote);
             console.log('selectedVehicle', this.selectedVehicle);
             console.log('priceDifference', this.priceDifference);
-            console.log('upgradeRecommendation', this.upgradeRecommendation);
-            console.log('availableCategoryUpgrades', this.availableCategoryUpgrades);
+            console.log('upgradeRecommendation', {...this.upgradeRecommendation});
         }
-        // get the upgrade recommendation if there is one
-        const upgradeOption = this._recommendForSelected();
+        this.setRecommendedUpgrade(this._recommendForSelected());
         if(this.debugging) {
-            console.log('upgradeOption', upgradeOption);
+            console.log('priceDifference', this.priceDifference);
+            console.log('upgradeRecommendation', {...this.upgradeRecommendation});
             console.groupEnd();
         }
-        // return the upgrade option with the added upgrade specific props
-        return {
-            ...upgradeOption,
-            // override the original common props method with the specifc props if the upgrade exists
-            props : (upgradeOption.exists) 
-                ? upgradeOptionProps(upgradeOption)
-                : upgradeOption.props(),
-            selectedQuoteId : this.selectedQuoteId,
-            selectedQuote : this.selectedQuote,
-            selectedVehicleIndex : this.selectedVehicleIndex,
-            selectedVehicle : this.selectedVehicle
-        };
     }
     
     /**
@@ -284,7 +305,9 @@ export default class QuotesRecommendedUpgrade {
         // return the recommendation for the selected quote & common props
         return {
             upgradeQuoteId : this.upgradeRecommendation.data.quoteId,
+            upgradeQuote : this.upgradeRecommendation.data.quote,
             upgradeVehicleIndex : this.upgradeRecommendation.data.vehicleIndex,
+            upgradeVehicle : this.upgradeRecommendation.data.vehicle,
             priceDifference : this.priceDifference,
             ...this.upgradeRecommendation
         };
@@ -381,6 +404,7 @@ export default class QuotesRecommendedUpgrade {
                             key : cheapestUpgradeQuote.quoteId,
                             quoteId : cheapestUpgradeQuote.quoteId,
                             vehicleIndex : cheapestUpgradeQuote.vehicleIndex,
+                            quote : this.quotes[cheapestUpgradeQuote.quoteId],
                             vehicle : this.quotes[cheapestUpgradeQuote.quoteId].vehicles[cheapestUpgradeQuote.vehicleIndex],
                             priceDifference : cheapestUpgradeQuote.priceDifference
                         }
@@ -427,8 +451,10 @@ export default class QuotesRecommendedUpgrade {
             this.priceDifference = this.selectedVehicle.price + priceDifference;
         }
         if(this.debugging && upgradeVehicles.length) {
-            console.log('All vehicles', quote.vehicles);
             console.log('Only available upgrade vehicles', upgradeVehicles);
+        }
+        if(this.debugging) {
+            console.log('All vehicles', quote.vehicles);
             console.log('Upgrade Quote Price', this.priceDifference);
             console.log('Price difference between quotes', priceDifference);
             console.groupEnd();
@@ -456,7 +482,7 @@ export default class QuotesRecommendedUpgrade {
             selectedVehicleIndex : this.selectedVehicleIndex,
             upgradeQuoteId : this.upgradeRecommendation.data.quoteId,
             upgradeVehicleIndex : this.upgradeRecommendation.data.vehicleIndex,
-            priceDifference : this.priceDifference,
+            priceDifference : this.upgradeRecommendation.data.priceDifference,
             selectedVehicle : {
                 VehicleClass : this.selectedVehicle.class,
                 VehicleType : this.selectedVehicle.type,

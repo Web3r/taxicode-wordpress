@@ -1,10 +1,10 @@
 <template>
   <div id="biq-admin-vue-app">
-    <h1>Taxicode Booking Instant Quotes Admin</h1>
+    <h1>{{app_title}}</h1>
     <router-view v-if="initialised" 
-        :debugging="biq_app_debug_enabled"
-        :appSettings="appSettings"
-        :appRESTBaseURL="biq_app_url"
+        :debugging="biqAppDebugEnabled"
+        :app-settings="appSettings"
+        :appRESTBaseURL="biqAppURL"
         @appSettingsUpdated="appSettingsUpdated" 
     ></router-view>
   </div>
@@ -16,13 +16,13 @@
         version : '1.0.1',
         
         props : {
-            biq_app_url : {
+            biqAppURL : {
                 type : String,
                 required : true,
                 default : '//',
             },
 
-            biq_app_debug_enabled : {
+            biqAppDebugEnabled : {
                 type : Boolean,
                 default : false
             }
@@ -30,6 +30,7 @@
 
         data() {
             return {
+                app_title : 'Taxicode Booking Instant Quotes Admin',
                 initialised : false,
                 settings : {
                     biq_api_host : 'https://api.taxicode.com/',
@@ -46,10 +47,10 @@
                             color : 'red'
                         }
                     },
+                    booking_test_mode : false,
                     quote_type : '',
-                    complete_page_text : '',
-                    custom_css : '',
-                    booking_test_mode : false
+                    recommend_upgrade : false,
+                    complete_page_text : ''
                 }
             }
         },
@@ -68,9 +69,9 @@
         methods : {
             getAppSettings : function() {
                 const app = this;
-                const biq_app_settings_url = `${this.biq_app_url}settings-get/`;
-                if(this.biq_app_debug_enabled) {
-                    console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
+                const biq_app_settings_url = `${this.biqAppURL}settings-get/`;
+                if(this.biqAppDebugEnabled) {
+                    console.group(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
                 }
                 axios.get(biq_app_settings_url)
                 .then(response => {
@@ -78,25 +79,32 @@
                     app.initialised = true;
                 })
                 .catch(error => {
-                    if(this.biq_app_debug_enabled) {
+                    if(app.biqAppDebugEnabled) {
                         console.info('Updated Settings');
                         console.log(error);
-                        console.groupEnd();
                     }
                     console.error(error);
+                })
+                .finally(() => {
+                    if(app.biqAppDebugEnabled) {
+                        console.groupEnd();
+                    }
                 });
             },
 
             appSettingsUpdated : function(new_settings) {
-                if(this.biq_app_debug_enabled) {
+                if(this.biqAppDebugEnabled) {
                     console.group('Updating BIQ App Settings');
-                    console.info({...this.settings});
-                    console.info(new_settings);
+                    console.log('App Settings', {...this.settings});
+                    console.log('New Settings', new_settings);
+                    // this is a string from the REST & doesn't parse to JSON well :(
+                    // but the echoed string inside the script tag to be supplied as a prop to the
+                    // Checkout Page view via the global window variable is an object.
+                    // It's dirty, but needs must for now 2021
+                    console.log('stripe_cardform_style', new_settings.stripe_cardform_style);
+                    console.info('type', typeof(new_settings.stripe_cardform_style));
                     try {
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        console.log(new_settings.stripe_cardform_style);
-                        console.log(typeof(new_settings.stripe_cardform_style));
-                        console.log(JSON.parse(new_settings.stripe_cardform_style));
+                        console.log('parse attempt', JSON.parse(new_settings.stripe_cardform_style));
                     } catch(e) {
                         console.error(e);
                     }
@@ -108,16 +116,18 @@
                     stripe_pk : new_settings.stripe_public,
                     // this is a string from the REST & doesn't parse to JSON well :(
                     stripe_cardform_style : new_settings.stripe_cardform_style,
+                    // convert to boolean for ease
+                    booking_test_mode : (new_settings.test_mode == '1'),
                     quote_type : new_settings.quote_type,
-                    complete_page_text : new_settings.complete_page_text,
-                    custom_css : new_settings.custom_css,
-                    booking_test_mode : new_settings.test_mode
+                    // convert to boolean for ease
+                    recommend_upgrade : (new_settings.recommend_upgrade == '1'),
+                    complete_page_text : new_settings.complete_page_text
                 };
                 this.settings = settings;
-                if(this.biq_app_debug_enabled) {
+                if(this.biqAppDebugEnabled) {
                     console.info('Updated Settings');
-                    console.info(settings);
-                    console.info({...this.settings});
+                    console.log('Settings', settings);
+                    console.log('App Settings', {...this.settings});
                     console.groupEnd();
                 }
             }

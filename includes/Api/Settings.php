@@ -52,10 +52,11 @@ class Settings extends WP_REST_Controller {
         $stripe_public =  $request['stripe_public'];
         $stripe_private =  $request['stripe_private'];
         $stripe_cardform_style = $request['stripe_cardform_style'];
+        $test_mode = $request['test_mode'];
         $quote_type = $request['quote_type'];
+        $recommend_upgrade = $request['recommend_upgrade'];
         $complete_page_text = $request['complete_page_text'];
         $custom_css = $request['custom_css'];
-        $test_mode = $request['test_mode'];
 
         if(trim($taxicode_public)!='') {
             update_option('tcplugin_taxicode_public', $taxicode_public);
@@ -78,8 +79,16 @@ class Settings extends WP_REST_Controller {
             update_option('tcplugin_stripe_cardform_style', $stripe_cardform_style);
         }
 
+        if(trim($test_mode)!='') {
+            update_option('tcplugin_test_mode', $test_mode);
+        }
+
         if(trim($quote_type)!='') {
             update_option('tcplugin_quote_type', $quote_type);
+        }
+
+        if(trim($recommend_upgrade)!='') {
+            update_option('tcplugin_recommend_upgrade', $recommend_upgrade);
         }
 
         if(trim($complete_page_text)!='') {
@@ -90,10 +99,6 @@ class Settings extends WP_REST_Controller {
             update_option('tcplugin_custom_css', $custom_css);
         }
 
-        if(trim($test_mode)!='') {
-            update_option('tcplugin_test_mode', $test_mode);
-        }
-
         $response = [
             'taxicode_public'       => get_option('tcplugin_taxicode_public'),
             'taxicode_private'      => get_option('tcplugin_taxicode_private'),
@@ -101,10 +106,11 @@ class Settings extends WP_REST_Controller {
             'paypal_public'         => get_option('tcplugin_paypal_public'),
             'stripe_public'         => get_option('tcplugin_stripe_public'),
             'stripe_cardform_style' => get_option('tcplugin_stripe_cardform_style'),
+            'test_mode'             => get_option('tcplugin_test_mode'),
             'quote_type'            => get_option('tcplugin_quote_type'),
+            'recommend_upgrade'     => get_option('tcplugin_recommend_upgrade'),
             'complete_page_text'    => get_option('tcplugin_complete_page_text'),
-            'custom_css'            => get_option('tcplugin_custom_css'),
-            'test_mode'             => get_option('tcplugin_test_mode')
+            'custom_css'            => get_option('tcplugin_custom_css')
         ];
 
         return rest_ensure_response($response);

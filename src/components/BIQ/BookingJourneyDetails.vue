@@ -32,6 +32,14 @@
 <script>
     import axios from 'axios';
 
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when there is an error on the backend
+        detailsLoadError : {
+            name : 'detailsLoadError'
+        }
+    };
+
     export default {
         name : 'BookingJourneyDetails',
 
@@ -131,7 +139,7 @@
                     }
                 };
                 // trigger the error event
-                self.$emit('detailsLoadError', event);
+                self.$emit(emitEvents.detailsLoadError.name, event);
                 if(self.debugging) {
                     console.info('Booking Details Load Error');
                     console.log(event);

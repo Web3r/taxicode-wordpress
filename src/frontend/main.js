@@ -36,13 +36,13 @@ Vue.use(Vuex);
 /* eslint-disable no-new */
 new Vue({
     store,
-    render: h => h(BIQApp, {
-        props: {
+    render : h => h(BIQApp, {
+        props : {
             biqAppURL,
             biqAppConfig : conf.LIVE,
             biqAppDebugEnabled : devMode || biq_app_debug_enabled
         }
     }),
-    el: '#biq-vue-app',
+    el : '#biq-vue-app',
     router
 });

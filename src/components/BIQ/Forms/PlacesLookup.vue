@@ -33,8 +33,22 @@
 
 <script>
     import axios from 'axios';
+    // import underscore for the ability to debounce the autocomplete lookup function
     import _ from 'underscore';
+    // import the component for the autocomplete input & options list
     import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the places input value is updated
+        input : {
+            name : 'input'
+        },
+        // when there is an error with the BIQ API places lookup
+        biqPlacesLookupError : {
+            name : 'biqPlacesLookupError'
+        }
+    };
 
     export default {
         name : 'PlacesLookup',
@@ -127,7 +141,7 @@
                 },
                 set(location_string) {
                     // let the v-modeller know the value has changed
-                    this.$emit('input', location_string);
+                    this.$emit(emitEvents.input.name, location_string);
                 }
             },
 
@@ -206,7 +220,7 @@
                         }
                     };
                     // trigger the error event
-                    self.$emit('biqPlacesLookupError', event);
+                    self.$emit(emitEvents.biqPlacesLookupError.name, event);
                 });
             },
 

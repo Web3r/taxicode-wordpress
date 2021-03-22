@@ -11,6 +11,7 @@
 
 <script>
     import axios from 'axios';
+    // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
 
     export default {
@@ -68,10 +69,10 @@
                             color : 'red'
                         }
                     },
+                    booking_test_mode : false,
                     quote_type : '',
-                    complete_page_text : '',
-                    custom_css : '',
-                    booking_test_mode : false
+                    recommend_upgrade : false,
+                    complete_page_text : ''
                 },
                 config : this.biqAppConfig
             };
@@ -179,10 +180,12 @@
                         // Checkout Page view via the global window variable is an object.
                         // It's dirty, but needs must for now 2021
                         stripe_cardform_style : app.stripe_cardform_style,
+                        // convert to boolean for ease
+                        booking_test_mode : (response.data.test_mode == '1'),
                         quote_type : response.data.quote_type,
-                        complete_page_text : response.data.complete_page_text,
-                        custom_css : response.data.custom_css,
-                        booking_test_mode : (response.data.test_mode == '1')
+                        // convert to boolean for ease
+                        recommend_upgrade : (response.data.recommend_upgrade == '1'),
+                        complete_page_text : response.data.complete_page_text
                     };
                     // make sure the api host ends in a /
                     if(settings.biq_api_host.slice(-1) !== '/') {

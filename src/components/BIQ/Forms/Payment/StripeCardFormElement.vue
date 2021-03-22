@@ -31,6 +31,8 @@
     import StripeElementsHandler from '@/common/BIQ/PaymentHandlers/StripeElementsHandler';
     // import the component to disply the 1-click-processing form submit button
     import ProcessFormSubmit from 'BIQ/Forms/ProcessFormSubmit.vue';
+    // import the list of events the component emits & can be listened for on the payment form
+    import { emitEvents } from './PaymentFormEvents';
 
     export default {
         name : 'StripeCardFormElement',
@@ -180,7 +182,7 @@
                 };
                 // trigger the submit event with the public payment handler to allow for form 
                 // validation and later transaction initiation
-                this.$emit('submit', event);
+                this.$emit(emitEvents.submit.name, event);
             },
             
             onHandlerSuccess : function(paymentHandler, paymentIntent) {
@@ -193,7 +195,7 @@
                     }
                 };
                 // trigger the transaction success event
-                this.$emit('transactionSuccess', event);
+                this.$emit(emitEvents.transactionSuccess.name, event);
             },
 
             onHandlerError : function(paymentHandler, error) {
@@ -209,7 +211,7 @@
                     }
                 };
                  // trigger the error event
-                this.$emit('transactionError', event);
+                this.$emit(emitEvents.transactionError.name, event);
             },
 
             validate : function() {

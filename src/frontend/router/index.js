@@ -4,44 +4,42 @@ Vue.use(Router);
 
 // import the app page components
 import HomePage from 'frontend/views/HomePage.vue';
-import CheckoutPage from 'frontend/views/CheckoutPage.vue';
-// @todo make the component load async to reduce chunk size
-import CompletePage from 'frontend/views/CompletePage.vue';
 
 export default new Router({
-    routes: [
+    routes : [
         {
-            path: '/',
-            name: 'HomePage',
-            component: HomePage,
-            props: {
+            path : '/',
+            name : 'HomePage',
+            component : HomePage,
+            props : {
                 searchFormData,
                 searchOnLoad
             }
         },
         {
-            path: '/:journey',
-            name: 'HomePageSearched',
-            component: HomePage,
-            props: {
+            path : '/:journey',
+            name : 'HomePageSearched',
+            component : HomePage,
+            props : {
                 searchFormData,
                 searchOnLoad
             }
         },
         {
-            path: '/checkout/:journey/:quote/:vehicle',
-            name: 'CheckoutPage',
-            component: CheckoutPage,
-            props: {
+            path : '/checkout/:journey/:quote/:vehicle',
+            name : 'CheckoutPage',
+            // make the component load async to reduce chunk size
+            component : () => import(/* webpackChunkName: "BIQCheckout" */ 'frontend/views/CheckoutPage.vue'),
+            props : {
                 stripe_cardform_style,
                 paypalClientToken
             }
         },
         {
-            path: '/complete/:booking_ref',
-            name: 'CompletePage',
-            // @todo make the component load async to reduce chunk size
-            component: CompletePage
+            path : '/complete/:booking_ref',
+            name : 'CompletePage',
+            // make the component load async to reduce chunk size
+            component : () => import(/* webpackChunkName: "BIQComplete" */ 'frontend/views/CompletePage.vue')
         }
     ]
 });

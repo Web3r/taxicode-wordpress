@@ -12,6 +12,14 @@
 </template>
 
 <script>
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the call to action button is clicked
+        c2aClick : {
+            name : 'c2aClick'
+        }
+    };
+
     export default {
         name : 'BookNowC2A',
 
@@ -66,7 +74,7 @@
                     selectedVehicleIndex : this.selectedVehicleIndex
                 };
                 // trigger the call to action click event
-                this.$emit('c2aClick', event);
+                this.$emit(emitEvents.c2aClick.name, event);
             }
         }
     };

@@ -38,6 +38,7 @@
 </template>
 
 <script>
+    // import the state getters mapper
     import { mapGetters } from 'vuex';
 
     export default {
