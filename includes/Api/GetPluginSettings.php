@@ -54,10 +54,10 @@ class GetPluginSettings extends WP_REST_Controller
             'paypal_public'         => get_option('tcplugin_paypal_public'),
             'stripe_public'         => get_option('tcplugin_stripe_public'),
             'stripe_cardform_style' => get_option('tcplugin_stripe_cardform_style'),
+            'test_mode'             => get_option('tcplugin_test_mode'),
             'quote_type'            => get_option('tcplugin_quote_type'),
-            'complete_page_text'    => get_option('tcplugin_complete_page_text'),
-            'custom_css'            => get_option('tcplugin_custom_css'),
-            'test_mode'             => get_option('tcplugin_test_mode')
+            'recommend_upgrade'     => get_option('tcplugin_recommend_upgrade'),
+            'complete_page_text'    => get_option('tcplugin_complete_page_text')
         ];
 
         $response = rest_ensure_response( $response );

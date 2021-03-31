@@ -40,24 +40,32 @@
                 :type="key"
                 :debugging="debugging"
                 :use-buttons="useButtons" 
-                @c2aClick="$emit('c2aClick', $event)"
+                @c2aClick="onClick"
             ></component>
         </div>
     </div>
 </template>
 
 <script>
+    // import the state getters mapper
     import { mapGetters } from 'vuex';
-    // import the quote results display cards
-    import QuoteCardVehicleSelect from 'BIQ/QuoteCards/QuoteCardVehicleSelect.vue';
-    import QuoteCardReducedToTypeAndClass from 'BIQ/QuoteCards/QuoteCardReducedToTypeAndClass.vue';
+
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the quote "Book Now" button is clicked
+        biqQuoteBookNow : {
+            name : 'biqQuoteBookNow'
+        }
+    };
 
     export default {
         name : 'TheSearchResults',
 
         components : {
-            'biq-quote-card-vehicle-select' : QuoteCardVehicleSelect,
-            'biq-quote-card-reduced-to-type-and-class' : QuoteCardReducedToTypeAndClass
+            // lazy load the quote result card component as it's an either or scenario decided at 
+            // runtime and displayed using the component:is computed value
+            'biq-quote-card-vehicle-select' : () => import(/* webpackChunkName: "BIQQuoteCardVehicleSelect" */ 'BIQ/QuoteCards/QuoteCardVehicleSelect.vue'),
+            'biq-quote-card-reduced-to-type-and-class' : () => import(/* webpackChunkName: "BIQQuoteCardReduced" */ 'BIQ/QuoteCards/QuoteCardReducedToTypeAndClass.vue')
         },
 
         props : {
@@ -97,7 +105,14 @@
             'quotesError', 
             'zeroQuotes', 
             'journeyID'
-        ])
+        ]),
+
+        methods : {
+            onClick : function(event) {
+                // bubble the call to action click event
+                this.$emit(emitEvents.biqQuoteBookNow.name, event);
+            }
+        }
     };
 </script>
 

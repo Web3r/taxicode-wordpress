@@ -8,9 +8,9 @@
             :paypal-client-token="paypalClientToken"
             :processing="processing"
             :debugging="debugging"
-            @submit="onSubmit"
-            @checkoutComplete="onCheckoutSuccess"
-            @checkoutError="onCheckoutError"
+            @biqCheckoutSubmit="onSubmit"
+            @biqCheckoutComplete="onCheckoutSuccess"
+            @biqCheckoutError="onCheckoutError"
         >
             <template #checkout-error="{ error }">
                 <div 
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+    // import the state getters mapper
     import { mapGetters } from 'vuex';
     // import the mixin that sets values & validates field values
     import PagesMixin from 'mixins/PagesMixin';

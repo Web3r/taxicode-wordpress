@@ -11,6 +11,7 @@
 
 <script>
     import axios from 'axios';
+    // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
 
     export default {
@@ -68,10 +69,10 @@
                             color : 'red'
                         }
                     },
+                    booking_test_mode : false,
                     quote_type : '',
-                    complete_page_text : '',
-                    custom_css : '',
-                    booking_test_mode : false
+                    recommend_upgrade : false,
+                    complete_page_text : ''
                 },
                 config : this.biqAppConfig
             };
@@ -153,18 +154,18 @@
                 axios.get(biq_app_settings_url)
                 .then(response => {
                     if(app.biqAppDebugEnabled) {
-                        console.log(response);
-                        console.log({...app.settings});
+                        console.log('response', response);
+                        console.log('App Settings', {...app.settings});
                         // this is a string from the REST & doesn't parse to JSON well :(
                         // but the echoed string inside the script tag to be supplied as a prop to the
                         // Checkout Page view via the global window variable is an object.
                         // It's dirty, but needs must for now 2021
-                        console.info(typeof(stripe_cardform_style));
-                        console.log(stripe_cardform_style);
-                        console.info(typeof(response.data.stripe_cardform_style));
-                        console.log(response.data.stripe_cardform_style);
+                        console.log('stripe_cardform_style', stripe_cardform_style);
+                        console.info('type', typeof(stripe_cardform_style));
+                        console.log('response.data.stripe_cardform_style', response.data.stripe_cardform_style);
+                        console.info('type', typeof(response.data.stripe_cardform_style));
                         try {
-                            console.log(JSON.parse(response.data.stripe_cardform_style));
+                            console.log('parse attempt', JSON.parse(response.data.stripe_cardform_style));
                         } catch(e) {
                             console.error(e);
                         }
@@ -179,10 +180,12 @@
                         // Checkout Page view via the global window variable is an object.
                         // It's dirty, but needs must for now 2021
                         stripe_cardform_style : app.stripe_cardform_style,
+                        // convert to boolean for ease
+                        booking_test_mode : (response.data.test_mode == '1'),
                         quote_type : response.data.quote_type,
-                        complete_page_text : response.data.complete_page_text,
-                        custom_css : response.data.custom_css,
-                        booking_test_mode : (response.data.test_mode == '1')
+                        // convert to boolean for ease
+                        recommend_upgrade : (response.data.recommend_upgrade == '1'),
+                        complete_page_text : response.data.complete_page_text
                     };
                     // make sure the api host ends in a /
                     if(settings.biq_api_host.slice(-1) !== '/') {
@@ -192,7 +195,7 @@
                     app.initialised = true;
                     if(app.biqAppDebugEnabled) {
                         console.info('Loaded Settings');
-                        console.log({...app.settings});
+                        console.log('App Settings', {...app.settings});
                         console.groupEnd();
                     }
                 })

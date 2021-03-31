@@ -1,18 +1,16 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 Vue.use(Router);
 
-// import the admin app page components
-import Settings from 'admin/views/Settings.vue'
-
 export default new Router({
-    routes: [
+    routes : [
         {
-            path: '/',
-            name: 'Settings',
-            component: Settings,
-            props: {
-                biq_sk
+            path : '/',
+            name : 'SettingsPage',
+            component : () => import(/* webpackChunkName: "BIQAdminSettings" */ 'admin/views/SettingsPage.vue'),
+            props : {
+                biq_sk,
+                custom_css
             }
         }
     ]

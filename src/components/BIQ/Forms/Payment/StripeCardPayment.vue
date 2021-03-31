@@ -55,6 +55,8 @@
     import ValidatesMixin from 'mixins/ValidatesMixin';
     // import the component to display the journey details being booked
     import StripeCardFormElement from 'BIQ/Forms/Payment/StripeCardFormElement.vue';
+    // import the list of events the component emits & can be listened for on the payment form
+    import { emitEvents } from './PaymentFormEvents';
 
     export default {
         name : 'StripeCardPayment',
@@ -185,7 +187,7 @@
                     ...event.data
                 };
                 // trigger the submit event to allow for full form validation
-                this.$emit('submit', event);
+                this.$emit(emitEvents.submit.name, event);
             },
             
             onTransactionSuccess : function(event) {
@@ -215,7 +217,7 @@
                     }
                 };
                 // trigger the transaction success event
-                this.$emit('transactionSuccess', event);
+                this.$emit(emitEvents.transactionSuccess.name, event);
             },
 
             onTransactionError : function(event) {
@@ -228,7 +230,7 @@
                     ...event.data
                 };
                 // trigger the error event
-                this.$emit('transactionError', event);
+                this.$emit(emitEvents.transactionError.name, event);
             },
 
             specialValidationErrors : function() {

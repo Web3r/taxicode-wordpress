@@ -59,9 +59,10 @@ class Admin {
 
         $content = '
 <script>
-    const biq_app_debug_enabled = false;
-    const biq_app_url = \'' . get_rest_url('', '/taxicode/v1/') . '\';
+    const biqAppURL = \'' . get_rest_url('', '/taxicode/v1/') . '\';
     const biq_sk = \'' . get_option('tcplugin_taxicode_private') . '\';
+    const custom_css = ' . json_encode(get_option('tcplugin_custom_css')) . ';
+    const biq_app_debug_enabled = false;
 </script>
 <div class="wrap"><div id="biq-admin-vue-app"></div></div>';
         echo $content;

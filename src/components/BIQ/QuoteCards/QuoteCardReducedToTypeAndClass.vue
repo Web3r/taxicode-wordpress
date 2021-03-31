@@ -26,7 +26,7 @@
                     :selected-vehicle-index="selected_vehicle"
                     :label="c2aLabel"
                     :use-buttons="useButtons"
-                    @c2aClick="$emit('c2aClick', $event)"
+                    @c2aClick="onClick"
                 ></biq-book-now-c2a>
             </div>
         </div>
@@ -36,6 +36,14 @@
 <script>
     // import the Book Now Call To Action button
     import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
+
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the quote "Book Now" button is clicked
+        c2aClick : {
+            name : 'c2aClick'
+        }
+    };
 
     export default {
         name : 'QuoteCardReducedToTypeAndClass',
@@ -111,6 +119,13 @@
 
             vehicleAlt : function() {
                 return `${this.mappedType} Vehicle type image`;
+            }
+        },
+
+        methods : {
+            onClick : function(event) {
+                // bubble the call to action click event
+                this.$emit(emitEvents.c2aClick.name, event);
             }
         }
     };

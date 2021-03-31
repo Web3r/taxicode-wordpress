@@ -4,7 +4,7 @@
             <div class="form-group">
                 <label 
                     :for="`${fields.journey_type.id}-select`" 
-                    id="fields.journey_type.id"
+                    :id="fields.journey_type.id"
                 >{{fields.journey_type.label}}</label>
                 <b-form-select 
                     v-model="fields.journey_type.selected" 
@@ -73,7 +73,7 @@
             <div class="form-group">
                 <label 
                     :for="`${fields.people.id}-input`" 
-                    id="fields.people.id"
+                    :id="fields.people.id"
                 >{{fields.people.label}}</label>
                 <input 
                     v-model="fields.people.value" 

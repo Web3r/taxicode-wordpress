@@ -2,6 +2,7 @@
 
 <script>
     import axios from 'axios';
+    // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
@@ -12,6 +13,22 @@
 
     const JOURNEY_TYPE_OPTION_SINGLE = 'One Way';
     const JOURNEY_TYPE_OPTION_RETURN = 'Return';
+
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the BIQ API quotes have been searched & a response returned
+        biqQuotesSearched : {
+            name : 'biqQuotesSearched'
+        },
+        // when the BIQ API quotes have been searched & a response returned with no quotes available
+        biqZeroQuotes : {
+            name : 'biqZeroQuotes'
+        },
+        // when there is an error with the BIQ API quotes search
+        biqQuotesError : {
+            name : 'biqQuotesError'
+        }
+    };
 
     export default {
         name : 'TheSearchForm',
@@ -165,9 +182,7 @@
                 // first set the form to current search form state
                 const searchState = this.searchDetails;
                 if(this.debugging) {
-                    console.group('Setting BIQ Search Form from State');
-                    console.log(searchState);
-                    console.groupEnd();
+                    console.log('BIQ Search Form from State', searchState);
                 }
                 this.fields.journey_type.selected = searchState.journey_type;
                 this.fields.pickup.value = searchState.pickup;
@@ -326,11 +341,11 @@
                         }
                     };
                     // set the event name to be triggered
-                    let event_name = 'biqQuotesSearched';
+                    let event_name = emitEvents.biqQuotesSearched.name;
                     if(Object.keys(response.data.quotes).length <= 0) {
                     // zero quotes returned
                         // change the event to be triggered
-                        event_name = 'biqZeroQuotes';
+                        event_name = emitEvents.biqZeroQuotes.name;
                         // add the event error data
                         event.data.error = {
                             message : response.data.warnings[0]
@@ -354,7 +369,7 @@
                         }
                     };
                     // trigger the error event
-                    self.$emit('biqQuotesError', event);
+                    self.$emit(emitEvents.biqQuotesError.name, event);
                     if(self.debugging) {
                         console.info('BIQ API Quotes Search Error');
                         console.groupEnd();

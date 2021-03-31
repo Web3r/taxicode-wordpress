@@ -21,6 +21,7 @@
                     <b-form-select 
                         v-model="fields.method.selected" 
                         :options="fields.method.options" 
+                        :disabled="processing"
                     ></b-form-select>
                 </div>
             </div>
@@ -82,6 +83,7 @@
 
 <script>
     import axios from 'axios';
+    // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
@@ -94,6 +96,22 @@
 
     const PAYMENT_TYPE_CARD = 'Pay with Card';
     const PAYMENT_TYPE_PAYPAL = 'Pay with Paypal';
+
+    // define the list of events the component emits & can be listened for on the checkout form
+    const emitEvents = {
+        // when the BIQ Checkout form is submitted
+        biqCheckoutSubmit : {
+            name : 'biqCheckoutSubmit'
+        },
+        // when the BIQ Checkout process completes successfully & the booking is made
+        biqCheckoutComplete : {
+            name : 'biqCheckoutComplete'
+        },
+        // when the BIQ Checkout process fails (transaction error or BIQ API Booking error)
+        biqCheckoutError : {
+            name : 'biqCheckoutError'
+        }
+    };
 
     export default {
         name : 'TheCheckoutForm',
@@ -160,6 +178,7 @@
                 transaction_descriptor : 'Taxi Journey',
                 has_errors : false,
                 error_message : '',
+                validation_errors : {},
                 fields : {
                     method : {
                         selected : PAYMENT_TYPE_CARD,
@@ -193,6 +212,20 @@
 
             isPaypalPayment : function() {
                 return (this.fields.method.selected === PAYMENT_TYPE_PAYPAL);
+            },
+
+            formSections : function() {
+                // define the common form sections used
+                const sections = ['passengerForm'];
+                // determine which payment form section is being used
+                // Paypal doesn't have additional fields or a validate method
+                switch(this.fields.method.selected) {
+                    case PAYMENT_TYPE_CARD : 
+                        sections.push('cardForm');
+                    break;
+                }
+                // return the list of form section refs
+                return sections;
             }
         },
 
@@ -220,7 +253,7 @@
                     if(this.debugging) {
                         console.group(`BIQ CheckoutForm '${event.data.source}' Validation Error`);
                         console.log(event);
-                        console.log(this.errors);
+                        console.log(this.validation_errors);
                         console.groupEnd();
                     }
                     // update the processing state flags
@@ -233,6 +266,7 @@
                     console.groupEnd();
                 }
                 this.error_message = '';
+                this.validation_errors = {};
                 this.has_errors = false;
                 let setup = null;
                 // determine which payment handler was used
@@ -268,7 +302,7 @@
                     default :
                     // just allow the event to bubble
                         // trigger the submit event to allow for full form validation
-                        return this.$emit('submit', event);
+                        return this.$emit(emitEvents.biqCheckoutSubmit.name, event);
                 }
             },
             
@@ -290,33 +324,25 @@
                 // update the processing state flags to allow another attempt
                 this.bookingFailed();
                 // trigger the checkout error event so the page can inform the user
-                this.$emit('checkoutError', event);
+                this.$emit(emitEvents.biqCheckoutError.name, event);
             },
 
             validate : function() {
                 // reset the common validation error flags
                 let errors = 0;
                 let validation_errors = {};
-                // validate the passenger details form section
-                if(!this.$refs.passengerForm.validate()) {
-                    validation_errors = {
-                        ...validation_errors,
-                        ...this.$refs.passengerForm.validationErrors()
-                    }
-                    errors++;
-                }
-                // validate the card payment form section
-                if(this.isCardPayment) {
-                    if(!this.$refs.cardForm.validate()) {
+                // validate the BIQ Checkout form sections
+                this.formSections.forEach(section => {
+                    if(!this.$refs[section].validate()) {
                         validation_errors = {
                             ...validation_errors,
-                            ...this.$refs.cardForm.validationErrors()
+                            ...this.$refs[section].validationErrors()
                         }
                         errors++;
                     }
-                }
+                });
                 // set any validation errors
-                this.errors = validation_errors;
+                this.validation_errors = validation_errors;
                 // only valid if no errors encountered
                 return (errors == 0);
             },
@@ -367,7 +393,7 @@
                         }
                     };
                     // trigger the checkout error event, a refund will be needed
-                    self.$emit('checkoutError', event);
+                    self.$emit(emitEvents.biqCheckoutError.name, event);
                 });
             },
 
@@ -418,7 +444,7 @@
                 };
                 // trigger the checkout complete success event so the checkout page can move 
                 // to the complete page & update the booked state of the checkout
-                this.$emit('checkoutComplete', event);
+                this.$emit(emitEvents.biqCheckoutComplete.name, event);
             }
         }
     };

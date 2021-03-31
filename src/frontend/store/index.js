@@ -9,13 +9,13 @@ import BIQCheckoutStateStore from 'BIQ/store/modules/CheckoutStateStore';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    modules: {
+    modules : {
         BIQSearchStateStore,
         BIQQuotesStateStore,
         BIQCheckoutStateStore
     },
 
-    plugins: [
+    plugins : [
        createPersistedState({
         paths : [
             'BIQSearchStateStore',

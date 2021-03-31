@@ -33,8 +33,22 @@
 
 <script>
     import axios from 'axios';
+    // import underscore for the ability to debounce the autocomplete lookup function
     import _ from 'underscore';
+    // import the component for the autocomplete input & options list
     import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+        // when the places input value is updated
+        input : {
+            name : 'input'
+        },
+        // when there is an error with the BIQ API places lookup
+        biqPlacesLookupError : {
+            name : 'biqPlacesLookupError'
+        }
+    };
 
     export default {
         name : 'PlacesLookup',
@@ -127,7 +141,7 @@
                 },
                 set(location_string) {
                     // let the v-modeller know the value has changed
-                    this.$emit('input', location_string);
+                    this.$emit(emitEvents.input.name, location_string);
                 }
             },
 
@@ -151,8 +165,8 @@
                     return;
                 }
                 if(this.debugging) {
-                    console.info(`BIQ Places ${this.label} lookup to API '${this.apiPlacesLookup}'`);
-                    console.log(term);
+                    console.info();
+                    console.log(`BIQ Places ${this.label} lookup to API '${this.apiPlacesLookup}'`, term);
                 }
                 this.force_lookup = false;
                 this.$refs.locationfield.inputValue = term;
@@ -165,8 +179,7 @@
                 .then(response => {
                     // @todo make sure results are usable
                     if(self.debugging) {
-                        console.info(`BIQ Places ${this.label} response`);
-                        console.log(response);
+                        console.log(`BIQ Places ${this.label} response`, response);
                     }
                     if(response.data.status != 'OK') {
                     // throw new error event & let the catch() handle creating the event
@@ -207,7 +220,7 @@
                         }
                     };
                     // trigger the error event
-                    self.$emit('biqPlacesLookupError', event);
+                    self.$emit(emitEvents.biqPlacesLookupError.name, event);
                 });
             },
 

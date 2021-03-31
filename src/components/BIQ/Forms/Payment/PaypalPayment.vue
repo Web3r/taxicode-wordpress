@@ -38,6 +38,8 @@
     import PaypalHandler from '@/common/BIQ/PaymentHandlers/PaypalHandler';
     // import the component to disply the 1-click-processing form submit button
     import ProcessFormSubmit from 'BIQ/Forms/ProcessFormSubmit.vue';
+    // import the list of events the component emits & can be listened for on the payment form
+    import { emitEvents } from './PaymentFormEvents';
 
     export default {
         name : 'PaypalPayment',
@@ -135,7 +137,7 @@
                     }
                 };
                 // trigger the transaction success event
-                this.$emit('transactionSuccess', event);
+                this.$emit(emitEvents.transactionSuccess.name, event);
             },
 
             onHandlerError : function(paymentHandler, error) {
@@ -153,7 +155,7 @@
                     }
                 };
                  // trigger the error event
-                this.$emit('transactionError', event);
+                this.$emit(emitEvents.transactionError.name, event);
             },
 
             onTransactionSuccess : function(event) {
@@ -178,7 +180,7 @@
                     paymentHandler : this.paymentHandler.getPublicHandler(),
                 };
                 // trigger the submit event to allow for full form validation & flow consistency
-                this.$emit('submit', event);
+                this.$emit(emitEvents.submit.name, event);
             },
 
             onTransactionError : function(error) {
@@ -212,7 +214,7 @@
                     }
                 };
                  // trigger the error event
-                this.$emit('transactionError', event);
+                this.$emit(emitEvents.transactionError.name, event);
             },
         }
     };
