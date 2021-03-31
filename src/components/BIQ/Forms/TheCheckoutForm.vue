@@ -28,7 +28,7 @@
             
             <stripe-card-payment v-if="isCardPayment"
                 ref="cardForm"
-                :app-config="appConfig"
+                :biq-config="biqConfig"
                 :app-settings="appSettings" 
                 :processing="processing"
                 :amount="price"
@@ -49,7 +49,7 @@
                 :amount="price"
                 :descriptor="transaction_descriptor"
                 :debugging="debugging"
-                :useButtons="appConfig.useButtons"
+                :useButtons="biqConfig.useButtons"
                 @submit="onSubmit"
                 @transactionSuccess="onTransactionSuccess"
                 @transactionError="onTransactionError"
@@ -87,31 +87,17 @@
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
+    // import default Stripe card elements style config object just in case
+    import { DEFAULT_STRIPE_CARD_STYLE } from 'BIQ/config';
+    // import the checkout form fields, emitted events and the payment types
+    import { 
+        PAYMENT_TYPE_CARD, 
+        PAYMENT_TYPE_PAYPAL, 
+        formFields, 
+        checkoutEvents as emitEvents 
+    } from '@/common/BIQ/QuoteCheckout';
     // import the component for the passenger details form section of the checkout
     import PassengerDetailsForm from 'BIQ/Forms/PassengerDetailsForm.vue';
-    // import the component to handle stripe card element transaction payment method form section of the checkout
-    import StripeCardPayment from 'BIQ/Forms/Payment/StripeCardPayment.vue';
-    // import the component to handle paypal transaction payment method form section of the checkout
-    import PaypalPayment from 'BIQ/Forms/Payment/PaypalPayment.vue';
-
-    const PAYMENT_TYPE_CARD = 'Pay with Card';
-    const PAYMENT_TYPE_PAYPAL = 'Pay with Paypal';
-
-    // define the list of events the component emits & can be listened for on the checkout form
-    const emitEvents = {
-        // when the BIQ Checkout form is submitted
-        biqCheckoutSubmit : {
-            name : 'biqCheckoutSubmit'
-        },
-        // when the BIQ Checkout process completes successfully & the booking is made
-        biqCheckoutComplete : {
-            name : 'biqCheckoutComplete'
-        },
-        // when the BIQ Checkout process fails (transaction error or BIQ API Booking error)
-        biqCheckoutError : {
-            name : 'biqCheckoutError'
-        }
-    };
 
     export default {
         name : 'TheCheckoutForm',
@@ -122,12 +108,14 @@
 
         components : {
             'biq-passenger-details-form-section' : PassengerDetailsForm,
-            'stripe-card-payment' : StripeCardPayment,
-            'paypal-payment' : PaypalPayment
+            // allow for lazy load the payment forms to reduce chunk size, but make sure they are 
+            // prefetched for cache speed
+            'stripe-card-payment' : () => import(/* webpackChunkName: "BIQCheckoutStripe", webpackPrefetch: true */ 'BIQ/Forms/Payment/StripeCardPayment.vue'),
+            'paypal-payment' : () => import(/* webpackChunkName: "BIQCheckoutPaypal", webpackPrefetch: true */ 'BIQ/Forms/Payment/PaypalPayment.vue')
         },
 
         props : {
-            appConfig : {
+            biqConfig : {
                 type : Object,
                 required : true,
                 default : function() { 
@@ -147,17 +135,8 @@
                 type : Object,
                 required : true,
                 default : function() { 
-                    return {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    };
-                 }
+                    return DEFAULT_STRIPE_CARD_STYLE;
+                }
             },
             
             paypalClientToken : {
@@ -179,18 +158,7 @@
                 has_errors : false,
                 error_message : '',
                 validation_errors : {},
-                fields : {
-                    method : {
-                        selected : PAYMENT_TYPE_CARD,
-                        options : [
-                            PAYMENT_TYPE_CARD, 
-                            PAYMENT_TYPE_PAYPAL
-                        ],
-                        label : 'Select Payment Method:',
-                        errorMsg : 'Cardholder name must be set',
-                        id : 'tcplugin-payament-select'
-                    }
-                }
+                fields : formFields
             };
         },
 
@@ -351,7 +319,7 @@
                 const self = this;
                 // create the form data payload for the API pay call
                 const formData = this.assembleData(token, method, formdataAppend);
-                const apiCheckoutURL = `${this.appSettings.biq_api_host}${this.appConfig.PAYMENT_URI}`;
+                const apiCheckoutURL = `${this.appSettings.biq_api_host}${this.biqConfig.PAYMENT_URI}`;
                 if(this.debugging) {
                     console.info(`BIQ Checkout transaction attempt to API '${apiCheckoutURL}'`);
                 }

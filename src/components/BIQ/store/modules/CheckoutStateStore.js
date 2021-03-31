@@ -1,18 +1,5 @@
-// define the default initial state structure & values
-const defaultState = () => {
-    return {
-        processing : false,
-        processed : false,
-        basket : {
-            quote_id : '',
-            vehicle_index : 0,
-            amount : 0,
-        },
-        quote : {},
-        vehicle : {},
-        booking_ref : ''
-    };
-};
+// import the method to generate the default state structure object
+import { defaultState } from '@/common/BIQ/QuoteCheckout';
 
 // define the state store module
 const CheckoutStateStore = {
@@ -115,5 +102,5 @@ const CheckoutStateStore = {
         }
     }
 };
-
+// export the default state store module
 export default CheckoutStateStore;

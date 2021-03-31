@@ -1,32 +1,7 @@
-const location = {
-    string : '',
-    postcode : '',
-    position : [0,0]
-};
-// define the default initial state structure & values
-const defaultState = () => {
-    return {
-        quoting : false,
-        quotes_loaded : false,
-        api_error : false,
-        journey_id : '',
-        journey_details : {
-            pickup : location,
-            destination : location,
-            vias : [],
-            people : 1,
-            return : false,
-            date : '',
-            distance : 1,
-            duration : 116,
-            duration_text : '1 min',
-            quote_type : 'mileage',
-            is_airport : false,
-            hourly : false
-        },
-        journey_quotes : {}
-    };
-};
+// import the methods to generate the default state structure & journey detail objects
+import { defaultState, journeyDetails } from '@/common/BIQ/QuotesSearched';
+// import the methods to display the journey date & times
+import { journeyDateString, journeyTimeString } from '@/common/BIQ/QuoteCheckout';
 
 // define the state store module
 const QuotesStateStore = {
@@ -44,10 +19,10 @@ const QuotesStateStore = {
         },
         journeyID : (state) => state.journey_id,
         journeyDetails : (state) => state.journey_details,
-        journeyDate : (state) => new Date(Date.parse(state.journey_details.date)).toDateString(),
-        journeyTime : (state) => new Date(Date.parse(state.journey_details.date)).toLocaleTimeString(),
-        journeyReturnDate : (state) => new Date(Date.parse(state.journey_details.return)).toDateString(),
-        journeyReturnTime : (state) => new Date(Date.parse(state.journey_details.return)).toLocaleTimeString(),
+        journeyDate : (state) => journeyDateString(state.journey_details.date),
+        journeyTime : (state) => journeyTimeString(state.journey_details.date),
+        journeyReturnDate : (state) => state.journey_details.return && journeyDateString(state.journey_details.return),
+        journeyReturnTime : (state) => state.journey_details.return && journeyTimeString(state.journey_details.return),
         journeyHasReturn : (state) => !!state.journey_details.return,
         journeyHasVias : (state) => (Array.isArray(state.journey_details.vias) && state.journey_details.vias.length > 0),
         journeyQuotes : (state) => state.journey_quotes
@@ -110,25 +85,12 @@ const QuotesStateStore = {
             state.journey_id = payload.journey_id;
             // set the quotes returned from the API
             state.journey_quotes = payload.quotes;
-           // set the API journey details
-            state.journey_details = {
-                pickup : payload.journey.pickup,
-                destination : payload.journey.destination,
-                vias : payload.journey.vias,
-                people : payload.journey.people,
-                return : payload.journey.return,
-                date : payload.journey.date,
-                distance : payload.journey.distance,
-                duration : payload.journey.duration,
-                duration_text : payload.journey.duration_text,
-                quote_type : payload.journey.quote_type,
-                is_airport : payload.journey.is_airport,
-                hourly : payload.journey.hourly
-            };
+            // set the API journey details
+            state.journey_details = journeyDetails(payload.journey);
             // set a flag to indicate API quotes have been loaded for use
             state.quotes_loaded = true;
         }
     }
 };
-
+// export the default state store module
 export default QuotesStateStore;

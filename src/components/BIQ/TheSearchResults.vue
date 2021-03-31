@@ -14,7 +14,7 @@
         <div v-if="quotesError">
             <slot 
                 name="quotes-error"
-                :error="{ message : quotesError }"
+                :error="quotesError"
             >
                 <p>{{quotesError}}</p>
             </slot>
@@ -23,13 +23,14 @@
         <div v-if="zeroQuotes">
             <slot 
                 name="zero-quotes"
-                :error="{ message : zero_quotes_error_message }"
+                :error="zero_quotes_error_message"
             >
                 <p>{{zero_quotes_error_message}}</p>
             </slot>
         </div>
 
         <div v-if="hasSearchResults"
+            id="results"
             class="row"
         >
             <component :is="quote_card" v-for="(quote, key) in displayQuotes"
@@ -40,7 +41,7 @@
                 :type="key"
                 :debugging="debugging"
                 :use-buttons="useButtons" 
-                @c2aClick="onClick"
+                @biqQuoteBookNow="onClick"
             ></component>
         </div>
     </div>
@@ -49,14 +50,8 @@
 <script>
     // import the state getters mapper
     import { mapGetters } from 'vuex';
-
-    // define the list of events the component emits & can be listened for
-    const emitEvents = {
-        // when the quote "Book Now" button is clicked
-        biqQuoteBookNow : {
-            name : 'biqQuoteBookNow'
-        }
-    };
+    // import the journey quotes searched booking events
+    import { quoteBookingEvents as emitEvents } from '@/common/BIQ/QuotesSearched';
 
     export default {
         name : 'TheSearchResults',

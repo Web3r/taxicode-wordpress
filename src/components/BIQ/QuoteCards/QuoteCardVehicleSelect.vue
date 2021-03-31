@@ -41,12 +41,16 @@
 <script>
     // import the Book Now Call To Action button
     import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
+    // import the journey quotes searched booking events
+    import { quoteBookingEvents } from '@/common/BIQ/QuotesSearched';
 
     // define the list of events the component emits & can be listened for
     const emitEvents = {
-        // when the quote "Book Now" button is clicked
-        c2aClick : {
-            name : 'c2aClick'
+        // include the standard journey quotes searched booking events
+        ...quoteBookingEvents,
+        // when the quote vehicle is changed
+        vehicleChange : {
+            name : 'vehicleChange'
         }
     };
 
@@ -114,7 +118,7 @@
         methods : {
             onClick : function(event) {
                 // bubble the call to action click event
-                this.$emit(emitEvents.c2aClick.name, event);
+                this.$emit(emitEvents.biqQuoteBookNow.name, event);
             },
 
             onQuoteVehicleChange : function(event) {
@@ -122,17 +126,29 @@
                 const vehicle = this.quote.vehicles[vehicle_index];
                 if(this.debugging) {
                     console.group('Quote Vehicle Changed');
-                    console.log(this.quote.quote_id);
-                    console.log(vehicle_index);
-                    console.log(vehicle.price);
-                    console.log(this.quote);
-                    console.log(vehicle);
-                    console.log(event);
+                    console.log('Quote ID', this.quote.quote_id);
+                    console.log('Vehicle Index', vehicle_index);
+                    console.log('Price', vehicle.price);
+                    console.log('Quote', this.quote);
+                    console.log('Vehicle', vehicle);
+                    console.log('Event', event);
                     console.groupEnd();
                 }
+                // update the details changed 
                 this.selected_vehicle = vehicle_index;
                 this.quote_price = vehicle.price;
                 this.display_vehicle_src = vehicle.image;
+                // create a new event object to represent the vehicle change new data
+                const vehicleChangeEvent = {
+                    data : {
+                        quote_id : this.quote.quote_id,
+                        price : vehicle.price,
+                        vehicle_index,
+                        vehicle
+                    }
+                }
+                // trigger the vehicle change event
+                this.$emit(emitEvents.vehicleChange.name, vehicleChangeEvent);
             }
         }
     };

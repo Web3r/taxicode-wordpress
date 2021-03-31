@@ -1,8 +1,8 @@
 <template>
     <button v-if="useButtons"
+        :class="styleClass"
         :disabled="processing" 
         @click="onClick"
-        class="form-control btn btn-primary"
     >
         <div v-if="processing" 
             class="spinner-border spinner-border-sm"
@@ -11,11 +11,11 @@
     </button>
 
     <input v-else 
+        :class="styleClass"
         :value="submitLabel" 
         :disabled="processing" 
         @click="onClick" 
         type="button" 
-        class="btn btn-primary"
     />
 </template>
 
@@ -40,6 +40,11 @@
             label : {
                 type : String,
                 default : 'Submit'
+            },
+
+            styleClass : {
+                type : String,
+                default : 'btn btn-primary'
             },
 
             useButtons : {

@@ -1,77 +1,95 @@
-import { sortQuotes } from './QuotesSorter';
+// import the method to sort the quotes according to order types
+import { sort } from '@/common/BIQ/QuotesSorter';
 
 const debugging = true;
 
-// define the quote results default display sort order
-export const DEFAULT_SORT = 'SORT_BY_PRICE';
-
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - q = quotes
+ * - t = format type (best requires quote highlight)
+ * - so = sort order type 
+ */
 // define the function to format the quote data for display
-export const formatQuotes = (quotes, type, sort_by) => {
-    const display = [];
+export const formatQuotes = (q, t, so) => {
+    const d = [];
     if(debugging) {
         console.group("Formatting BIQ Quotes");
+        console.log('Quotes', {...q});
+        console.log('Type', t);
+        console.log('Sort Order', so);
     }
-    Object.keys(quotes).forEach(key => {
+    // loop the quotes to create a quotes display list
+    Object.keys(q).forEach(k => {
         const quote = {
-            ...quotes[key],
-            quote_id : key,
+            ...q[k],
+            quote_id : k,
             selected_vehicle : 0
         };
         // if the quote disply type is not filtering for best or the quote is highlighted as best
-        if(type!='best' || (type=='best' && quote.highlight)) {
+        if(t != 'best' || (t == 'best' && quote.highlight)) {
             // add the quote to the display list
-            display.push(quote);
+            d.push(quote);
         }
     });
+    // define the sorted quotes display list
+    const sd = sort(d, so);
     if(debugging) {
-        console.log({...quotes});
-        console.log(type);
-        console.log(sort_by);
+        console.log('Sorted', sd);
         console.groupEnd();
     }
-    return display;
+    return sd;
 };
 
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - q = quotes
+ * - so = sort order type 
+ */
 // define the callback to reduce the quotes to type & class option only
-export const reduceToTypeAndClass = quotes => {
+export const reduceToTypeAndClass = (q, so) => {
     if(debugging) {
         console.group("Reducing BIQ Quotes to type & class only");
+        console.log('Quotes', {...q});
+        console.log('Sort Order', so);
     }
     // sorting taking from app, but needs further reconstructing for web UI
-    const sorted_quotes = formatQuotesReduced(quotes);
+    const sq = formatQuotesReduced(q, so);
     if(debugging) {
-        console.log({...sorted_quotes});
+        console.log({...sq});
     }
-    const sorted = sorted_quotes.sorted;
-    const display = {};
-    if(sorted.hasOwnProperty('recommended') && sorted.recommended.length) {
-        display['cheapest'] = sorted.recommended[0];
+    const s = sq.sorted;
+    // define the sorted quotes display list
+    const sd = {};
+    if(s.hasOwnProperty('recommended') && s.recommended.length) {
+        sd['cheapest'] = s.recommended[0];
     }
-    if(sorted.hasOwnProperty('executive') && sorted.executive.length) {
-        display['exec'] = sorted.executive[0];
+    if(s.hasOwnProperty('executive') && s.executive.length) {
+        sd['exec'] = s.executive[0];
     }
-    if(sorted.hasOwnProperty('vip') && sorted.vip.length) {
-        display['luxury'] = sorted.vip[0];
+    if(s.hasOwnProperty('vip') && s.vip.length) {
+        sd['luxury'] = s.vip[0];
     }
-    if(sorted.hasOwnProperty('chauffeur') && sorted.chauffeur.length) {
-        display['chauffeur'] = sorted.chauffeur[0];
+    if(s.hasOwnProperty('chauffeur') && s.chauffeur.length) {
+        sd['chauffeur'] = s.chauffeur[0];
     }
     if(debugging) {
-        console.log(display);
+        console.log('Sorted', sd);
         console.groupEnd();
     }
-    return display;
+    return sd;
 };
 
 // define the function to format the quote data for display
-export const formatQuotesReduced = quotes => {
+export const formatQuotesReduced = (q, so) => {
     // initiate quotes keys
     let raw = {};
     let sorted = {};
 
-    for(let key in quotes) {
+    for(let key in q) {
         // get the current object based on key
-        let temp = quotes[key];
+        let temp = q[key];
 
         // skip the non active quotes
         if(temp.active) {
@@ -138,17 +156,18 @@ export const formatQuotesReduced = quotes => {
         }
     }
 
-    for(let type in sorted) {
-        sorted[type] = sortQuotes(sorted[type], DEFAULT_SORT);
+    for(let t in sorted) {
+        sorted[t] = sort(sorted[t], so);
     }
     return { raw, sorted };
 };
 
+// create a default exportable object container
 const QuotesFormatter = {
     formatQuotes,
     reduceToTypeAndClass,
     formatQuotesReduced,
-    sortQuotes
+    sortQuotes : sort
 };
-
+// export the default object container
 export default QuotesFormatter;

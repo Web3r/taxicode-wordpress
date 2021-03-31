@@ -22,8 +22,8 @@ import router from 'admin/router';
 new Vue({
     render : h => h(BIQAdminApp, {
         props : {
-            biqAppURL,
-            biqAppDebugEnabled : devMode || biq_app_debug_enabled
+            appURL : biqAppURL,
+            appDebugEnabled : devMode || biqAppDebugEnabled
         }
     }),
     el : '#biq-admin-vue-app',

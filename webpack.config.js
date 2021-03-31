@@ -1,8 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
-const package = require('./package.json');
+//const package = require('./package.json');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+//const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -12,8 +12,9 @@ const devMode = process.env.NODE_ENV !== 'production';
 
 // Naming and path settings
 const entryPoints = {
-  frontend : './src/frontend/main.js',
-  admin : './src/admin/main.js'
+    frontend : './src/frontend/main.js',
+    search_lite : './src/frontend/search_lite.js',
+    admin : './src/admin/main.js'
 };
 // @NOTE __dirname is coming from node & not from this files location
 // set the location where the compiled output will be
@@ -27,10 +28,10 @@ const publicPath = webRoot + exportPath.split(webRoot)[1];
 // create an array of plugins being used
 const plugins = [];
 
-// add the vue loader plugin
+// add build progress indicator plugin
 plugins.push(new webpack.ProgressPlugin());
 
-// add the vue loader plugin
+// add the clean build folder plugin
 plugins.push(new CleanWebpackPlugin());
 
 // add the vue loader plugin

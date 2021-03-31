@@ -1,46 +1,22 @@
-import { DEFAULT_SORT, formatQuotes, reduceToTypeAndClass } from '@/common/BIQ/QuotesFormatter';
-
-// create a new date to initialise the search form date & time fields
-const d = new Date();
-// just put the date & time forward a little
-d.setDate(d.getDate() + 1);
-d.setHours(d.getHours() + 2);
-
-// define a function to add leading zeros to the date time values for string value use
-const az = i => (i<10) ? i="0"+i : i;
-
-// define the default initial state structure & values
-const defaultState = () => {
-    return {
-        search_details : {
-            journey_type : 'One Way',
-            pickup : '',
-            vias : [], 
-            destination : '', 
-            // getMonth is zero based, getDate is not
-            date : d.getFullYear() + "-" + az(d.getMonth() +1) + "-" + az(d.getDate()), 
-            time : az(d.getHours()) + ":" + az(d.getMinutes()) + ":" + az(d.getSeconds()), 
-            people : '1',
-            returning : {
-                date : '', 
-                time : '', 
-            }
-        },
-        results : false,
-        display_type : '',
-        display_quotes : []
-    };
-};
-
+// import the method to generate the default state structure object
+import { defaultState } from '@/common/BIQ/QuotesSearch';
+// import the method to generate quotes display type list
+import { DEFAULT_SORT, displayQuotes } from '@/common/BIQ/QuotesSearched';
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - s = state
+ * - p = payload
+ */
 // define the state store module
 const SearchStateStore = {
     state : defaultState(),
     
     getters : {
-        searchDetails : (state) => state.search_details,
-        hasSearchResults : (state) => state.results,
-        displayType : (state) => state.display_type,
-        displayQuotes : (state) => state.display_quotes
+        searchDetails : (s) => s.search_details,
+        hasSearchResults : (s) => s.results,
+        displayType : (s) => s.display_type,
+        displayQuotes : (s) => s.display_quotes
     },
     
     actions : {
@@ -51,62 +27,48 @@ const SearchStateStore = {
             commit('resetSearchState');
         },
 
-        searchingQuotes({ commit, dispatch }, details) {
+        searchingQuotes({ commit, dispatch }, p) {
             // reset the search state
             commit('resetSearchState');
             // inform the quotes store module the API Quotes are being searched
             dispatch('quoting', null, { root : true });
             // set the search details being quoted for
-            commit('searchingQuotesFor', details);
+            commit('searchingQuotesFor', p);
         },
         
-        searchedQuotes({ commit, dispatch }, journey) {
+        searchedQuotes({ commit, dispatch }, p) {
             // inform the quotes store module of the API journey quotes response
-            dispatch('quoted', journey, { root : true });
+            dispatch('quoted', p, { root : true });
             // set the quotes to be displayed in the results
-            if(Object.keys(journey.quotes).length > 0) {
-                const payload = {
-                    type : journey.display_type,
-                    // determine the quotes to display from the quote results based on the setting type
-                    quotes : (journey.display_type == 'type_class')
-                        ? reduceToTypeAndClass(journey.quotes) 
-                        : formatQuotes(journey.quotes, journey.display_type, DEFAULT_SORT)
-                };
-                commit('displaying', payload);
+            if(Object.keys(p.quotes).length > 0) {
+                commit('displaying', displayQuotes(p.quotes, p.display_type, DEFAULT_SORT));
             }
         },
 
-        changeDisplayType({ commit, rootGetters }, type) {
-            const payload = {
-                type,
-                // determine the quotes to display from the quote results based on the setting type
-                quotes : (type == 'type_class')
-                    ? reduceToTypeAndClass(rootGetters.journeyQuotes) 
-                    : formatQuotes(rootGetters.journeyQuotes, type, DEFAULT_SORT)
-            };
-            commit('displaying', payload);
+        changeDisplayType({ commit, rootGetters }, p) {
+            commit('displaying', displayQuotes(rootGetters.journeyQuotes, p, DEFAULT_SORT));
         }
     },
 
     mutations : {
-        resetSearchState(state) {
+        resetSearchState(s) {
             // reset the state to the initial state
-            Object.assign(state, defaultState());
+            Object.assign(s, defaultState());
         },
 
-        searchingQuotesFor(state, details) {
+        searchingQuotesFor(s, p) {
             // set the search form state details
-            state.search_details = details;
+            s.search_details = p;
         },
         
-        displaying(state, payload) {
+        displaying(s, p) {
             // set the search results quotes to display 
-            state.display_quotes = payload.quotes;
-            state.display_type = payload.type;
+            s.display_quotes = p.quotes;
+            s.display_type = p.type;
             // set the flag to indicate quote results can be displayed
-            state.results = true;
+            s.results = true;
         }
     }
 };
-
+// export the default state store module
 export default SearchStateStore;
