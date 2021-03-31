@@ -1,14 +1,17 @@
 <template>
-    <div class="form-group">
-        <label 
-            :for="inputID" 
-            :id="id"
+    <div 
+        :class="containerClass"
+    >
+        <label v-if="label"
+            :id="inputID" 
+            :for="id"
         >{{label}}</label>
         <vue-typeahead-bootstrap
             ref="locationfield"
             v-model="location"
-            :id="inputID"
+            :id="id"
             :placeholder="placeholder"
+            :size="size"
             :inputClass="errorStateClass"
             :show-all-results="true"
             :show-on-focus="true"
@@ -16,6 +19,10 @@
             :serializer="item => item.string"
             @hit="selectedLocation = $event"
         >
+            <template
+                slot="prepend"
+            ></template>
+
             <template 
                 slot="suggestion" 
                 slot-scope="{ data, htmlText }"
@@ -27,6 +34,10 @@
                     <span class="ml-4" v-html="htmlText"></span>
                 </div>
             </template>
+
+            <template
+                slot="append"
+            ></template>
         </vue-typeahead-bootstrap>
     </div>
 </template>
@@ -58,7 +69,7 @@
         },
 
         props : {
-            apiPlacesLookup : {
+            biqPlacesLookup : {
                 type : String,
                 required : true,
                 default : '//places/?term='
@@ -69,14 +80,14 @@
                 default : 'biq-places-lookup'
             },
 
-            label : {
-                type : String,
-                default : 'Location'
-            },
-
             placeholder : {
                 type : String,
                 default : 'Location postcode or place name'
+            },
+
+            label : {
+                type : String,
+                default : ''
             },
 
             value : {
@@ -87,6 +98,17 @@
             required : {
                 type : Boolean,
                 default : false
+            },
+
+            size: {
+                type : String,
+                default : null,
+                validator : size => ['lg', 'sm'].indexOf(size) > -1
+            },
+
+            containerClass : {
+                type : String,
+                default : ''
             },
 
             validClass : {
@@ -150,11 +172,12 @@
             },
 
             errorStateClass : function() {
-                return this.errorState == null
+                const errorState = (this.errorState == null)
                     ? ''
                     : this.errorState
                         ? this.errorClass
                         : this.validClass;
+                return `${this.id} ${errorState}`;
             }
         },
 
@@ -166,12 +189,12 @@
                 }
                 if(this.debugging) {
                     console.info();
-                    console.log(`BIQ Places ${this.label} lookup to API '${this.apiPlacesLookup}'`, term);
+                    console.log(`BIQ Places ${this.label} lookup to API '${this.biqPlacesLookup}'`, term);
                 }
                 this.force_lookup = false;
                 this.$refs.locationfield.inputValue = term;
                 const self = this;
-                const apiPlacesLookupURL = `${this.apiPlacesLookup}${term}`;
+                const apiPlacesLookupURL = `${this.biqPlacesLookup}${term}`;
                 let airports = [];
                 let stations = [];
                 let locations = [];

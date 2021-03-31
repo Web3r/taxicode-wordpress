@@ -6,12 +6,14 @@ use WP_REST_Controller;
 /**
  * REST_API Handler
  */
-class Settings extends WP_REST_Controller {
+class Settings extends WP_REST_Controller
+{
 
     /**
      * [__construct description]
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->namespace = 'taxicode/v1';
         $this->rest_base = 'settings-save';
     }
@@ -21,15 +23,16 @@ class Settings extends WP_REST_Controller {
      *
      * @return void
      */
-    public function register_routes() {
+    public function register_routes()
+    {
         register_rest_route(
             $this->namespace,
             '/' . $this->rest_base,
             array(
                 array(
                     'methods'             => \WP_REST_Server::EDITABLE,
-                    'callback'            => array( $this, 'get_items' ),
-                    'permission_callback' => array( $this, 'get_items_permissions_check' ),
+                    'callback'            => array($this, 'get_items'),
+                    'permission_callback' => array($this, 'get_items_permissions_check'),
                     'args'                => $this->get_collection_params(),
                 )
             )
@@ -43,14 +46,14 @@ class Settings extends WP_REST_Controller {
      *
      * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
      */
-    public function get_items( $request ) {
-
-        $taxicode_public =  $request['taxicode_public'];
-        $taxicode_private =  $request['taxicode_private'];
-        $biq_api_host =  $request['biq_api_host'];
+    public function get_items($request)
+    {
+        $taxicode_public = $request['taxicode_public'];
+        $taxicode_private = $request['taxicode_private'];
+        $biq_api_host = $request['biq_api_host'];
         $paypal_public = $request['paypal_public'];
-        $stripe_public =  $request['stripe_public'];
-        $stripe_private =  $request['stripe_private'];
+        $stripe_public = $request['stripe_public'];
+        $stripe_private = $request['stripe_private'];
         $stripe_cardform_style = $request['stripe_cardform_style'];
         $test_mode = $request['test_mode'];
         $quote_type = $request['quote_type'];
@@ -58,44 +61,44 @@ class Settings extends WP_REST_Controller {
         $complete_page_text = $request['complete_page_text'];
         $custom_css = $request['custom_css'];
 
-        if(trim($taxicode_public)!='') {
+        if(trim($taxicode_public) != '') {
             update_option('tcplugin_taxicode_public', $taxicode_public);
         }
-        if(trim($taxicode_private)!='') {
+        if(trim($taxicode_private) != '') {
             update_option('tcplugin_taxicode_private', $taxicode_private);
         }
-        if(trim($biq_api_host)!='') {
+        if(trim($biq_api_host) != '') {
             update_option('tcplugin_biq_api_host', $biq_api_host);
         }
         
-        if(trim($paypal_public)!='') {
+        if(trim($paypal_public) != '') {
             update_option('tcplugin_paypal_public', $paypal_public);
         }
         
-        if(trim($stripe_public)!='') {
+        if(trim($stripe_public) != '') {
             update_option('tcplugin_stripe_public', $stripe_public);
         }
-        if(trim($stripe_cardform_style)!='') {
+        if(trim($stripe_cardform_style) != '') {
             update_option('tcplugin_stripe_cardform_style', $stripe_cardform_style);
         }
 
-        if(trim($test_mode)!='') {
+        if(trim($test_mode) != '') {
             update_option('tcplugin_test_mode', $test_mode);
         }
 
-        if(trim($quote_type)!='') {
+        if(trim($quote_type) != '') {
             update_option('tcplugin_quote_type', $quote_type);
         }
 
-        if(trim($recommend_upgrade)!='') {
+        if(trim($recommend_upgrade) != '') {
             update_option('tcplugin_recommend_upgrade', $recommend_upgrade);
         }
 
-        if(trim($complete_page_text)!='') {
+        if(trim($complete_page_text) != '') {
             update_option('tcplugin_complete_page_text', $complete_page_text);
         }
 
-        if(trim($custom_css)!='') {
+        if(trim($custom_css) != '') {
             update_option('tcplugin_custom_css', $custom_css);
         }
 
@@ -123,7 +126,8 @@ class Settings extends WP_REST_Controller {
      *
      * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
      */
-    public function get_items_permissions_check( $request ) {
+    public function get_items_permissions_check($request)
+    {
         return true;
     }
 
@@ -132,7 +136,8 @@ class Settings extends WP_REST_Controller {
      *
      * @return array Collection parameters.
      */
-    public function get_collection_params() {
+    public function get_collection_params()
+    {
         return [];
     }
 }

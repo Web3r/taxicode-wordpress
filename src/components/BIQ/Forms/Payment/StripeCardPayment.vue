@@ -32,17 +32,17 @@
         </div>
         <stripe-card-form-element
             ref="card"
-            :api-client-secret-from="`${appSettings.biq_api_host}${appConfig.CLIENT_SECRET_URI}`"
+            :biq-client-secret-from="`${appSettings.biq_api_host}${biqConfig.CLIENT_SECRET_URI}`"
             :stripe-public-key="appSettings.stripe_pk"
             :amount="amount"
             :stripe-card-form-style="stripeCardFormStyle"
-            :hide-postal-code="appConfig.PGH_CONF.hidePostalCode"
+            :hide-postal-code="biqConfig.PGH_CONF.hidePostalCode"
             :processing="processing"
             :id="id"
             :label="label"
             :descriptor="descriptor"
             :debugging="debugging"
-            :use-buttons="appConfig.useButtons"
+            :use-buttons="biqConfig.useButtons"
             @submit="onSubmit"
             @transactionSuccess="onTransactionSuccess"
             @transactionError="onTransactionError"
@@ -53,10 +53,12 @@
 <script>
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
+    // import default Stripe card elements style config object just in case
+    import { DEFAULT_STRIPE_CARD_STYLE } from 'BIQ/config';
+    // import the list of events the component emits & can be listened for on the payment form
+    import { paymentEvents as emitEvents } from '@/common/BIQ/QuoteCheckout';
     // import the component to display the journey details being booked
     import StripeCardFormElement from 'BIQ/Forms/Payment/StripeCardFormElement.vue';
-    // import the list of events the component emits & can be listened for on the payment form
-    import { emitEvents } from './PaymentFormEvents';
 
     export default {
         name : 'StripeCardPayment',
@@ -70,7 +72,7 @@
         },
 
         props : {
-            appConfig : {
+            biqConfig : {
                 type : Object,
                 required : true,
                 default : function() { 
@@ -90,16 +92,7 @@
                 type : Object,
                 required : true,
                 default : function() { 
-                    return {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    };
+                    return DEFAULT_STRIPE_CARD_STYLE;
                  }
             },
 

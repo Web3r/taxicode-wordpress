@@ -10,7 +10,7 @@ class Frontend
 
     public function __construct()
     {
-        add_shortcode( 'taxicode-app', [ $this, 'render_frontend' ] );
+        add_shortcode('taxicode-app', [$this, 'render_frontend']);
     }
 
     /**
@@ -23,6 +23,8 @@ class Frontend
      */
     public function render_frontend($atts, $content='')
     {
+        // include the vendor specific styles used
+        wp_enqueue_style( 'taxicode-vendors-vue' );
         // include the vendor specific styles used
         wp_enqueue_style( 'taxicode-vendors' );
         // include the scoped app styles generated
@@ -46,6 +48,20 @@ class Frontend
             $searchFormData = null;
             $search_on_load = false;
         }
+        if($_GET["test"]) {
+            $searchFormData = [
+                "journey_type"  => "One Way",
+                "pickup"  => "York",
+                "destination"  => "York Station, YO24 1AB",
+                "via"  => "",
+                "date"  => "2021-05-08",
+                "time"  => "10:35",
+                "return_date"  => "",
+                "return_time"  => "",
+                "people"  => "3",
+            ];
+            $search_on_load = true;
+        }
         try {
             // get a Braintree paypal gateway client token
             $paypalGateway = new Gateway(['accessToken' => get_option('tcplugin_paypal_public')]);
@@ -61,10 +77,10 @@ class Frontend
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     const biqAppURL = \'' . get_rest_url('', '/taxicode/v1/') . '\';
+    const biqAppDebugEnabled = false;
     const searchOnLoad = ' . json_encode($search_on_load) . ';
     const searchFormData = ' . json_encode($searchFormData) . ';
     const paypalClientToken = \'' . $paypalClientToken . '\';
-    const biq_app_debug_enabled = false;
 
     // this is a string from the REST & doesn\'t parse to JSON well :(
     // but the echoed string here to be supplied as a prop to the

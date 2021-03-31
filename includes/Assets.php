@@ -4,14 +4,15 @@ namespace Taxicode;
 /**
  * Scripts and Styles Class
  */
-class Assets {
+class Assets
+{
 
-    function __construct() {
-
-        if ( is_admin() ) {
-            add_action( 'admin_enqueue_scripts', [ $this, 'register' ], 5 );
+    function __construct()
+    {
+        if (is_admin()) {
+            add_action('admin_enqueue_scripts', [$this, 'register'], 5);
         } else {
-            add_action( 'wp_enqueue_scripts', [ $this, 'register' ], 5 );
+            add_action('wp_enqueue_scripts', [$this, 'register'], 5);
         }
     }
 
@@ -20,9 +21,10 @@ class Assets {
      *
      * @return void
      */
-    public function register() {
-        $this->register_scripts( $this->get_scripts() );
-        $this->register_styles( $this->get_styles() );
+    public function register()
+    {
+        $this->register_scripts($this->get_scripts());
+        $this->register_styles($this->get_styles());
     }
 
     /**
@@ -32,13 +34,14 @@ class Assets {
      *
      * @return void
      */
-    private function register_scripts( $scripts ) {
-        foreach ( $scripts as $handle => $script ) {
-            $deps      = isset( $script['deps'] ) ? $script['deps'] : false;
-            $in_footer = isset( $script['in_footer'] ) ? $script['in_footer'] : false;
-            $version   = isset( $script['version'] ) ? $script['version'] : TAXICODE_VERSION;
+    private function register_scripts($scripts)
+    {
+        foreach($scripts as $handle => $script) {
+            $deps = isset($script['deps']) ? $script['deps'] : false;
+            $in_footer = isset($script['in_footer']) ? $script['in_footer'] : false;
+            $version = isset($script['version']) ? $script['version'] : TAXICODE_VERSION;
 
-            wp_register_script( $handle, $script['src'], $deps, $version, $in_footer );
+            wp_register_script($handle, $script['src'], $deps, $version, $in_footer);
         }
     }
 
@@ -49,11 +52,12 @@ class Assets {
      *
      * @return void
      */
-    public function register_styles( $styles ) {
-        foreach ( $styles as $handle => $style ) {
-            $deps = isset( $style['deps'] ) ? $style['deps'] : false;
+    public function register_styles($styles)
+    {
+        foreach($styles as $handle => $style) {
+            $deps = isset($style['deps']) ? $style['deps'] : false;
 
-            wp_register_style( $handle, $style['src'], $deps, TAXICODE_VERSION );
+            wp_register_style($handle, $style['src'], $deps, TAXICODE_VERSION);
         }
     }
 
@@ -62,8 +66,9 @@ class Assets {
      *
      * @return array
      */
-    public function get_scripts() {
-        $prefix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.min' : '';
+    public function get_scripts()
+    {
+        $prefix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.min' : '';
 
         $scripts = [
             'taxicode-runtime' => [
@@ -80,6 +85,12 @@ class Assets {
                 'src'       => TAXICODE_ASSETS . '/js/frontend.js',
                 'deps'      => [ 'jquery', 'taxicode-vendor', 'taxicode-runtime' ],
                 'version'   => filemtime( TAXICODE_PATH . '/assets/js/frontend.js' ),
+                'in_footer' => true
+            ],
+            'taxicode-search-lite' => [
+                'src'       => TAXICODE_ASSETS . '/js/search_lite.js',
+                'deps'      => [ 'jquery', 'taxicode-vendor', 'taxicode-runtime' ],
+                'version'   => filemtime( TAXICODE_PATH . '/assets/js/search_lite.js' ),
                 'in_footer' => true
             ],
             'taxicode-config' => [
@@ -103,14 +114,17 @@ class Assets {
      *
      * @return array
      */
-    public function get_styles() {
-
+    public function get_styles()
+    {
         $styles = [
             'taxicode-style' => [
                 'src' =>  TAXICODE_ASSETS . '/css/style.css'
             ],
             'taxicode-frontend' => [
                 'src' =>  TAXICODE_ASSETS . '/css/frontend.css'
+            ],
+            'taxicode-search-lite' => [
+                'src' =>  TAXICODE_ASSETS . '/css/search_lite.css'
             ],
             'taxicode-vendors' => [
                 'src' =>  TAXICODE_ASSETS . '/css/vendors.css'

@@ -6,12 +6,14 @@ use WP_REST_Controller;
 /**
  * REST_API Handler
  */
-class Details extends WP_REST_Controller {
+class Details extends WP_REST_Controller
+{
 
     /**
      * [__construct description]
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->namespace = 'taxicode/v1';
         $this->rest_base = 'booking-details';
     }
@@ -21,7 +23,8 @@ class Details extends WP_REST_Controller {
      *
      * @return void
      */
-    public function register_routes() {
+    public function register_routes()
+    {
         register_rest_route(
             $this->namespace,
             '/' . $this->rest_base,
@@ -43,18 +46,33 @@ class Details extends WP_REST_Controller {
      *
      * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
      */
-    public function get_items( $request ) {
+    public function get_items($request)
+    {
+        // define the API URL pattern for retrieving the booking details
+        $api_uri_pattern = "%s/booking/details/?key=%s&secret=%s&id=%s";
+        // fill out the parts of the API URL with the option values & the booking ref
+        $api_url = sprintf(
+            $api_uri_pattern, 
+            get_option('tcplugin_biq_api_host'),
+            get_option('tcplugin_taxicode_public'),
+            get_option('tcplugin_taxicode_private'),
+            $request['booking_ref']
+        );
+        // $api_url = https://api.taxicode.com//booking/details/?key=soPSNg0BDHIGjgRr&secret=7nuH6cf4GW6JqF81&id=
 
-        $booking_ref = $request['booking_ref'];
+        // make the API call but no need to verify the SSL of the origin
+        $api_call = wp_remote_get( $api_url, [ 'sslverify' => false ] );
+        if(is_wp_error($api_call)) {
+            $processed_response = wp_remote_retrieve_response_message($api_call);
+        } else {
+            // get the API response body (it's plain text JSON)
+            $api_response = wp_remote_retrieve_body($api_call);
+            // convert the response to assoc
+            $processed_response = json_decode($api_response);
+        }
 
-        $url = get_option('tcplugin_biq_api_host') . '/booking/details/?key=' . get_option('tcplugin_taxicode_public') . '&secret=' . get_option('tcplugin_taxicode_private') . "&id={$booking_ref}";
-
-        $response = json_decode(wp_remote_retrieve_body( wp_remote_get( $url ) ));
-
-
-        $response = rest_ensure_response( $response );
-
-        return $response;
+        // make sure there is a response
+        return rest_ensure_response($processed_response);
     }
 
     /**
@@ -64,7 +82,8 @@ class Details extends WP_REST_Controller {
      *
      * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
      */
-    public function get_items_permissions_check( $request ) {
+    public function get_items_permissions_check($request)
+    {
         return true;
     }
 
@@ -73,7 +92,8 @@ class Details extends WP_REST_Controller {
      *
      * @return array Collection parameters.
      */
-    public function get_collection_params() {
+    public function get_collection_params()
+    {
         return [];
     }
 }

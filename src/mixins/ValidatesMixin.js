@@ -1,4 +1,20 @@
-const ValidatesMixin = {
+// define the list of form events components can emit & be listened for
+export const formEvents = {
+    // when the form submit button is clicked
+    submit : {
+        name : 'submit'
+    },
+    // when the form input values have been validated
+    validated : {
+        name : 'validated'
+    },
+    // when there is an form input field validation error on the form
+    validationError : {
+        name : 'validationError'
+    }
+};
+
+export const ValidatesMixin = {
     props : {
         validClass : {
             type : String,

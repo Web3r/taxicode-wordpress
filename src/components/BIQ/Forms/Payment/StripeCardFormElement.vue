@@ -27,13 +27,16 @@
 </template>
 
 <script>
+    // import default Stripe card elements style config object just in case
+    import { DEFAULT_STRIPE_CARD_STYLE } from 'BIQ/config';
+    // import the list of events the component emits & can be listened for on the payment form
+    import { paymentEvents as emitEvents } from '@/common/BIQ/QuoteCheckout';
     // import the Stripe elements card form payment handler
     import StripeElementsHandler from '@/common/BIQ/PaymentHandlers/StripeElementsHandler';
     // import the component to disply the 1-click-processing form submit button
     import ProcessFormSubmit from 'BIQ/Forms/ProcessFormSubmit.vue';
-    // import the list of events the component emits & can be listened for on the payment form
-    import { emitEvents } from './PaymentFormEvents';
 
+    // component explicitly implements the "mixins/ValidatesMixin" interface as it differs somewhat
     export default {
         name : 'StripeCardFormElement',
 
@@ -42,7 +45,7 @@
         },
 
         props : {
-            apiClientSecretFrom : {
+            biqClientSecretFrom : {
                 type : String,
                 required : true,
                 default : '//booking/client_gateway_secret/'
@@ -58,16 +61,7 @@
                 type : Object,
                 required : true,
                 default : function() { 
-                    return {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    };
+                    return DEFAULT_STRIPE_CARD_STYLE;
                  }
             },
 
@@ -152,7 +146,7 @@
             // initialise the Stripe Element & bind it to the mount point
             this.paymentHandler.initialise(
                 this.stripePublicKey,
-                this.apiClientSecretFrom,
+                this.biqClientSecretFrom,
                 this.mount_on, 
                 this.stripeCardFormStyle, 
                 this.hidePostalCode

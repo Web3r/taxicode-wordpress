@@ -6,29 +6,14 @@
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
+    // import the journey quote search form fields
+    import { JOURNEY_TYPE_OPTION_RETURN, formFields } from '@/common/BIQ/QuotesSearch';
+    // import the journey quotes searched events
+    import { quotesSearchedEvents as emitEvents } from '@/common/BIQ/QuotesSearched';
     // import the API places location auto-complete lookup input field
     import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
     // import the component to disply the 1-click-processing form submit button
     import ProcessFormSubmit from 'BIQ/Forms/ProcessFormSubmit.vue';
-
-    const JOURNEY_TYPE_OPTION_SINGLE = 'One Way';
-    const JOURNEY_TYPE_OPTION_RETURN = 'Return';
-
-    // define the list of events the component emits & can be listened for
-    const emitEvents = {
-        // when the BIQ API quotes have been searched & a response returned
-        biqQuotesSearched : {
-            name : 'biqQuotesSearched'
-        },
-        // when the BIQ API quotes have been searched & a response returned with no quotes available
-        biqZeroQuotes : {
-            name : 'biqZeroQuotes'
-        },
-        // when there is an error with the BIQ API quotes search
-        biqQuotesError : {
-            name : 'biqQuotesError'
-        }
-    };
 
     export default {
         name : 'TheSearchForm',
@@ -43,22 +28,28 @@
         },
 
         props : {
-            apiPublicKey : {
+            biqPublicKey : {
                 type : String,
                 required : true,
                 default : ''
             },
             
-            apiPlacesLookup : {
+            biqPlacesLookup : {
                 type : String,
                 required : true,
                 default : '//places/?term='
             },
 
-            apiQuotesFrom : {
+            biqQuotesFrom : {
                 type : String,
                 required : true,
                 default : '//booking/quote/'
+            },
+
+            layout : {
+                type : String,
+                required : true,
+                default : 'compact'
             },
 
             searchOnLoad : {
@@ -74,58 +65,7 @@
 
         data() {
             return {
-                fields : {
-                    journey_type : {
-                        selected : JOURNEY_TYPE_OPTION_SINGLE,
-                        options : [
-                            JOURNEY_TYPE_OPTION_SINGLE, 
-                            JOURNEY_TYPE_OPTION_RETURN
-                        ],
-                        label : 'Journey type',
-                        required : false,
-                        error : null,
-                        errorMsg : '',
-                        id : 'tcplugin-journey-type',
-                        placeholder : ''
-                    },
-                    pickup : {
-                        value : '',
-                        label : 'Pickup',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Pickup location must be set',
-                        id : 'tcplugin-pickup',
-                        placeholder : 'Pickup postcode or place name'
-                    },
-                    destination : {
-                        value : '',
-                        label : 'Destination',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Destination location must be set',
-                        id : 'tcplugin-destination',
-                        placeholder : 'Destination postcode or place name'
-                    },
-                    via : {
-                        value : '',
-                        label : '(Optional) Via',
-                        required : false,
-                        error : null,
-                        errorMsg : '',
-                        id : 'tcplugin-via',
-                        placeholder : 'Via postcode or place name'
-                    },
-                    people : {
-                    // @todo validate input value is an integer between 1 & 99
-                        value : '1',
-                        label : 'Number of People',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Invalid number of people travelling',
-                        id : 'tcplugin-people',
-                        placeholder : ''
-                    }
-                },
+                fields : formFields('tcplugin'),
                 // @todo incoporate the journey date & time into the fields
                 date : '',
                 time : '',
@@ -169,6 +109,10 @@
             // BIQ Quoting state
                 'apiQuotesError'
             ]),
+
+            journeyDateTimeErrorState : function(fieldname) {
+                return !!this.errors[fieldname];
+            },
 
             onPlacesLookupError : function(event) {
                 if(this.debugging) {
@@ -314,10 +258,10 @@
                 // also updates the state flag for loading quotes
                 this.searchingQuotes(journey);
                 if(this.debugging) {
-                    console.group(`Searching BIQ API Quotes from '${this.apiQuotesFrom}'`);
+                    console.group(`Searching BIQ API Quotes from '${this.biqQuotesFrom}'`);
                 }
                 // get the quotes for the specified journey details
-                axios.get(`${this.apiQuotesFrom}?key=${this.apiPublicKey}&${apiQuotesURI}`)
+                axios.get(`${this.biqQuotesFrom}?key=${this.biqPublicKey}&${apiQuotesURI}`)
                 .then(response => {
                     if(self.debugging) {
                         console.log(response);

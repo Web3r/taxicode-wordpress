@@ -1,16 +1,19 @@
 import Vue from 'vue';
+// import the app router plugin
 import Router from 'vue-router';
-Vue.use(Router);
 
-// import the app page components
-import HomePage from 'frontend/views/HomePage.vue';
+// make the component load async to reduce chunk size
+const HomePageComponent = () => import(/* webpackChunkName: "BIQSearch", webpackPrefetch: true */ 'frontend/views/HomePage.vue')
+
+// allow vue to use the web router plugin & ensure single inclusion
+Vue.use(Router);
 
 export default new Router({
     routes : [
         {
             path : '/',
             name : 'HomePage',
-            component : HomePage,
+            component : HomePageComponent,
             props : {
                 searchFormData,
                 searchOnLoad
@@ -19,7 +22,7 @@ export default new Router({
         {
             path : '/:journey',
             name : 'HomePageSearched',
-            component : HomePage,
+            component : HomePageComponent,
             props : {
                 searchFormData,
                 searchOnLoad
@@ -29,7 +32,7 @@ export default new Router({
             path : '/checkout/:journey/:quote/:vehicle',
             name : 'CheckoutPage',
             // make the component load async to reduce chunk size
-            component : () => import(/* webpackChunkName: "BIQCheckout" */ 'frontend/views/CheckoutPage.vue'),
+            component : () => import(/* webpackChunkName: "BIQCheckout", webpackPrefetch: true */ 'frontend/views/CheckoutPage.vue'),
             props : {
                 stripe_cardform_style,
                 paypalClientToken
@@ -39,7 +42,7 @@ export default new Router({
             path : '/complete/:booking_ref',
             name : 'CompletePage',
             // make the component load async to reduce chunk size
-            component : () => import(/* webpackChunkName: "BIQComplete" */ 'frontend/views/CompletePage.vue')
+            component : () => import(/* webpackChunkName: "BIQComplete", webpackPrefetch: true */ 'frontend/views/CompletePage.vue')
         }
     ]
 });

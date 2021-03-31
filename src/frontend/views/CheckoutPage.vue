@@ -2,7 +2,7 @@
     <div>
         <the-biq-checkout-form
             ref="checkout"
-            :app-config="appConfig"
+            :biq-config="appConfig.biq"
             :app-settings="appSettings" 
             :stripe-card-form-style="stripe_cardform_style"
             :paypal-client-token="paypalClientToken"
@@ -33,6 +33,8 @@
     import { mapGetters } from 'vuex';
     // import the mixin that sets values & validates field values
     import PagesMixin from 'mixins/PagesMixin';
+    // import default Stripe card elements style config object just in case
+    import { DEFAULT_STRIPE_CARD_STYLE } from 'BIQ/config';
     // import the component to display the journey details being booked
     import TheCheckoutForm from 'BIQ/Forms/TheCheckoutForm.vue';
     // import the component to display the journey details being booked
@@ -55,16 +57,7 @@
                 type : Object,
                 required : true,
                 default : function() { 
-                    return {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    };
+                    return DEFAULT_STRIPE_CARD_STYLE;
                  }
             },
             

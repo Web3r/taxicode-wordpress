@@ -60,12 +60,11 @@ class GetPluginSettings extends WP_REST_Controller
             'complete_page_text'    => get_option('tcplugin_complete_page_text')
         ];
 
-        $response = rest_ensure_response( $response );
-
-        return $response;
+        return rest_ensure_response($response);
     }
 
-    public function get_items_permissions_check( $request ) {
+    public function get_items_permissions_check($request)
+    {
         return true;
     }
 }

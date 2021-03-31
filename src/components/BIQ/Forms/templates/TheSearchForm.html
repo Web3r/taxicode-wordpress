@@ -3,13 +3,14 @@
         <div class="col">
             <div class="form-group">
                 <label 
-                    :for="`${fields.journey_type.id}-select`" 
-                    :id="fields.journey_type.id"
+                    :for="fields.journey_type.id" 
+                    :id="`${fields.journey_type.id}-select`"
                 >{{fields.journey_type.label}}</label>
                 <b-form-select 
                     v-model="fields.journey_type.selected" 
                     :options="fields.journey_type.options"
-                    :id="`${fields.journey_type.id}-select`"
+                    :id="fields.journey_type.id"
+                    class="journey"
                 ></b-form-select>
             </div>
         </div>
@@ -23,7 +24,7 @@
                 ref="pickupfield"
                 key="pickup"
                 v-model="fields.pickup.value"
-                :api-places-lookup="apiPlacesLookup"
+                :biq-places-lookup="biqPlacesLookup"
                 :required="fields.pickup.required"
                 :error-state="fields.pickup.error"
                 :id="fields.pickup.id"
@@ -39,7 +40,7 @@
                 ref="destinationfield"
                 key="destination"
                 v-model="fields.destination.value"
-                :api-places-lookup="apiPlacesLookup"
+                :biq-places-lookup="biqPlacesLookup"
                 :required="fields.destination.required"
                 :error-state="fields.destination.error"
                 :id="fields.destination.id"
@@ -58,7 +59,7 @@
                 ref="viafield"
                 key="via"
                 v-model="fields.via.value"
-                :api-places-lookup="apiPlacesLookup"
+                :biq-places-lookup="biqPlacesLookup"
                 :required="fields.via.required"
                 :error-state="fields.via.error"
                 :id="fields.via.id"
@@ -72,12 +73,12 @@
         <div class="col">
             <div class="form-group">
                 <label 
-                    :for="`${fields.people.id}-input`" 
-                    :id="fields.people.id"
+                    :id="`${fields.people.id}-input`" 
+                    :for="fields.people.id"
                 >{{fields.people.label}}</label>
                 <input 
                     v-model="fields.people.value" 
-                    :id="`${fields.people.id}-input`"
+                    :id="fields.people.id"
                     :placeholder="fields.people.placeholder" 
                     :required="fields.people.required"
                     :class="errorStateClass('people')" 
@@ -93,13 +94,13 @@
     <div class="row">
         <div class="col">
             <div 
-                id="tcplugin-date" 
                 class="form-group"
             >
                 <label>Date</label>
                 <b-form-datepicker 
                     v-model="date" 
-                    :state="errors.date" 
+                    :state="journeyDateTimeErrorState('date')" 
+                    id="tcplugin-date" 
                     locale="en" 
                     class="form-control"
                 ></b-form-datepicker>
@@ -108,13 +109,13 @@
 
         <div class="col">
             <div 
-                id="tcplugin-time" 
                 class="form-group"
             >
                 <label>Time</label>
                 <b-form-timepicker 
                     v-model="time" 
-                    :state="errors.time" 
+                    :state="journeyDateTimeErrorState('time')" 
+                    id="tcplugin-time" 
                     locale="en"
                 ></b-form-timepicker>
             </div>
@@ -126,13 +127,13 @@
     >
         <div class="col">
             <div 
-                id="tcplugin-return-date" 
                 class="form-group"
             >
                 <label>Return Date</label>
                 <b-form-datepicker 
                     v-model="return_date" 
-                    :state="errors.return_date" 
+                    :state="journeyDateTimeErrorState('return_date')" 
+                    id="tcplugin-return-date" 
                     locale="en" 
                     class="form-control"
                 ></b-form-datepicker>
@@ -141,13 +142,13 @@
 
         <div class="col">
             <div 
-                id="tcplugin-return-time" 
                 class="form-group"
             >
                 <label>Return Time</label>
                 <b-form-timepicker 
                     v-model="return_time" 
-                    :state="errors.return_time" 
+                    :state="journeyDateTimeErrorState('return_time')" 
+                    id="tcplugin-return-time" 
                     locale="en"
                 ></b-form-timepicker>
             </div>

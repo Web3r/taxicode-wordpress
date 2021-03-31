@@ -31,6 +31,8 @@
 
 <script>
     import axios from 'axios';
+    // import the methods to generate the default state structure & journey detail objects
+    import { journeyDate } from '@/common/BIQ/QuoteCheckout';
 
     // define the list of events the component emits & can be listened for
     const emitEvents = {
@@ -85,7 +87,7 @@
             this.error = false;
             if(self.debugging) {
                 console.group(`Loading Booking Details from '${this.bookingDetailsFrom}'`);
-                console.log({...this.booking});
+                console.log('Booking Details', {...this.booking});
             }
             // let the wordpress backend plugin get the booking details as the API call needs the private key as well
             axios.get(`${this.bookingDetailsFrom}${this.bookingRef}`)
@@ -110,19 +112,18 @@
                     pickup : response.data.booking.pickup.string,
                     destination : response.data.booking.destination.string,
                     vias : response.data.booking.vias,
-                    date : new Date(Date.parse(response.data.booking.date)),
+                    date : journeyDate(response.data.booking.date),
                     return_date : null
                 }
                 if(response.data.booking.return) {
                 // the booking has a return journey leg
-                    booking.return_date = new Date(Date.parse(response.data.booking.return));
+                    booking.return_date = journeyDate(response.data.booking.return);
                 }
                 // set the booking details object & a flag to indicate the successful loading
                 self.booking = booking;
                 self.loaded = true;
                 if(self.debugging) {
-                    console.log('Booking Details Loaded');
-                    console.log({...self.booking});
+                    console.log('Booking Details Loaded', {...self.booking});
                     console.groupEnd();
                 }
             })

@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Taxicode API Client
+Plugin Name: Taxicode BIQ API Client
 Plugin URI: https://api.taxicode.com
-Description: A search and checkout client for the Taxicode API
-Version: 0.1
-Author: Alasdair Watson
-Author URI: https://www.black-ink.org/
+Description: A search and checkout client for the Taxicode Booking Instant Quotes API
+Version: 1.0.1
+Author: Evil Wizard
+Author URI: https://taxicode.com/
 License: GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: taxicode
@@ -13,7 +13,7 @@ Domain Path: /languages
 */
 
 /**
- * Copyright (c) 2020 Alasdair Watson (email: alasdair@black-ink.org). All rights reserved.
+ * Copyright (c) 2021 Evil Wizard Creations (email: evil.wizard95@googlemail.com). All rights reserved.
  *
  * Released under the GPL license
  * http://www.opensource.org/licenses/gpl-license.php
@@ -41,8 +41,7 @@ Domain Path: /languages
 // don't call the file directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
-if( file_exists( dirname(__FILE__) . '/vendor/autoload.php'))
-{
+if( file_exists( dirname(__FILE__) . '/vendor/autoload.php')) {
     require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
 }
 
@@ -52,14 +51,15 @@ if( file_exists( dirname(__FILE__) . '/vendor/autoload.php'))
  *
  * @class Taxicode The class that holds the entire Taxicode plugin
  */
-final class Taxicode {
+final class Taxicode
+{
 
     /**
      * Plugin version
      *
      * @var string
      */
-    public $version = '0.1.1';
+    public $version = '1.0.1';
 
     /**
      * Holds various class instances
@@ -74,7 +74,8 @@ final class Taxicode {
      * Sets up all the appropriate hooks and actions
      * within our plugin.
      */
-    public function __construct() {
+    public function __construct()
+    {
 
         $this->define_constants();
 
@@ -90,10 +91,11 @@ final class Taxicode {
      * Checks for an existing Taxicode() instance
      * and if it doesn't find one, creates it.
      */
-    public static function init() {
+    public static function init()
+    {
         static $instance = false;
 
-        if ( ! $instance ) {
+        if (!$instance) {
             $instance = new Taxicode();
         }
 
@@ -107,8 +109,9 @@ final class Taxicode {
      *
      * @return mixed
      */
-    public function __get( $prop ) {
-        if ( array_key_exists( $prop, $this->container ) ) {
+    public function __get($prop)
+    {
+        if(array_key_exists($prop, $this->container)) {
             return $this->container[ $prop ];
         }
 
@@ -122,8 +125,9 @@ final class Taxicode {
      *
      * @return mixed
      */
-    public function __isset( $prop ) {
-        return isset( $this->{$prop} ) || isset( $this->container[ $prop ] );
+    public function __isset($prop)
+    {
+        return isset($this->{$prop}) || isset($this->container[$prop]);
     }
 
     /**
@@ -131,13 +135,14 @@ final class Taxicode {
      *
      * @return void
      */
-    public function define_constants() {
-        define( 'TAXICODE_VERSION', $this->version );
-        define( 'TAXICODE_FILE', __FILE__ );
-        define( 'TAXICODE_PATH', dirname( TAXICODE_FILE ) );
-        define( 'TAXICODE_INCLUDES', TAXICODE_PATH . '/includes' );
-        define( 'TAXICODE_URL', plugins_url( '', TAXICODE_FILE ) );
-        define( 'TAXICODE_ASSETS', TAXICODE_URL . '/assets' );
+    public function define_constants()
+    {
+        define('TAXICODE_VERSION', $this->version);
+        define('TAXICODE_FILE', __FILE__);
+        define('TAXICODE_PATH', dirname(TAXICODE_FILE));
+        define('TAXICODE_INCLUDES', TAXICODE_PATH . '/includes');
+        define('TAXICODE_URL', plugins_url('', TAXICODE_FILE));
+        define('TAXICODE_ASSETS', TAXICODE_URL . '/assets');
     }
 
     /**
@@ -145,7 +150,8 @@ final class Taxicode {
      *
      * @return void
      */
-    public function init_plugin() {
+    public function init_plugin()
+    {
         $this->includes();
         $this->init_hooks();
     }
@@ -155,15 +161,16 @@ final class Taxicode {
      *
      * Nothing being called here yet.
      */
-    public function activate() {
+    public function activate()
+    {
 
-        $installed = get_option( 'taxicode_installed' );
+        $installed = get_option('taxicode_installed');
 
-        if ( ! $installed ) {
-            update_option( 'taxicode_installed', time() );
+        if(!$installed) {
+            update_option('taxicode_installed', time());
         }
 
-        update_option( 'taxicode_version', TAXICODE_VERSION );
+        update_option('taxicode_version', TAXICODE_VERSION);
     }
 
     /**
@@ -171,7 +178,8 @@ final class Taxicode {
      *
      * Nothing being called here yet.
      */
-    public function deactivate() {
+    public function deactivate()
+    {
 
     }
 
@@ -180,19 +188,24 @@ final class Taxicode {
      *
      * @return void
      */
-    public function includes() {
+    public function includes()
+    {
 
         require_once TAXICODE_INCLUDES . '/Assets.php';
 
-        if ( $this->is_request( 'admin' ) ) {
+        if($this->is_request('admin')) {
             require_once TAXICODE_INCLUDES . '/Admin.php';
         }
 
-        if ( $this->is_request( 'frontend' ) ) {
+        if($this->is_request('frontend')) {
             require_once TAXICODE_INCLUDES . '/Frontend.php';
         }
 
-        if ( $this->is_request( 'ajax' ) ) {
+        if($this->is_request('search_lite')) {
+            require_once TAXICODE_INCLUDES . '/SearchLite.php';
+        }
+
+        if($this->is_request('ajax')) {
             // require_once TAXICODE_INCLUDES . '/class-ajax.php';
         }
 
@@ -204,12 +217,13 @@ final class Taxicode {
      *
      * @return void
      */
-    public function init_hooks() {
+    public function init_hooks()
+    {
 
-        add_action( 'init', array( $this, 'init_classes' ) );
+        add_action('init', array($this, 'init_classes'));
 
         // Localize our plugin
-        add_action( 'init', array( $this, 'localization_setup' ) );
+        add_action('init', array($this, 'localization_setup'));
     }
 
     /**
@@ -217,17 +231,22 @@ final class Taxicode {
      *
      * @return void
      */
-    public function init_classes() {
+    public function init_classes()
+    {
 
-        if ( $this->is_request( 'admin' ) ) {
+        if($this->is_request('admin')) {
             $this->container['admin'] = new Taxicode\Admin();
         }
 
-        if ( $this->is_request( 'frontend' ) ) {
+        if($this->is_request( 'frontend')) {
             $this->container['frontend'] = new Taxicode\Frontend();
         }
 
-        if ( $this->is_request( 'ajax' ) ) {
+        if($this->is_request( 'search_lite')) {
+            $this->container['search_lite'] = new Taxicode\SearchLite();
+        }
+
+        if($this->is_request( 'ajax')) {
             // $this->container['ajax'] =  new Taxicode\Ajax();
         }
 
@@ -240,8 +259,9 @@ final class Taxicode {
      *
      * @uses load_plugin_textdomain()
      */
-    public function localization_setup() {
-        load_plugin_textdomain( 'taxicode', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+    public function localization_setup()
+    {
+        load_plugin_textdomain('taxicode', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 
     /**
@@ -251,22 +271,21 @@ final class Taxicode {
      *
      * @return bool
      */
-    private function is_request( $type ) {
-        switch ( $type ) {
+    private function is_request($type)
+    {
+        switch ($type) {
             case 'admin' :
                 return is_admin();
-
             case 'ajax' :
-                return defined( 'DOING_AJAX' );
-
+                return defined('DOING_AJAX');
             case 'rest' :
-                return defined( 'REST_REQUEST' );
-
+                return defined('REST_REQUEST');
             case 'cron' :
-                return defined( 'DOING_CRON' );
-
+                return defined('DOING_CRON');
             case 'frontend' :
-                return ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' );
+                return (!is_admin() || defined('DOING_AJAX')) && !defined('DOING_CRON');
+            case 'search_lite' :
+                return (!is_admin() || defined('DOING_AJAX')) && !defined('DOING_CRON');
         }
     }
 

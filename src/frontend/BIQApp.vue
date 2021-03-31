@@ -3,78 +3,54 @@
         <router-view v-if="initialised" 
             :app-config="appConfig"
             :app-settings="appSettings" 
-            :appRESTBase="biqAppURL"
-            :debugging="biqAppDebugEnabled"
+            :appRESTBase="appURL"
+            :debugging="appDebugEnabled"
         ></router-view>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
     // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
+    // import the mixin that sets values & validates field values
+    import AppsMixin from 'mixins/AppsMixin';
+    // import the BIQ static config just in case and the settings formatter
+    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, biqSettings } from 'BIQ/config';
 
     export default {
         name : 'BIQApp',
         version : '1.0.1',
 
-        props : {
-            biqAppURL : {
-                type : String,
-                required : true,
-                default : '//'
-            },
+        mixins : [
+            AppsMixin
+        ],
 
+        props : {
             biqAppConfig : {
                 type : Object,
                 required : true,
                 default : function() { 
                     return {
-                        PLACES_URI : 'places/',
-                        AUTH_URI : 'auth/',
-                        QUOTE_URI : 'booking/quote/',
-                        JOURNEY_URI : 'booking/journey/?id=',
-                        CLIENT_SECRET_URI : 'booking/client_gateway_secret/',
-                        PAYMENT_URI : 'booking/pay/',
-                        BOOKING_DETALS_URI : 'booking-details/?booking_ref=',
-                        PGH_CONF            : {
-                            hidePostalCode  : true
-                        },
-                        useButtons : true
+                        biq : biqConf,
+                        BOOKING_DETALS_URI : 'booking-details/?booking_ref='
                     };
                 }
-            },
-
-            biqAppDebugEnabled : {
-                type : Boolean,
-                default : false
             }
         },
 
         data() {
             return {
-                initialised : false,
                 settings : {
-                    biq_api_host : 'https://api.taxicode.com/',
+                    biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
-                    stripe_cardform_style : {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    },
+                    stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,
                     booking_test_mode : false,
                     quote_type : '',
                     recommend_upgrade : false,
                     complete_page_text : ''
-                },
-                config : this.biqAppConfig
+                }
             };
         },
 
@@ -117,11 +93,7 @@
             ]),
 
             appConfig : function() {
-                return { ...this.config };
-            },
-
-            appSettings : function() {
-                return { ...this.settings };
+                return { ...this.biqAppConfig };
             }
         },
 
@@ -145,68 +117,20 @@
                 'booked'
             ]),
 
-            getAppSettings : function() {
-                const app = this;
-                const biq_app_settings_url = `${this.biqAppURL}settings-get/`;
-                if(this.biqAppDebugEnabled) {
-                    console.group(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
+            appSettingsUpdated : function(new_settings) {
+                if(this.appDebugEnabled) {
+                    console.group('Updating BIQ App Settings');
+                    console.log('BIQ App Settings', {...this.settings});
+                    console.log('New BIQ Settings', new_settings);
                 }
-                axios.get(biq_app_settings_url)
-                .then(response => {
-                    if(app.biqAppDebugEnabled) {
-                        console.log('response', response);
-                        console.log('App Settings', {...app.settings});
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop to the
-                        // Checkout Page view via the global window variable is an object.
-                        // It's dirty, but needs must for now 2021
-                        console.log('stripe_cardform_style', stripe_cardform_style);
-                        console.info('type', typeof(stripe_cardform_style));
-                        console.log('response.data.stripe_cardform_style', response.data.stripe_cardform_style);
-                        console.info('type', typeof(response.data.stripe_cardform_style));
-                        try {
-                            console.log('parse attempt', JSON.parse(response.data.stripe_cardform_style));
-                        } catch(e) {
-                            console.error(e);
-                        }
-                    }
-                    const settings = {
-                        biq_pk : response.data.taxicode_public,
-                        biq_api_host : response.data.biq_api_host,
-                        paypal_pk : response.data.paypal_public,
-                        stripe_pk : response.data.stripe_public,
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop to the
-                        // Checkout Page view via the global window variable is an object.
-                        // It's dirty, but needs must for now 2021
-                        stripe_cardform_style : app.stripe_cardform_style,
-                        // convert to boolean for ease
-                        booking_test_mode : (response.data.test_mode == '1'),
-                        quote_type : response.data.quote_type,
-                        // convert to boolean for ease
-                        recommend_upgrade : (response.data.recommend_upgrade == '1'),
-                        complete_page_text : response.data.complete_page_text
-                    };
-                    // make sure the api host ends in a /
-                    if(settings.biq_api_host.slice(-1) !== '/') {
-                        settings.biq_api_host = settings.biq_api_host + '/';
-                    }
-                    app.settings = settings;
-                    app.initialised = true;
-                    if(app.biqAppDebugEnabled) {
-                        console.info('Loaded Settings');
-                        console.log('App Settings', {...app.settings});
-                        console.groupEnd();
-                    }
-                })
-                .catch(error => {
-                    if(app.biqAppDebugEnabled) {
-                        console.info('Settings Load Error');
-                        console.log(error);
-                        console.groupEnd();
-                    }
-                    console.error(error);
-                });
+                const settings = biqSettings(new_settings, this.appDebugEnabled);
+                this.settings = settings;
+                if(this.appDebugEnabled) {
+                    console.info('Updated Settings');
+                    console.log('Settings', settings);
+                    console.log('BIQ App Settings', {...this.settings});
+                    console.groupEnd();
+                }
             }
         }
     };

@@ -36,14 +36,8 @@
 <script>
     // import the Book Now Call To Action button
     import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
-
-    // define the list of events the component emits & can be listened for
-    const emitEvents = {
-        // when the quote "Book Now" button is clicked
-        c2aClick : {
-            name : 'c2aClick'
-        }
-    };
+    // import the journey quotes searched booking events
+    import { quoteBookingEvents as emitEvents } from '@/common/BIQ/QuotesSearched';
 
     export default {
         name : 'QuoteCardReducedToTypeAndClass',
@@ -125,7 +119,7 @@
         methods : {
             onClick : function(event) {
                 // bubble the call to action click event
-                this.$emit(emitEvents.c2aClick.name, event);
+                this.$emit(emitEvents.biqQuoteBookNow.name, event);
             }
         }
     };

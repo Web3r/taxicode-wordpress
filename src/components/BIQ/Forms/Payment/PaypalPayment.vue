@@ -34,13 +34,14 @@
 </template>
 
 <script>
+    // import the list of events the component emits & can be listened for on the payment form
+    import { paymentEvents as emitEvents } from '@/common/BIQ/QuoteCheckout';
     // import the Stripe elements card form payment handler
     import PaypalHandler from '@/common/BIQ/PaymentHandlers/PaypalHandler';
     // import the component to disply the 1-click-processing form submit button
     import ProcessFormSubmit from 'BIQ/Forms/ProcessFormSubmit.vue';
-    // import the list of events the component emits & can be listened for on the payment form
-    import { emitEvents } from './PaymentFormEvents';
 
+    // component explicitly implements the "mixins/ValidatesMixin" interface as it differs somewhat
     export default {
         name : 'PaypalPayment',
 
