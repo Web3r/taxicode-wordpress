@@ -35,7 +35,6 @@ class SearchLite
 <style>
 '.get_option('tcplugin_custom_css').'
 </style>
-<script src="https://js.stripe.com/v3/"></script>
 <script>
     const biqAppURL = \'' . get_rest_url('', '/taxicode/v1/') . '\';
     const biqAppDebugEnabled = false;

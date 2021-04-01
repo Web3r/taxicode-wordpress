@@ -179,8 +179,6 @@ const biqSearchMixin = {
         },
 
         onSearchQuotesFormSubmit : function(event) {
-            // @todo allow the home page to POST to the plugin page & auto search on load
-            event.preventDefault();
             // trigger the search form submit event
             this.$emit(formEvents.submit.name, event);
             // @todo need to be able to check if it needs to proceed with the search

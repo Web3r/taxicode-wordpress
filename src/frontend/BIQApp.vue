@@ -17,26 +17,107 @@
     // import the BIQ static config just in case and the settings formatter
     import { DEFAULT_STRIPE_CARD_STYLE, biqConf, biqSettings } from 'BIQ/config';
 
-    export default {
-        name : 'BIQApp',
-        version : '1.0.1',
+    // define the BIQ Frontend App release constants values
+    const APP_VERSION = '1.0.1';
+    const APP_NAME = 'BIQApp';
+    const APP_TITLE = 'Taxicode Booking Instant Quotes';
 
-        mixins : [
-            AppsMixin
-        ],
-
-        props : {
-            biqAppConfig : {
-                type : Object,
-                required : true,
-                default : function() { 
-                    return {
-                        biq : biqConf,
-                        BOOKING_DETALS_URI : 'booking-details/?booking_ref='
-                    };
-                }
+    // define the main BIQ Frontend App component properties (inherits props from AppsMixin)
+    const props = {
+        biqAppConfig : {
+            type : Object,
+            required : true,
+            default : function() { 
+                return {
+                    biq : biqConf,
+                    BOOKING_DETALS_URI : 'booking-details/?booking_ref='
+                };
             }
-        },
+        }
+    };
+    // define the main BIQ Frontend App component computed property methods (inherits computed property methods from AppsMixin)
+    const computed = {
+        ...mapGetters([
+        // BIQ Quote Search state
+            'searchDetails',
+            'hasSearchResults',
+            'displayType',
+            'displayQuotes',
+        // BIQ Quoting state
+            'loadingQuotes', 
+            'quotesError', 
+            'quotesLoaded', 
+            'zeroQuotes', 
+            'journeyID', 
+            'journeyDetails', 
+            'journeyDate', 
+            'journeyTime', 
+            'journeyHasReturn', 
+            'journeyReturnDate', 
+            'journeyReturnTime', 
+            'journeyHasVias', 
+            'journeyQuotes',
+        // BIQ Book Now Checkout state
+            'processed',
+            'processing',
+            'basket',
+            'quoteID',
+            'vehicleIndex',
+            'price',
+            'quoteData',
+            'quoteVehicleData',
+            'bookingRef'
+        ]),
+
+        appConfig : function() {
+            return { ...this.biqAppConfig };
+        }
+    };
+    // define the main BIQ Frontend App component methods (inherits methods from AppsMixin)
+    const methods = {
+        ...mapActions([
+        // BIQ Quote Search state
+            'resetSearch',
+            'searchingQuotes', 
+            'searchedQuotes',
+            'changeDisplayType',
+        // BIQ Quoting state
+            'resetQuotes',
+            'quoting', 
+            'apiQuotesError',
+            'quoted',
+        // BIQ Book Now Checkout state
+            'resetCheckout',
+            'bookNow',
+            'booking',
+            'bookingFailed',
+            'booked'
+        ]),
+
+        appSettingsUpdated : function(new_settings) {
+            if(this.appDebugEnabled) {
+                console.group('Updating BIQ App Settings');
+                console.log('BIQ App Settings', {...this.settings});
+                console.log('New BIQ Settings', new_settings);
+            }
+            const settings = biqSettings(new_settings, this.appDebugEnabled);
+            this.settings = settings;
+            if(this.appDebugEnabled) {
+                console.info('Updated Settings');
+                console.log('Settings', settings);
+                console.log('BIQ App Settings', {...this.settings});
+                console.groupEnd();
+            }
+        }
+    };
+
+    export default {
+        name : APP_NAME,
+        version : APP_VERSION,
+        props : {...props},
+        computed : {...computed},
+        methods : {...methods},
+        mixins : [AppsMixin],
 
         data() {
             return {
@@ -57,81 +138,6 @@
         created() {
             // get the app settings from the backend
             this.getAppSettings();
-        },
-
-        computed : {
-            ...mapGetters([
-            // BIQ Quote Search state
-                'searchDetails',
-                'hasSearchResults',
-                'displayType',
-                'displayQuotes',
-            // BIQ Quoting state
-                'loadingQuotes', 
-                'quotesError', 
-                'quotesLoaded', 
-                'zeroQuotes', 
-                'journeyID', 
-                'journeyDetails', 
-                'journeyDate', 
-                'journeyTime', 
-                'journeyHasReturn', 
-                'journeyReturnDate', 
-                'journeyReturnTime', 
-                'journeyHasVias', 
-                'journeyQuotes',
-            // BIQ Book Now Checkout state
-                'processed',
-                'processing',
-                'basket',
-                'quoteID',
-                'vehicleIndex',
-                'price',
-                'quoteData',
-                'quoteVehicleData',
-                'bookingRef'
-            ]),
-
-            appConfig : function() {
-                return { ...this.biqAppConfig };
-            }
-        },
-
-        methods : {
-            ...mapActions([
-            // BIQ Quote Search state
-                'resetSearch',
-                'searchingQuotes', 
-                'searchedQuotes',
-                'changeDisplayType',
-            // BIQ Quoting state
-                'resetQuotes',
-                'quoting', 
-                'apiQuotesError',
-                'quoted',
-            // BIQ Book Now Checkout state
-                'resetCheckout',
-                'bookNow',
-                'booking',
-                'bookingFailed',
-                'booked'
-            ]),
-
-            appSettingsUpdated : function(new_settings) {
-                if(this.appDebugEnabled) {
-                    console.group('Updating BIQ App Settings');
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.log('New BIQ Settings', new_settings);
-                }
-                const settings = biqSettings(new_settings, this.appDebugEnabled);
-                this.settings = settings;
-                if(this.appDebugEnabled) {
-                    console.info('Updated Settings');
-                    console.log('Settings', settings);
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.groupEnd();
-                }
-            }
         }
     };
 </script>

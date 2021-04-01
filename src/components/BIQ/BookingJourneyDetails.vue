@@ -1,28 +1,25 @@
 <template>
     <div v-if="loaded"
-        id="biq-journey-details-booked" 
-        class="col"
+        class="flex-sm-fill"
     >
         <div class="card">
-            <div class="card-header">
-                Booking Details
-            </div>
+            <div class="card-header">{{labels.header}}</div>
 
             <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Booking Reference:</strong> {{bookingRef}}
+                    <strong>{{labels.booking.ref}}</strong><span>{{bookingRef}}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Name:</strong> {{booking.name}}
+                    <strong>{{labels.booking.name}}</strong> <span>{{booking.name}}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Date:</strong> {{journeyDate}} at {{journeyTime}}
+                    <strong>{{labels.booking.date}}</strong> <span>{{journeyDate}} &commat; {{journeyTime}}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Travelling From:</strong> {{booking.pickup}}
+                    <strong>{{labels.booking.pickup}}</strong> <span>{{booking.pickup}}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Going To:</strong> {{booking.destination}}
+                    <strong>{{labels.booking.destination}}</strong> <span>{{booking.destination}}</span>
                 </li>
             </ul>
         </div>
@@ -34,6 +31,80 @@
     // import the methods to generate the default state structure & journey detail objects
     import { journeyDate } from '@/common/BIQ/QuoteCheckout';
 
+    // define the component text labels used (can be overridden with the 'labels' prop)
+    const defaultLabels = {
+        header : 'Booking Details',
+        booking : {
+            ref : 'Booking Reference : ',
+            name : 'Name : ',
+            passengers : 'Passengers : ',
+            pickup : 'Pickup : ',
+            destination : 'Destination : ',
+            via : 'Via : ',
+            date : 'Date : ',
+            return_date : 'Returning : '
+        }
+    };
+    // define the component data structure & the default / initial values
+    const defaultData = {
+        loaded : false,
+        error : false,
+        booking : {
+            ref : '',
+            name : '',
+            passengers : 1,
+            pickup : '',
+            destination : '',
+            vias : [],
+            date : null,
+            return_date : null
+        }
+    };
+    // define the component properties
+    const props = {
+        bookingDetailsFrom : {
+            type : String,
+            required : true,
+            default : '//booking-details/?booking_ref='
+        },
+
+        bookingRef : {
+            type : String,
+            required : true,
+            default : ''
+        },
+
+        labels : {
+            type : Object,
+            // @todo add a validator to make sure that all the label keys are supplied
+            default : function() { 
+                return defaultLabels;
+            }
+        },
+
+        debugging : {
+            type : Boolean,
+            default : false
+        }
+    };
+    // define the component computed property methods
+    const computed = {
+        journeyDate :  function() {
+            return this.dateString(this.booking.date);
+        },
+
+        journeyTime :  function() {
+            return this.timeString(this.booking.date);
+        },
+
+        journeyReturnDate :  function() {
+            return this.dateString(this.booking.return_date);
+        },
+        
+        journeyReturnTime :  function() {
+            return this.timeString(this.booking.return_date);
+        }
+    };
     // define the list of events the component emits & can be listened for
     const emitEvents = {
         // when there is an error on the backend
@@ -41,51 +112,21 @@
             name : 'detailsLoadError'
         }
     };
-
-    export default {
-        name : 'BookingJourneyDetails',
-
-        props : {
-            bookingDetailsFrom : {
-                type : String,
-                required : true,
-                default : '//booking-details/?booking_ref='
-            },
-
-            bookingRef : {
-                type : String,
-                required : true,
-                default : ''
-            },
-
-            debugging : {
-                type : Boolean,
-                default : false
-            }
+    // define the component methods
+    const methods = {
+        dateString : function(d) {
+            return (d !== null) ? d.toDateString() : '';
         },
 
-        data() {
-            return {
-                loaded : false,
-                error : false,
-                booking : {
-                    ref : '',
-                    name : '',
-                    passengers : 1,
-                    pickup : '',
-                    destination : '',
-                    vias : [],
-                    date : null,
-                    return_date : null
-                }
-            };
+        timeString : function(d) {
+            return (d !== null) ? d.toLocaleTimeString() : '';
         },
 
-        mounted() {
+        getBookingDetails : function() {
             const self = this;
             this.loaded = false;
             this.error = false;
-            if(self.debugging) {
+            if(this.debugging) {
                 console.group(`Loading Booking Details from '${this.bookingDetailsFrom}'`);
                 console.log('Booking Details', {...this.booking});
             }
@@ -147,32 +188,21 @@
                     console.groupEnd();
                 }
             });
+        }
+    };
+
+    export default {
+        name : 'BookingJourneyDetails',
+        props : {...props},
+        computed : {...computed},
+        methods : {...methods},
+
+        data() {
+            return {...defaultData};
         },
 
-        computed : {
-            journeyDate :  function() {
-                return (this.booking.date !== null) 
-                    ? this.booking.date.toDateString() 
-                    : '';
-            },
-
-            journeyTime :  function() {
-                return (this.booking.date !== null) 
-                    ? this.booking.date.toLocaleTimeString() 
-                    : '';
-            },
-
-            journeyReturnDate :  function() {
-                return (this.booking.return_date !== null) 
-                    ? this.booking.return_date.toDateString() 
-                    : '';
-            },
-            
-            journeyReturnTime :  function() {
-                return (this.booking.return_date !== null) 
-                    ? this.booking.return_date.toLocaleTimeString() 
-                    : '';
-            }
+        mounted() {
+            this.getBookingDetails();
         }
     };
 </script>

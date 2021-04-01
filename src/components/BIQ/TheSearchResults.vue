@@ -29,9 +29,9 @@
             </slot>
         </div>
 
-        <div v-if="hasSearchResults"
+        <div v-if="hasSearchResults" 
             id="results"
-            class="row"
+            class="d-flex flex-wrap justify-content-between"
         >
             <component :is="quote_card" v-for="(quote, key) in displayQuotes"
                 :key="`quote_${quote.quote_id}_${quote.selected_vehicle}`"

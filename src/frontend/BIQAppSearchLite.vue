@@ -1,5 +1,5 @@
 <template>
-    <div id="biq-vue-app-search-lite">
+    <div id="biq-search-lite-vue-app">
         <the-biq-search-form v-if="initialised" 
             :biq-public-key="appSettings.biq_pk"
             :biq-places-lookup="`${appSettings.biq_api_host}${appConfig.biq.PLACES_URI}`"
@@ -23,28 +23,97 @@
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/Search/TheSearchForm.vue';
 
-    export default {
-        name : 'BIQAppSearchLite',
-        version : '1.0.1',
+    // define the APP release constants values
+    const APP_VERSION = '1.0.1';
+    const APP_NAME = 'BIQAppSearchLite';
+    const APP_TITLE = 'Taxicode Booking Instant Quotes - Search Lite';
 
-        mixins : [
-            AppsMixin
-        ],
+    // define the main app component properties (inherits props from AppsMixin)
+    const props = {
+        biqAppConfig : {
+            type : Object,
+            required : true,
+            default : function() { 
+                return {
+                    biq : biqConf
+                };
+            }
+        }
+    };
+    // define the main app component computed property methods (inherits computed property methods from AppsMixin)
+    const computed = {
+        ...mapGetters([
+        // BIQ Quote Search state
+            'searchDetails',
+            'hasSearchResults',
+            'displayType',
+            'displayQuotes',
+        // BIQ Quoting state
+            'loadingQuotes', 
+            'quotesError', 
+            'quotesLoaded', 
+            'zeroQuotes', 
+            'journeyID', 
+            'journeyDetails', 
+            'journeyDate', 
+            'journeyTime', 
+            'journeyHasReturn', 
+            'journeyReturnDate', 
+            'journeyReturnTime', 
+            'journeyHasVias', 
+            'journeyQuotes'
+        ]),
+
+        appConfig : function() {
+            return { ...this.biqAppConfig };
+        }
+    };
+    // define the main app component methods (inherits methods from AppsMixin)
+    const methods = {
+        ...mapActions([
+        // BIQ Quote Search state
+            'resetSearch',
+            'searchingQuotes', 
+            'searchedQuotes',
+            'changeDisplayType',
+        // BIQ Quoting state
+            'resetQuotes',
+            'quoting', 
+            'apiQuotesError',
+            'quoted'
+        ]),
+
+        appSettingsUpdated : function(new_settings) {
+            if(this.appDebugEnabled) {
+                console.group('Updating BIQ App Settings');
+                console.log('BIQ App Settings', {...this.settings});
+                console.log('New BIQ Settings', new_settings);
+            }
+            const settings = biqSettings(new_settings, this.appDebugEnabled);
+            this.settings = settings;
+            if(this.appDebugEnabled) {
+                console.info('Updated Settings');
+                console.log('Settings', settings);
+                console.log('BIQ App Settings', {...this.settings});
+                console.groupEnd();
+            }
+        },
+
+        onSearchQuotes : function(evt) {
+            
+        }
+    };
+
+    export default {
+        name : APP_NAME,
+        version : APP_VERSION,
+        props : {...props},
+        computed : {...computed},
+        methods : {...methods},
+        mixins : [AppsMixin],
 
         components : {
             'the-biq-search-form' : TheSearchForm,
-        },
-
-        props : {
-            biqAppConfig : {
-                type : Object,
-                required : true,
-                default : function() { 
-                    return {
-                        biq : biqConf
-                    };
-                }
-            }
         },
 
         data() {
@@ -67,69 +136,6 @@
         created() {
             // get the app settings from the backend
             this.getAppSettings();
-        },
-
-        computed : {
-            ...mapGetters([
-            // BIQ Quote Search state
-                'searchDetails',
-                'hasSearchResults',
-                'displayType',
-                'displayQuotes',
-            // BIQ Quoting state
-                'loadingQuotes', 
-                'quotesError', 
-                'quotesLoaded', 
-                'zeroQuotes', 
-                'journeyID', 
-                'journeyDetails', 
-                'journeyDate', 
-                'journeyTime', 
-                'journeyHasReturn', 
-                'journeyReturnDate', 
-                'journeyReturnTime', 
-                'journeyHasVias', 
-                'journeyQuotes'
-            ]),
-
-            appConfig : function() {
-                return { ...this.biqAppConfig };
-            }
-        },
-
-        methods : {
-            ...mapActions([
-            // BIQ Quote Search state
-                'resetSearch',
-                'searchingQuotes', 
-                'searchedQuotes',
-                'changeDisplayType',
-            // BIQ Quoting state
-                'resetQuotes',
-                'quoting', 
-                'apiQuotesError',
-                'quoted'
-            ]),
-
-            appSettingsUpdated : function(new_settings) {
-                if(this.appDebugEnabled) {
-                    console.group('Updating BIQ App Settings');
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.log('New BIQ Settings', new_settings);
-                }
-                const settings = biqSettings(new_settings, this.appDebugEnabled);
-                this.settings = settings;
-                if(this.appDebugEnabled) {
-                    console.info('Updated Settings');
-                    console.log('Settings', settings);
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.groupEnd();
-                }
-            },
-
-            onSearchQuotes : function(evt) {
-                
-            }
         }
     };
 </script>

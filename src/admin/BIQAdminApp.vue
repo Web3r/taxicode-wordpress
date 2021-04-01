@@ -16,17 +16,45 @@
     // import the BIQ static config just in case and the settings formatter
     import { DEFAULT_STRIPE_CARD_STYLE, biqConf, biqSettings } from 'BIQ/config';
 
-    export default {
-        name : 'BIQAdminApp',
-        version : '1.0.1',
+    // define the BIQ Admin App release constants values
+    const APP_VERSION = '1.0.1';
+    const APP_NAME = 'BIQAdminApp';
+    const APP_TITLE = 'Taxicode Booking Instant Quotes Admin';
+    
+    // define the main BIQ Admin App component properties (inherits props from AppsMixin)
+    const props = {};
+    // define the main BIQ Admin App component computed property methods (inherits computed property methods from AppsMixin)
+    const computed = {};
+    // define the main BIQ Admin App component methods (inherits methods from AppsMixin)
+    const methods = {
+        appSettingsUpdated : function(new_settings) {
+            if(this.appDebugEnabled) {
+                console.group('Updating BIQ App Settings');
+                console.log('BIQ App Settings', {...this.settings});
+                console.log('New BIQ Settings', new_settings);
+            }
+            const settings = biqSettings(new_settings, this.appDebugEnabled);
+            this.settings = settings;
+            if(this.appDebugEnabled) {
+                console.info('Updated Settings');
+                console.log('Settings', settings);
+                console.log('BIQ App Settings', {...this.settings});
+                console.groupEnd();
+            }
+        }
+    };
 
-        mixins : [
-            AppsMixin
-        ],
+    export default {
+        name : APP_NAME,
+        version : APP_VERSION,
+        mixins : [AppsMixin],
+        props,
+        computed,
+        methods,
 
         data() {
             return {
-                app_title : 'Taxicode Booking Instant Quotes Admin',
+                app_title : APP_TITLE,
                 settings : {
                     biq_api_host : biqConf.LIVE_API_HOST,
                     biq_pk : '',
@@ -44,24 +72,6 @@
         created() {
             // get the app settings from the backend
             this.getAppSettings();
-        },
-
-        methods : {
-            appSettingsUpdated : function(new_settings) {
-                if(this.appDebugEnabled) {
-                    console.group('Updating BIQ App Settings');
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.log('New BIQ Settings', new_settings);
-                }
-                const settings = biqSettings(new_settings, this.appDebugEnabled);
-                this.settings = settings;
-                if(this.appDebugEnabled) {
-                    console.info('Updated Settings');
-                    console.log('Settings', settings);
-                    console.log('BIQ App Settings', {...this.settings});
-                    console.groupEnd();
-                }
-            }
         }
     };
 </script>

@@ -54,6 +54,7 @@
 
             <b-form-datepicker 
                 v-model="date" 
+                key="date"
                 :state="journeyDateTimeErrorState('date')" 
                 :date-format-options="date_picker_formats.short"
                 id="tcplugin-date" 
@@ -63,6 +64,7 @@
 
             <b-form-timepicker 
                 v-model="time" 
+                key="time"
                 :state="journeyDateTimeErrorState('time')" 
                 id="tcplugin-time" 
                 class="biq-journey-time flex-sm-fill"
@@ -92,6 +94,7 @@
         >
             <b-form-datepicker 
                 v-model="return_date" 
+                key="return_date"
                 :date-format-options="date_picker_formats.short"
                 :state="journeyDateTimeErrorState('return_date')" 
                 id="tcplugin-return-date" 
@@ -99,6 +102,7 @@
             ></b-form-datepicker>
             <b-form-timepicker 
                 v-model="return_time" 
+                key="return_time"
                 :state="journeyDateTimeErrorState('return_time')" 
                 id="tcplugin-return-time" 
                 locale="en"
