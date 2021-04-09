@@ -4,7 +4,7 @@ import {
     TYPE_UPGRADE_TIERS, 
     upgradeCriteria, 
     upgradeOptionProps 
-} from '@/common/BIQ/VehicleUpgrade';
+} from '@BIQ/VehicleUpgrade';
  
 /**
  * Create no upgrade available object 

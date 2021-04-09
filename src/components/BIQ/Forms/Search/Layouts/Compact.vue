@@ -1,5 +1,8 @@
 <template>
-    <form id="biq-search-form" class="biq-layout-compact">
+    <form 
+        :id="`${idPrefix}-search-form`" 
+        class="biq-layout-compact"
+    >
         <div class="d-flex flex-wrap">
             <div class="biq-pickup flex-sm-fill">
                 <b-form-select 
@@ -15,6 +18,7 @@
                 key="pickup"
                 v-model="fields.pickup.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.pickup.required"
                 :error-state="fields.pickup.error"
                 :id="fields.pickup.id"
@@ -29,6 +33,7 @@
                 key="via"
                 v-model="fields.via.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.via.required"
                 :error-state="fields.via.error"
                 :id="fields.via.id"
@@ -43,6 +48,7 @@
                 key="destination"
                 v-model="fields.destination.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.destination.required"
                 :error-state="fields.destination.error"
                 :id="fields.destination.id"
@@ -97,15 +103,19 @@
                 key="return_date"
                 :date-format-options="date_picker_formats.short"
                 :state="journeyDateTimeErrorState('return_date')" 
+                :required="hasReturn"
                 id="tcplugin-return-date" 
                 locale="en" 
+                class="biq-journey-return-date flex-sm-fill"
             ></b-form-datepicker>
             <b-form-timepicker 
                 v-model="return_time" 
                 key="return_time"
                 :state="journeyDateTimeErrorState('return_time')" 
+                :required="hasReturn"
                 id="tcplugin-return-time" 
                 locale="en"
+                class="biq-journey-return-time flex-sm-fill"
             ></b-form-timepicker>
         </div>
 
@@ -113,12 +123,11 @@
             id="biq-search-submit-container" 
             class="d-flex align-items-center"
         >
-            <div class="col">
+            <div class="flex-fill">
                 <biq-process-form-submit 
                     :processing="loadingQuotes"
-                    :use-buttons="useButtons"
                     @click="onSearchQuotesFormSubmit"
-                    style-class="submit-btn flex-fill"
+                    style-class="btn-primary"
                     label="Get A Quote"
                 ></biq-process-form-submit>
             </div>

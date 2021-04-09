@@ -1,10 +1,11 @@
 <template>
-    <div class="row">
-        <div id="tcplugin-cardholder-details" class="col">
-            <div class="form-group">
+    <div class="d-flex flex-wrap justify-content-between row-col">
+        <div id="tcplugin-cardholder-details" class="d-flex flex-wrap justify-content-between flex-fill row-col">
+            <div class="flex-fill">
                 <label 
                     :for="fields.cardholder_name.id"
                 >{{fields.cardholder_name.label}}</label>
+                
                 <input 
                     v-model="fields.cardholder_name.value" 
                     :id="fields.cardholder_name.id" 
@@ -12,13 +13,15 @@
                     :required="fields.cardholder_name.required"
                     :class="errorStateClass('cardholder_name')" 
                     type="text" 
-                    class="form-control" 
+                    class="flex-fill" 
                 />
             </div>
-            <div class="form-group">
+
+            <div class="flex-fill">
                 <label 
                     :for="fields.billing_postcode.id"
                 >{{fields.billing_postcode.label}}</label>
+
                 <input 
                     v-model="fields.billing_postcode.value" 
                     :id="fields.billing_postcode.id" 
@@ -26,10 +29,11 @@
                     :required="fields.billing_postcode.required"
                     :class="errorStateClass('billing_postcode')" 
                     type="text" 
-                    class="form-control"
+                    class="flex-fill"
                 />
             </div>
         </div>
+
         <stripe-card-form-element
             ref="card"
             :biq-client-secret-from="`${appSettings.biq_api_host}${biqConfig.CLIENT_SECRET_URI}`"
@@ -255,11 +259,3 @@
         }
     };
 </script>
-
-<style scoped>
-    ::v-deep .stripe-card-container {
-        font-size : 1.6rem !important;
-        letter-spacing: -0.015em !important;
-        padding: 8px !important;
-    }
-</style>

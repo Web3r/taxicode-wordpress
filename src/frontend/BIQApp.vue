@@ -15,12 +15,12 @@
     // import the mixin that sets values & validates field values
     import AppsMixin from 'mixins/AppsMixin';
     // import the BIQ static config just in case and the settings formatter
-    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, biqSettings } from 'BIQ/config';
+    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, updateAppSettings } from 'BIQ/config';
 
     // define the BIQ Frontend App release constants values
     const APP_VERSION = '1.0.1';
     const APP_NAME = 'BIQApp';
-    const APP_TITLE = 'Taxicode Booking Instant Quotes';
+    const APP_TITLE = `Booking Instant Quotes v${APP_VERSION}`;
 
     // define the main BIQ Frontend App component properties (inherits props from AppsMixin)
     const props = {
@@ -94,33 +94,23 @@
             'booked'
         ]),
 
-        appSettingsUpdated : function(new_settings) {
-            if(this.appDebugEnabled) {
-                console.group('Updating BIQ App Settings');
-                console.log('BIQ App Settings', {...this.settings});
-                console.log('New BIQ Settings', new_settings);
-            }
-            const settings = biqSettings(new_settings, this.appDebugEnabled);
-            this.settings = settings;
-            if(this.appDebugEnabled) {
-                console.info('Updated Settings');
-                console.log('Settings', settings);
-                console.log('BIQ App Settings', {...this.settings});
-                console.groupEnd();
-            }
-        }
+        appSettingsUpdated : updateAppSettings
     };
 
     export default {
         name : APP_NAME,
         version : APP_VERSION,
-        props : {...props},
-        computed : {...computed},
-        methods : {...methods},
-        mixins : [AppsMixin],
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            AppsMixin
+        ],
 
         data() {
             return {
+                app_title : APP_TITLE,
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',

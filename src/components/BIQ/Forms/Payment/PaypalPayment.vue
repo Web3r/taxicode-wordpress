@@ -1,6 +1,7 @@
 <template>
     <div class="row">
         <div class="col"></div>
+        
         <div 
             :id="id" 
             class="col"
@@ -10,6 +11,7 @@
                     for="paypal" 
                     class="control-label"
                 >{{label}}</label>
+
                 <v-braintree
                     :authorization="authorization"
                     :paypal="setup"
@@ -21,8 +23,8 @@
                         <div class="form-group">
                             <biq-process-form-submit 
                                 :processing="processing"
-                                :use-buttons="useButtons"
                                 @click.prevent="slotProps.submit"
+                                style-class="btn-primary"
                                 label="Book Now"
                             ></biq-process-form-submit>
                         </div>

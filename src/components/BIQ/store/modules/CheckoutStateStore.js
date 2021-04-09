@@ -1,26 +1,32 @@
 // import the method to generate the default state structure object
-import { defaultState } from '@/common/BIQ/QuoteCheckout';
+import { defaultState } from '@BIQ/QuoteCheckout';
 
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - s = state
+ * - p = payload
+ */
 // define the state store module
 const CheckoutStateStore = {
     state : defaultState(),
     
     getters : {
-        processed : (state) => state.processed,
-        processing : (state) => state.processing,
-        basket : (state) => {
+        processed : (s) => s.processed,
+        processing : (s) => s.processing,
+        basket : (s) => {
             return {
-                quote : state.basket.quote_id,
-                vehicle : state.basket.vehicle_index,
-                price : state.basket.amount
+                quote : s.basket.quote_id,
+                vehicle : s.basket.vehicle_index,
+                price : s.basket.amount
             };
         },
-        quoteID : (state) => state.basket.quote_id,
-        vehicleIndex : (state) => state.basket.vehicle_index,
-        price : (state) => state.basket.amount,
-        quoteData : (state) => state.quote,
-        quoteVehicleData : (state) => state.vehicle,
-        bookingRef : (state) => state.booking_ref
+        quoteID : (s) => s.basket.quote_id,
+        vehicleIndex : (s) => s.basket.vehicle_index,
+        price : (s) => s.basket.amount,
+        quoteData : (s) => s.quote,
+        quoteVehicleData : (s) => s.vehicle,
+        bookingRef : (s) => s.booking_ref
     },
     
     actions : {
@@ -29,76 +35,74 @@ const CheckoutStateStore = {
             commit('resetCheckoutState');
         },
 
-        bookNow({ commit }, basket) {
+        bookNow({ commit }, p) {
             // reset the checkout state
             commit('resetCheckoutState');
             // set the details to build the checkout basket content
-            commit('buildBasket', basket);
+            commit('buildBasket', p);
         },
 
         booking({ commit }) {
             // set the processing flags to prevent multiple procesing
-            const payload = {
+            const p = {
                 processing : true,
                 processed : false
             };
             // set the checkout processing state
-            commit('processing', payload);
+            commit('processing', p);
         },
 
         bookingFailed({ commit }) {
             // reset the processing flags to allow further procesing attempts
-            const payload = {
+            const p = {
                 processing : false,
                 processed : false
             };
             // set the checkout processing state
-            commit('processing', payload);
+            commit('processing', p);
         },
         
-        booked({ commit }, booking_ref) {
+        booked({ commit }, p) {
             // reset the checkout state
             commit('resetCheckoutState');
-            // set the processing flags to prevent further procesing attempts
-            const payload = {
+            // set the checkout processing state flags to prevent further procesing attempts
+            commit('processing', {
                 processing : false,
                 processed : false
-            };
-            // set the checkout processing state
-            commit('processing', payload);
+            });
             // set the booking ref
-            commit('booked', { booking_ref });
+            commit('booked', { p });
         }
     },
     
     mutations : {
-        resetCheckoutState(state) {
+        resetCheckoutState(s) {
             // reset the state to the initial state
-            Object.assign(state, defaultState());
+            Object.assign(s, defaultState());
         },
 
-        buildBasket(state, basket) {
+        buildBasket(s, p) {
             // set the journey quote ID being booked
-            state.basket.quote_id = basket.quote;
+            s.basket.quote_id = p.quote;
             // set the quote vehicle index
-            state.basket.vehicle_index = basket.vehicle;
+            s.basket.vehicle_index = p.vehicle;
             // set the checkout amount based on the vehicle price returned for the quote
-            state.basket.amount = basket.quote_data.vehicles[basket.vehicle].price;
+            s.basket.amount = p.quote_data.vehicles[p.vehicle].price;
             // set the journey quote details
-            state.quote = basket.quote_data;
+            s.quote = p.quote_data;
             // set the journey quote vehicle details
-            state.vehicle = basket.quote_data.vehicles[basket.vehicle];
+            s.vehicle = p.quote_data.vehicles[p.vehicle];
         },
 
-        processing(state, payload) {
+        processing(s, p) {
             // set the flags to indicate the checkout processing state
-            state.processing = payload.processing;
-            state.processed = payload.processed;
+            s.processing = p.processing;
+            s.processed = p.processed;
         },
 
-        booked(state, payload) {
+        booked(s, p) {
             // set the booking reference
-            state.booking_ref = payload.booking_ref
+            s.booking_ref = p.booking_ref
         }
     }
 };

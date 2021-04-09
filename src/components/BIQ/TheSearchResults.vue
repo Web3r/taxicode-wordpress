@@ -6,7 +6,7 @@
                 name="loading-quotes"
             >
                 <div class="row">
-                    <div class="spinner-border spinner-border-sm"></div>{{loading_label}}
+                    <div class="spinner-border spinner-border-sm"></div>&nbsp;{{loading_label}}
                 </div>
             </slot>
         </div>
@@ -40,7 +40,6 @@
                 :display-results-type="displayResultsType"
                 :type="key"
                 :debugging="debugging"
-                :use-buttons="useButtons" 
                 @biqQuoteBookNow="onClick"
             ></component>
         </div>
@@ -73,11 +72,6 @@
             debugging : {
                 type : Boolean,
                 default : false
-            },
-
-            useButtons : {
-                type : Boolean,
-                default : true
             }
         },
 

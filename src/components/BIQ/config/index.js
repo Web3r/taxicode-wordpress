@@ -1,44 +1,74 @@
 // define the default Stripe card elements style config object
 export const DEFAULT_STRIPE_CARD_STYLE = {
-    base : {
-        fontFamily : "'Muli', sans-serif",
-        fontSize : '14px',
-        color : '#333'
+    "base" : {
+        "fontFamily" : "'Muli', sans-serif",
+        "fontSize" : "14px",
+        "color" : "#333"
     },
-    invalid : {
-        color : 'red'
+    "invalid" : {
+        "color" : "red"
     }
 };
-export const biqSettings = (settings, debugging) => {
-    if(debugging) {
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - s = settings
+ * - d = debugging
+ */
+// define the method to extract / map the settings to the app use
+export const biqSettings = (s, d) => {
+    if(d) {
         // this is a string from the REST & doesn't parse to JSON well :(
         // but the echoed string inside the script tag to be supplied as a prop to the
         // Checkout Page view via the global window variable is an object.
         // It's dirty, but needs must for now 2021
-        console.log('stripe_cardform_style', settings.stripe_cardform_style);
-        console.info('type', typeof(settings.stripe_cardform_style));
+        console.log('stripe_cardform_style', s.stripe_cardform_style);
+        console.info('type', typeof(s.stripe_cardform_style));
         try {
-            console.log('parse attempt', JSON.parse(settings.stripe_cardform_style));
+            console.log('parse attempt', JSON.parse(s.stripe_cardform_style));
         } catch(e) {
             console.error(e);
         }
     }
     // return the extracted BIQ app settings 
     return {
-        biq_pk : settings.taxicode_public,
-        biq_api_host : settings.biq_api_host,
-        paypal_pk : settings.paypal_public,
-        stripe_pk : settings.stripe_public,
+        biq_pk : s.taxicode_public,
+        biq_api_host : s.biq_api_host,
+        paypal_pk : s.paypal_public,
+        stripe_pk : s.stripe_public,
         // this is a string from the REST & doesn't parse to JSON well :(
-        stripe_cardform_style : settings.stripe_cardform_style,
+        stripe_cardform_style : s.stripe_cardform_style,
         // convert to boolean for ease
-        booking_test_mode : (settings.test_mode == '1'),
-        quote_type : settings.quote_type,
+        booking_test_mode : (s.test_mode == '1'),
+        quote_type : s.quote_type,
         // convert to boolean for ease
-        recommend_upgrade : (settings.recommend_upgrade == '1'),
-        complete_page_text : settings.complete_page_text
+        recommend_upgrade : (s.recommend_upgrade == '1'),
+        complete_page_text : s.complete_page_text
     };
 };
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - ns = new settings
+ */
+// expected to be imported as a vue component App method
+export const updateAppSettings = function(ns) {
+    if(this.appDebugEnabled) {
+        console.group('Updating BIQ App Settings');
+        console.log('BIQ App Settings', { ...this.settings });
+        console.log('New BIQ Settings', ns);
+    }
+    // just extract all the supplied settings
+    const s = biqSettings(ns, this.appDebugEnabled);
+    // set the app settings provided
+    this.settings = s;
+    if(this.appDebugEnabled) {
+        console.info('Updated Settings');
+        console.log('Settings', s);
+        console.log('BIQ App Settings', { ...this.settings });
+        console.groupEnd();
+    }
+}
 // define the BIQ config to be used
 export const biqConf = {
     LIVE_API_HOST : 'https://api.taxicode.com/',
@@ -49,8 +79,8 @@ export const biqConf = {
     JOURNEY_URI : 'booking/journey/?id=',
     CLIENT_SECRET_URI : 'booking/client_gateway_secret/',
     PAYMENT_URI : 'booking/pay/',
-    PGH_CONF            : {
-        hidePostalCode  : true
+    PGH_CONF : {
+        hidePostalCode : true
     },
     useButtons : true
 };

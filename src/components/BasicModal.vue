@@ -10,23 +10,35 @@
         >
             <div class="modal-wrapper">
                 <div class="modal-container">
-
-                    <div class="modal-header">
+                    <div v-if="$slots.header || header" 
+                        class="modal-header"
+                    >
                         <slot 
                             name="header"
-                        >{{headerText}}</slot>
+                            :text="header"
+                        >
+                            <h5>{{header}}</h5>
+                        </slot>
                     </div>
 
-                    <div class="modal-body">
+                    <div class="modal-body d-flex flex-wrap">
                         <slot 
                             name="body"
-                        >{{bodyText}}</slot>
+                            :text="body"
+                        >
+                            <p>{{body}}</p>
+                        </slot>
                     </div>
 
-                    <div class="modal-footer">
+                    <div v-if="$slots.footer || footer" 
+                        class="modal-footer"
+                    >
                         <slot 
                             name="footer"
-                        >{{footerText}}</slot>
+                            :text="footer"
+                        >
+                            <span>{{footer}}</span>
+                        </slot>
                     </div>
                 </div>
             </div>
@@ -35,6 +47,26 @@
 </template>
 
 <script>
+    // import the CSS specific to the modal popup (webpack will chunk this  & auto load / include separately)
+    import 'frontend/static-assets/css/modal_popup.css';
+
+    // define the component properties
+    const props = {
+        header : {
+            type : String,
+            default : 'Default Header'
+        },
+
+        body : {
+            type : String,
+            default : 'Default Body'
+        },
+
+        footer : {
+            type : String,
+            default : 'Default Footer'
+        }
+    };
     // define the list of events the component emits & can be listened for
     const emitEvents = {
         // when the cancel action button is clicked
@@ -42,100 +74,22 @@
             name : 'cancel'
         }
     };
+    // define the component methods
+    const methods = {
+        onCancel : function(evt) {
+            // trigger the modal cancelled event
+            this.$emit(emitEvents.cancel.name, evt);
+        },
+    };
 
     export default {
         name: 'BasicModal',
-
-        props: {
-            headerText : {
-                type : String,
-                default : 'Default Header'
-            },
-
-            bodyText : {
-                type : String,
-                default : 'Default Body'
-            },
-
-            footerText : {
-                type : String,
-                default : 'Default Footer'
-            }
-
-        },
+        props,
+        methods,
 
         mounted() {
             // set the focus on the overlay so pressing the esc key will also trigger the onCancel event
             this.$refs.overlay.focus();
-        },
-
-        methods : {
-            onCancel : function(event) {
-                // trigger the modal cancelled event
-                this.$emit(emitEvents.cancel.name, event);
-            }
         }
     };
 </script>
-
-<style scoped>
-    .modal-mask {
-        position: fixed;
-        z-index: 9998;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: table;
-        transition: opacity 0.3s ease;
-    }
-
-    .modal-wrapper {
-        display: table-cell;
-        vertical-align: middle;
-    }
-
-    .modal-container {
-        width: 300px;
-        margin: 0px auto;
-        padding: 20px 30px;
-        background-color: #fff;
-        border-radius: 2px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-        transition: all 0.3s ease;
-        font-family: Helvetica, Arial, sans-serif;
-    }
-
-    .modal-header h3 {
-        margin-top: 0;
-        color: #42b983;
-    }
-
-    .modal-body {
-        margin: 20px 0;
-    }
-
-    /*
-    * The following styles are auto-applied to elements with
-    * transition="modal" when their visibility is toggled
-    * by Vue.js.
-    *
-    * You can easily play with the modal transition by editing
-    * these styles.
-    */
-
-    .modal-enter {
-        opacity: 0;
-    }
-
-    .modal-leave-active {
-        opacity: 0;
-    }
-
-    .modal-enter .modal-container,
-    .modal-leave-active .modal-container {
-        -webkit-transform: scale(1.1);
-        transform: scale(1.1);
-    }
-</style>

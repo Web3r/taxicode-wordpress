@@ -12,31 +12,40 @@
         >
             <div class="modal-wrapper">
                 <div class="modal-container">
-
                     <div class="modal-header">
                         <slot 
                             name="header"
                             :text="upgrade_props.title"
-                        >{{upgrade_props.title}}</slot>
+                        >
+                            <h5>{{upgrade_props.title}}</h5>
+                        </slot>
                     </div>
 
-                    <div class="modal-body">
+                    <div class="modal-body d-flex flex-wrap">
                         <slot 
                             name="body"
                             :upgrade="upgrade_props"
-                        >{{upgrade_props.description}}</slot>
+                        >
+                            <p>{{upgrade_props.description}}</p>
+                        </slot>
                     </div>
 
-                    <div class="modal-footer">
-                        <button 
-                            class="btn btn-secondary" 
-                            @click="onCancel"
-                        >{{cancelUpgradeActionText}}</button>
-                        &nbsp;
-                        <button 
-                            class="btn btn-primary" 
-                            @click="onConfirm"
-                        >{{confirmUpgradeActionText}}</button>
+                    <div class="modal-footer d-flex flex-wrap justify-content-end">
+                        <slot 
+                            name="footer"
+                            :cancel="onCancel"
+                            :confirm="onConfirm"
+                        >
+                            <button 
+                                class="btn btn-secondary" 
+                                @click="onCancel"
+                            >{{cancelUpgradeActionText}}</button>
+
+                            <button 
+                                class="btn btn-primary" 
+                                @click="onConfirm"
+                            >{{confirmUpgradeActionText}}</button>
+                        </slot>
                     </div>
                 </div>
             </div>
@@ -48,10 +57,47 @@
     // import the state getters & actions mappers
     import { mapGetters } from 'vuex';
     // import the recommended quote upgrade calculator
-    import QuotesRecommendedUpgradeCalculator from '@/common/BIQ/QuotesRecommendedUpgradeCalculator';
+    import QuotesRecommendedUpgradeCalculator from '@BIQ/QuotesRecommendedUpgradeCalculator';
     // import the vehicle specific upgrade stuff
-    import { emptyUpgradeProps } from '@/common/BIQ/VehicleUpgrade';
+    import { emptyUpgradeProps } from '@BIQ/VehicleUpgrade';
+    // import the CSS specific to the modal popup (webpack will chunk this  & auto load / include separately)
+    import 'frontend/static-assets/css/modal_popup.css';
 
+    // define the component properties
+    const props = {
+        journey : {
+            type : String,
+            required : true,
+            default : ''
+        },
+
+        quote : {
+            type : String,
+            required : true,
+            default : ''
+        },
+
+        vehicle : {
+            type : Number,
+            required : true,
+            default : 0
+        },
+
+        confirmUpgradeActionText : {
+            type : String,
+            default : 'Upgrade'
+        },
+
+        cancelUpgradeActionText : {
+            type : String,
+            default : "Don't Upgrade"
+        },
+
+        debugging : {
+            type : Boolean,
+            default : false
+        }
+    };
     // define the list of events the component emits & can be listened for
     const emitEvents = {
         // when there are no upgraded quotes available for the selected quote
@@ -67,45 +113,59 @@
             name : 'cancel'
         }
     };
+    // define the component computed property methods
+    const computed = {
+        ...mapGetters([
+        // BIQ Quoting state
+            'journeyDetails', 
+            'journeyQuotes'
+        ])
+    };
+    // define the component methods
+    const methods = {
+        generateUpgradeOffer : function() {
+            // see if there is an quote avalaible for upgrade recommendation
+            this.quotesRecommendedUpgrade.makeRecommendationFor(this.journeyQuotes[this.quote], this.vehicle);
+            // get the recommended upgrade
+            const upgrade = this.quotesRecommendedUpgrade.getRecommendedUpgrade();
+            if(this.debugging) {
+                console.group('Upgrade Recommendation');
+                console.log('upgrade', upgrade);
+                console.log('props', upgrade.props());
+                console.groupEnd();
+            }
+            // determine if to offer the quote vehicle upgrade recommendation
+            if(!upgrade.exists) {
+            // no quote upgrade to offer
+                // trigger the no upgrade available event
+                return this.$emit(emitEvents.unavailable.name, upgrade);
+            }
+            // there is a quote upgrade recommendation to offer so set the props details
+            this.upgrade_props = upgrade.props();
+            // flag the modal popup to display the recommended upgrade offer
+            this.has_upgrade = true;
+        },
+
+        onCancel : function(evt) {
+            // trigger the modal cancelled event
+            this.$emit(emitEvents.cancel.name, evt);
+        },
+
+        onConfirm : function(evt) {
+            // add the recommended upgrade to the event
+            evt.data = {
+                recommendedUpgrade : this.quotesRecommendedUpgrade.getRecommendedUpgrade()
+            };
+            // trigger the modal confirmed event
+            this.$emit(emitEvents.confirm.name, evt);
+        }
+    };
 
     export default {
         name: 'QuoteUpgradeOfferModal',
-
-        props: {
-            journey : {
-                type : String,
-                required : true,
-                default : ''
-            },
-
-            quote : {
-                type : String,
-                required : true,
-                default : ''
-            },
-
-            vehicle : {
-                type : Number,
-                required : true,
-                default : 0
-            },
-
-            confirmUpgradeActionText : {
-                type : String,
-                default : 'Upgrade'
-            },
-
-            cancelUpgradeActionText : {
-                type : String,
-                default : "Don't Upgrade"
-            },
-
-            debugging : {
-                type : Boolean,
-                default : false
-            }
-
-        },
+        props,
+        computed,
+        methods,
 
         data() {
             return {
@@ -121,119 +181,12 @@
 
         mounted() {
             // see if there is an quote avalaible for upgrade recommendation
-            this.quotesRecommendedUpgrade.makeRecommendationFor(this.journeyQuotes[this.quote], this.vehicle);
-            // get the recommended upgrade
-            const quoteRecommendedUpgrade = this.quotesRecommendedUpgrade.getRecommendedUpgrade();
-            if(this.debugging) {
-                console.group('Upgrade Recommendation');
-                console.log('quoteUpgradeOption', quoteRecommendedUpgrade);
-                console.log('props', quoteRecommendedUpgrade.props());
-                console.groupEnd();
-            }
-            // determine if to offer the quote vehicle upgrade recommendation
-            if(!quoteRecommendedUpgrade.exists) {
-            // no quote upgrade to offer
-                // trigger the no upgrade available event
-                return this.$emit(emitEvents.unavailable.name, quoteRecommendedUpgrade);
-            }
-            // there is a quote upgrade recommendation to offer so set the props details
-            this.upgrade_props = quoteRecommendedUpgrade.props();
-            // flag the modal popup to display the recommended upgrade offer
-            this.has_upgrade = true;
+            this.generateUpgradeOffer();
         },
 
         updated() {
             // set the focus on the overlay so pressing the esc key will also trigger the onCancel event
             this.$refs.overlay.focus();
-        },
-
-        computed : {
-            ...mapGetters([
-            // BIQ Quoting state
-                'journeyDetails', 
-                'journeyQuotes'
-            ])
-        },
-
-        methods : {
-            onCancel : function(event) {
-                // trigger the modal cancelled event
-                this.$emit(emitEvents.cancel.name, event);
-            },
-
-            onConfirm : function(event) {
-                // get the recommended upgrade 
-                const recommendedUpgrade = this.quotesRecommendedUpgrade.getRecommendedUpgrade();
-                // the upgrade offer was accepted, so ...
-                // set the upgrade quote as the selected quote and ...
-                event = {
-                    recommendedUpgrade
-                };
-                // trigger the modal confirmed event
-                this.$emit(emitEvents.confirm.name, event);
-            }
         }
     };
 </script>
-
-<style scoped>
-    .modal-mask {
-        position: fixed;
-        z-index: 9998;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: table;
-        transition: opacity 0.3s ease;
-    }
-
-    .modal-wrapper {
-        display: table-cell;
-        vertical-align: middle;
-    }
-
-    .modal-container {
-        width: 550px;
-        margin: 0px auto;
-        padding: 20px 30px;
-        background-color: #fff;
-        border-radius: 2px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-        transition: all 0.3s ease;
-        font-family: Helvetica, Arial, sans-serif;
-    }
-
-    .modal-header h3 {
-        margin-top: 0;
-        color: #42b983;
-    }
-
-    .modal-body {
-        margin: 20px 0;
-    }
-
-    /*
-    * The following styles are auto-applied to elements with
-    * transition="modal" when their visibility is toggled
-    * by Vue.js.
-    *
-    * You can easily play with the modal transition by editing
-    * these styles.
-    */
-
-    .modal-enter {
-        opacity: 0;
-    }
-
-    .modal-leave-active {
-        opacity: 0;
-    }
-
-    .modal-enter .modal-container,
-    .modal-leave-active .modal-container {
-        -webkit-transform: scale(1.1);
-        transform: scale(1.1);
-    }
-</style>

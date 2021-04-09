@@ -75,6 +75,12 @@
                 default : '//places/?term='
             },
 
+            biqPublicKey : {
+                type : String,
+                required : true,
+                default : ''
+            },
+
             id : {
                 type : String,
                 default : 'biq-places-lookup'
@@ -198,7 +204,7 @@
                 let airports = [];
                 let stations = [];
                 let locations = [];
-                axios.get(apiPlacesLookupURL)
+                axios.get(`${apiPlacesLookupURL}&key=${this.biqPublicKey}`)
                 .then(response => {
                     // @todo make sure results are usable
                     if(self.debugging) {

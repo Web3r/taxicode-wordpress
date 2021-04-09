@@ -27,6 +27,8 @@ const publicPath = webRoot + exportPath.split(webRoot)[1];
 
 // create an array of plugins being used
 const plugins = [];
+// create an array of module rules
+const moduleRules = [];
 
 // add build progress indicator plugin
 plugins.push(new webpack.ProgressPlugin());
@@ -62,6 +64,7 @@ module.exports = {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             '@': path.resolve('./src/'),
+            '@BIQ': path.resolve('./src/common/BIQ/'),
             'BIQ': path.resolve('./src/components/BIQ/'),
             'frontend': path.resolve('./src/frontend/'),
             'admin': path.resolve('./src/admin/')
@@ -81,7 +84,7 @@ module.exports = {
                     test: /[\\\/]node_modules[\\\/]/,
                     name: 'vendors',
                     chunks: 'all'
-                }
+                },
             }
         },
         minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})]

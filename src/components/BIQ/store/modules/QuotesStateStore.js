@@ -1,31 +1,37 @@
 // import the methods to generate the default state structure & journey detail objects
-import { defaultState, journeyDetails } from '@/common/BIQ/QuotesSearched';
-// import the methods to display the journey date & times
-import { journeyDateString, journeyTimeString } from '@/common/BIQ/QuoteCheckout';
+import { defaultState } from '@BIQ/QuotesSearched';
+// import the methods to format the provided journey data, display the journey date & times
+import { journeyDetails, journeyDateString, journeyTimeString } from '@BIQ/Journey';
 
+/**
+ * Variable name replacement to help reduce production size
+ * 
+ * - s = state
+ * - p = payload
+ */
 // define the state store module
 const QuotesStateStore = {
     state : defaultState(),
     
     getters : {
-        loadingQuotes : (state) => state.quoting,
-        quotesError : (state) => state.api_error,
-        quotesLoaded : (state) => state.quotes_loaded,
-        zeroQuotes : (state) => {
-            if(!state.quotes_loaded) {
+        loadingQuotes : (s) => s.quoting,
+        quotesError : (s) => s.api_error,
+        quotesLoaded : (s) => s.quotes_loaded,
+        zeroQuotes : (s) => {
+            if(!s.quotes_loaded) {
                 return false;
             }
-            return (Object.keys(state.journey_quotes).length === 0);
+            return (Object.keys(s.journey_quotes).length === 0);
         },
-        journeyID : (state) => state.journey_id,
-        journeyDetails : (state) => state.journey_details,
-        journeyDate : (state) => journeyDateString(state.journey_details.date),
-        journeyTime : (state) => journeyTimeString(state.journey_details.date),
-        journeyReturnDate : (state) => state.journey_details.return && journeyDateString(state.journey_details.return),
-        journeyReturnTime : (state) => state.journey_details.return && journeyTimeString(state.journey_details.return),
-        journeyHasReturn : (state) => !!state.journey_details.return,
-        journeyHasVias : (state) => (Array.isArray(state.journey_details.vias) && state.journey_details.vias.length > 0),
-        journeyQuotes : (state) => state.journey_quotes
+        journeyID : (s) => s.journey_id,
+        journeyDetails : (s) => s.journey_details,
+        journeyDate : (s) => journeyDateString(s.journey_details.date),
+        journeyTime : (s) => journeyTimeString(s.journey_details.date),
+        journeyReturnDate : (s) => s.journey_details.return && journeyDateString(s.journey_details.return),
+        journeyReturnTime : (s) => s.journey_details.return && journeyTimeString(s.journey_details.return),
+        journeyHasReturn : (s) => !!s.journey_details.return,
+        journeyHasVias : (s) => (Array.isArray(s.journey_details.vias) && s.journey_details.vias.length > 0),
+        journeyQuotes : (s) => s.journey_quotes
     },
     
     actions : {
@@ -43,52 +49,52 @@ const QuotesStateStore = {
             commit('searching');
         },
 
-        apiQuotesError({ commit }, error) {
+        apiQuotesError({ commit }, p) {
             // set the quotes API error message state
-            commit('quotesError', { api_error : error });
+            commit('quotesError', { api_error : p });
             // reset the API loading / searching quotes state
             commit('searched');
 
         },
         
-        quoted({ commit }, journey) {
+        quoted({ commit }, p) {
             // reset the API loading / searching quotes state
             commit('searched');
             // set the journey details & quotes returned from the API
-            commit('quotes', journey);
+            commit('quotes', p);
         }
     },
     
     mutations : {
-        resetQuotesState(state) {
+        resetQuotesState(s) {
             // reset the state to the initial state
-            Object.assign(state, defaultState());
+            Object.assign(s, defaultState());
         },
 
-        searching(state) {
+        searching(s) {
             // set the flag to indicate API quotes are being loading / searching has started
-            state.quoting = true;
+            s.quoting = true;
         },
 
-        quotesError(state, payload) {
+        quotesError(s, p) {
             // set the error / warning messages returned from the API quotes search
-            state.api_error = payload.api_error;
+            s.api_error = p.api_error;
         },
 
-        searched(state) {
+        searched(s) {
             // reset the flag to indicate API quotes search has finished
-            state.quoting = false;
+            s.quoting = false;
         },
         
-        quotes(state, payload) {
+        quotes(s, p) {
             // set the API journey ID
-            state.journey_id = payload.journey_id;
+            s.journey_id = p.journey_id;
             // set the quotes returned from the API
-            state.journey_quotes = payload.quotes;
+            s.journey_quotes = p.quotes;
             // set the API journey details
-            state.journey_details = journeyDetails(payload.journey);
+            s.journey_details = journeyDetails(p.journey);
             // set a flag to indicate API quotes have been loaded for use
-            state.quotes_loaded = true;
+            s.quotes_loaded = true;
         }
     }
 };

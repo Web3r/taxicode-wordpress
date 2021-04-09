@@ -28,6 +28,30 @@
         <tbody>
         <tr>
             <th scope="row">
+                <label 
+                    for="search_target_permalink"
+                >Search Page Permalink</label>
+            </th>
+            <td>
+                <input 
+                    v-model="form.search_target_permalink" 
+                    id="search_target_permalink" 
+                    placeholder="/permalink-page/" 
+                    :required="true"
+                    :class="validation_errors.search_target_permalink" 
+                    type="text" 
+                    class="regular-text" 
+                    aria-describedby="search_target_permalinkHelp" 
+                />
+                <br />
+                <small 
+                    id="search_target_permalinkHelp" 
+                    class="form-text text-muted"
+                >The permalink target the main client app shortcode will appear on</small>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label>Booking Test Mode</label>
             </th>
             <td>

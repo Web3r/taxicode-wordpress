@@ -1,7 +1,10 @@
 <template>
-    <form id="biq-search-form" class="biq-layout biq-layout-column">
+    <form 
+        :id="`${idPrefix}-search-form`" 
+        class="biq-layout-column d-flex flex-column"
+    >
         <div class="d-flex flex-wrap">
-            <div class="form-group">
+            <div class="col-6">
                 <label 
                     :for="fields.journey_type.id" 
                     :id="`${fields.journey_type.id}-select`"
@@ -16,12 +19,13 @@
             </div>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-between">
+        <div class="d-flex flex-wrap justify-content-between row-col">
             <biq-places-lookup 
                 ref="pickupfield"
                 key="pickup"
                 v-model="fields.pickup.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.pickup.required"
                 :error-state="fields.pickup.error"
                 :id="fields.pickup.id"
@@ -29,7 +33,7 @@
                 :placeholder="fields.pickup.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
-                container-class="form-group"
+                container-class="biq-pickup flex-fill"
             ></biq-places-lookup>
 
             <biq-places-lookup 
@@ -37,6 +41,7 @@
                 key="destination"
                 v-model="fields.destination.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.destination.required"
                 :error-state="fields.destination.error"
                 :id="fields.destination.id"
@@ -44,16 +49,17 @@
                 :placeholder="fields.destination.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
-                container-class="form-group"
+                container-class="biq-destination flex-fill"
             ></biq-places-lookup>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-between">
+        <div class="d-flex flex-wrap justify-content-between row-col">
             <biq-places-lookup 
                 ref="viafield"
                 key="via"
                 v-model="fields.via.value"
                 :biq-places-lookup="biqPlacesLookup"
+                :biq-public-key="biqPublicKey"
                 :required="fields.via.required"
                 :error-state="fields.via.error"
                 :id="fields.via.id"
@@ -61,10 +67,10 @@
                 :placeholder="fields.via.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
-                container-class="form-group"
+                container-class="biq-via flex-fill"
             ></biq-places-lookup>
 
-            <div class="form-group">
+            <div class="flex-fill">
                 <label 
                     :id="`${fields.people.id}-input`" 
                     :for="fields.people.id"
@@ -76,7 +82,7 @@
                     :placeholder="fields.people.placeholder" 
                     :required="fields.people.required"
                     :class="errorStateClass('people')" 
-                    class="biq-people form-control"
+                    class="biq-people flex-fill"
                     type="number" 
                     min="1"
                     max="99"
@@ -84,8 +90,8 @@
             </div>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-between">
-            <div class="form-group">
+        <div class="d-flex flex-wrap justify-content-between row-col">
+            <div class="flex-fill">
                 <label 
                     for="tcplugin-date" 
                     id="date-input"
@@ -97,11 +103,11 @@
                     :state="journeyDateTimeErrorState('date')" 
                     id="tcplugin-date" 
                     locale="en" 
-                    class="form-control"
+                    class="biq-journey-date flex-fill"
                 ></b-form-datepicker>
             </div>
 
-            <div class="form-group">
+            <div class="flex-fill">
                 <label 
                     for="tcplugin-time" 
                     id="time-input"
@@ -113,14 +119,15 @@
                     :state="journeyDateTimeErrorState('time')" 
                     id="tcplugin-time" 
                     locale="en"
+                    class="biq-journey-time flex-fill"
                 ></b-form-timepicker>
             </div>
        </div>
 
         <div v-if="hasReturn" 
-            class="d-flex flex-wrap justify-content-between"
+            class="d-flex flex-wrap justify-content-between row-col"
         >
-            <div class="form-group">
+            <div class="flex-fill">
                 <label 
                     for="tcplugin-return-date" 
                     id="return_date-input"
@@ -132,11 +139,11 @@
                     :state="journeyDateTimeErrorState('return_date')" 
                     id="tcplugin-return-date" 
                     locale="en" 
-                    class="form-control"
+                    class="biq-journey-return-date flex-fill"
                 ></b-form-datepicker>
             </div>
 
-            <div class="form-group">
+            <div class="flex-fill">
                 <label 
                     for="tcplugin-return-time" 
                     id="return_time-input"
@@ -148,20 +155,20 @@
                     :state="journeyDateTimeErrorState('return_time')" 
                     id="tcplugin-return-time" 
                     locale="en"
+                    class="biq-journey-return-time flex-fill"
                 ></b-form-timepicker>
             </div>
        </div>
 
         <div class="d-flex flex-wrap justify-content-end">
             <div 
-                id="tcplugin-search-submit" 
-                class="form-group"
+                id="biq-search-submit-container" 
+                class="align-items-right col-6"
             >
                 <biq-process-form-submit 
                     :processing="loadingQuotes"
-                    :use-buttons="useButtons"
                     @click="onSearchQuotesFormSubmit"
-                    style-class="submit-btn"
+                    style-class="btn-primary"
                     label="Search"
                 ></biq-process-form-submit>
             </div>

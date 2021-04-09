@@ -1,5 +1,5 @@
 <template>
-    <button v-if="useButtons"
+    <button
         :class="styleClass"
         :disabled="processing" 
         @click="onClick"
@@ -9,17 +9,31 @@
         ></div>
         {{submitLabel}}
     </button>
-
-    <input v-else 
-        :class="styleClass"
-        :value="submitLabel" 
-        :disabled="processing" 
-        @click="onClick" 
-        type="button" 
-    />
 </template>
 
 <script>
+    // define the component properties
+    const props = {
+        processing : {
+            type : Boolean,
+            default : false
+        },
+
+        label : {
+            type : String,
+            default : 'Submit'
+        },
+
+        processingLabel : {
+            type : String,
+            default : 'Processing'
+        },
+
+        styleClass : {
+            type : String,
+            default : 'btn btn-primary'
+        }
+    };
     // define the list of events the component emits & can be listened for
     const emitEvents = {
         // when the form submit button is clicked
@@ -27,44 +41,25 @@
             name : 'click'
         }
     };
+    // define the component computed property methods
+    const computed = {
+        // Computed value because it's dependent on a processing flag
+        submitLabel : function() {
+            return this.processing ? this.processingLabel : this.label;
+        }
+    };
+    // define the component methods
+    const methods = {
+        onClick : function(evt) {
+            // trigger the process form submit event
+            this.$emit(emitEvents.click.name, evt);
+        }
+    };
 
     export default {
         name : 'ProcessFormSubmit',
-
-        props : {
-            processing : {
-                type : Boolean,
-                default : false
-            },
-
-            label : {
-                type : String,
-                default : 'Submit'
-            },
-
-            styleClass : {
-                type : String,
-                default : 'btn btn-primary'
-            },
-
-            useButtons : {
-                type : Boolean,
-                default : true
-            }
-        },
-
-        computed : {
-            // Computed value because it's dependent on a processing flag
-            submitLabel : function() {
-                return !this.processing ? this.label : 'Processing';
-            }
-        },
-
-        methods : {
-            onClick : function(event) {
-                // trigger the process form submit event
-                this.$emit(emitEvents.click.name, event);
-            }
-        }
+        props,
+        computed,
+        methods
     };
 </script>

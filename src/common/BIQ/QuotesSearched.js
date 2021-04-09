@@ -1,7 +1,9 @@
 // import the methods to format the quote data for display
-import { formatQuotes, reduceToTypeAndClass } from '@/common/BIQ/QuotesFormatter';
+import { formatQuotes, reduceToTypeAndClass } from '@BIQ/QuotesFormatter';
 // import the sort by price sort type 
-import { SORT_TYPE_PRICE } from '@/common/BIQ/QuotesSorter';
+import { SORT_TYPE_PRICE } from '@BIQ/QuotesSorter';
+// import the methods to display the journey date & times
+import { emptyJourneyDetails, journeyDetails } from '@BIQ/Journey';
 
 // define the default sort order type for the quotes results
 export const DEFAULT_SORT = SORT_TYPE_PRICE;
@@ -28,46 +30,6 @@ export const quoteBookingEvents = {
         name : 'biqQuoteBookNow'
     }
 };
-
-// define an empty journey location structured object
-export const emptyLocation = {
-    string : '',
-    postcode : '',
-    position : [0,0]
-};
-// define the empty structure of the journey details to use
-export const emptyJourneyDetails = {
-    pickup : emptyLocation,
-    destination : emptyLocation,
-    vias : [],
-    people : 1,
-    return : false,
-    date : '',
-    distance : 1,
-    duration : 116,
-    duration_text : '1 min',
-    quote_type : 'mileage',
-    is_airport : false,
-    hourly : false
-};
-
-// define a function to create a journey details object from an expected API journey data set
-export const journeyDetails = journey => {
-    return {
-        pickup : journey.pickup,
-        destination : journey.destination,
-        vias : journey.vias,
-        people : journey.people,
-        return : journey.return,
-        date : journey.date,
-        distance : journey.distance,
-        duration : journey.duration,
-        duration_text : journey.duration_text,
-        quote_type : journey.quote_type,
-        is_airport : journey.is_airport,
-        hourly : journey.hourly
-    }
-}
 
 // decide how to format the quotes for display purpose
 export const displayQuotes = (quotes, type, sort) => {
@@ -96,9 +58,6 @@ export const defaultState = () => {
 const QuotesSearched = {
     quotesSearchedEvents,
     quoteBookingEvents,
-    emptyLocation,
-    emptyJourneyDetails,
-    journeyDetails,
     displayQuotes,
     defaultState
 };

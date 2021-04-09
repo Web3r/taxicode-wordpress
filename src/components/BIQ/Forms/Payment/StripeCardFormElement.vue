@@ -1,13 +1,14 @@
 <template>
     <div 
         :id="id" 
-        class="col"
+        class="d-flex flex-wrap justify-content-between row-col"
     >
-        <div class="form-group">
+        <div class="flex-fill">
             <label 
                 :for="mount_on" 
                 class="control-label"
             >{{label}}</label>
+
             <div 
                 ref="card" 
                 :id="mount_on" 
@@ -15,11 +16,12 @@
                 class="form-control stripe-card-container"
             ></div>
         </div>
-        <div class="form-group">
+
+        <div class="flex-fill">
             <biq-process-form-submit 
                 :processing="processing"
-                :use-buttons="useButtons"
                 @click="onSubmit"
+                style-class="btn-primary"
                 label="Book Now"
             ></biq-process-form-submit>
         </div>

@@ -1,27 +1,26 @@
 <template>
-    <div>
+    <div id="biq-home-page">
         <the-biq-search-form
             :biq-public-key="appSettings.biq_pk"
-            :biq-places-lookup="`${appSettings.biq_api_host}${appConfig.biq.PLACES_URI}`"
-            :biq-quotes-from="`${appSettings.biq_api_host}${appConfig.biq.QUOTE_URI}`"
+            :biq-places-lookup="placesLookup"
+            :biq-quotes-from="quotesFrom"
             :search-on-load="searchOnLoad"
             :debugging="debugging"
-            :use-buttons="appConfig.biq.useButtons" 
+            @submit="onQuotesSearchSubmit"
             @biqQuotesSearched="onQuotesSearched"
             @biqZeroQuotes="onZeroQuotes"
             @biqQuotesError="onQuotesError"
             layout="column"
         ></the-biq-search-form>
-        
+
         <the-biq-search-results v-if="showResults" 
             :display-results-type="appSettings.quote_type"
             :debugging="debugging"
-            :use-buttons="appConfig.biq.useButtons" 
             @biqQuoteBookNow="onBookNowClicked"
         >
             <template #loading-quotes>
-                <div class="row">
-                    Generating Quotes...
+                <div class="d-flex">
+                    <div class="spinner-border"></div>&nbsp;Generating&nbsp;Quotes...
                 </div>
             </template>
         </the-biq-search-results>
@@ -36,11 +35,10 @@
             @confirm="onUpgradeModalConfirm"
         >
             <!-- you can use custom content here to overwrite default content -->
-            <template #body="slotProps">
-                <p>{{slotProps.upgrade.description}}</p>
+            <template #body="{ upgrade }">
+                <p>{{upgrade.description}}</p>
             </template>
         </biq-quote-upgrade-offer-modal>
-
     </div>
 </template>
 
@@ -54,22 +52,12 @@
     
     // define the Home Page component properties (inherits props from PagesMixin)
     const props = {
-        searchFormData : {
-            type : Object,
-            default : function() { 
-                return {};
-            }
-        },
-
-        searchOnLoad : {
-            type : Boolean,
-            default : false
-        }
     };
     // define the Home Page component computed property methods (inherits computed property methods from PagesMixin)
     const computed = {
         ...mapGetters([
         // BIQ Quote Search state
+            'searchOnLoad',
             'hasSearchResults',
             'displayType',
         // BIQ Quoting state
@@ -83,6 +71,14 @@
             'quoteID',
             'vehicleIndex'
         ]),
+
+        placesLookup : function() {
+            return `${this.appSettings.biq_api_host}${this.appConfig.biq.PLACES_URI}`;
+        },
+
+        quotesFrom : function() {
+            return `${this.appSettings.biq_api_host}${this.appConfig.biq.QUOTE_URI}`;
+        },
 
         showResults : function() {
             return (this.loadingQuotes || this.quotesError || this.quotesLoaded);
@@ -104,52 +100,15 @@
             'bookNow'
         ]),
 
-        searchFormPropData : function() {
-            if(this.debugging) {
-                console.log('BIQ Search Form POST prop data', this.searchFormData);
+        onQuotesSearchSubmit : function(evt) {
+            const {
+                validate,
+                searchApiQuotes
+            } = evt.data;
+            // run the form validation & get the quotes if able
+            if(validate()) {
+                searchApiQuotes();
             }
-            const journey_details = {
-                journey_type : (typeof(this.searchFormData.journey_type) != 'undefined')
-                    ? this.searchFormData.journey_type 
-                    : '',
-                pickup : (typeof(this.searchFormData.pickup) != 'undefined')
-                    ? this.searchFormData.pickup 
-                    : '',
-                vias : (typeof(this.searchFormData.via) != 'undefined')
-                    ? [this.searchFormData.via] 
-                    : [],
-                destination : (typeof(this.searchFormData.destination) != 'undefined')
-                    ? this.searchFormData.destination 
-                    : '', 
-                // @todo check that the date is in the future & adjust if not
-                date : (typeof(this.searchFormData.date) != 'undefined')
-                    ? this.searchFormData.date 
-                    : '', 
-                // @todo check that the date and time is in the future & adjust if not
-                time : (typeof(this.searchFormData.time) != 'undefined')
-                    ? this.searchFormData.time 
-                    : '', 
-                people : (typeof(this.searchFormData.people) != 'undefined')
-                    ? this.searchFormData.people 
-                    : '1'
-            };
-            let return_date = '';
-            let return_time = '';
-            if(typeof(this.searchFormData.return_date) != 'undefined') {
-            // @todo check that the date is in the future and after the outbound date 
-            // & adjust if not
-                return_date = this.searchFormData.return_date;
-                if(typeof(this.searchFormData.return_time) != 'undefined') {
-                // @todo check that the date and time is in the future and after the 
-                // outbound date time & adjust if not
-                    return_time = this.searchFormData.return_time;
-                }
-            }
-            journey_details.returning = {
-                date : return_date, 
-                time : return_time, 
-            };
-            return journey_details;
         },
 
         onQuotesSearched : function(evt) {
@@ -263,7 +222,7 @@
                 console.log('Confirm Modal Event', evt);
             }
             // get the recommended upgrade 
-            const recommendedUpgrade = evt.recommendedUpgrade;
+            const recommendedUpgrade = evt.data.recommendedUpgrade;
             if(this.debugging) {
                 console.group('Quote Upgrade Recommendation Accepted');
                 console.log('recommendedUpgrade', recommendedUpgrade);
@@ -318,10 +277,13 @@
 
     export default {
         name: 'HomePage',
-        props : {...props},
-        computed : {...computed},
-        methods : {...methods},
-        mixins : [PagesMixin],
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            PagesMixin
+        ],
 
         components : {
             'the-biq-search-form' : TheSearchForm,
@@ -343,23 +305,15 @@
         },
 
         created() {
-            if(this.searchOnLoad) {
-                // overwrite the search form details state with any POSTed values from 
-                // the server side generation, this will
-                this.$store.commit('searchingQuotesFor', this.searchFormPropData());
-            }
-            // make sure that is the search display state can still be used
-            if(this.displayType !== this.appSettings.quote_type && this.hasSearchResults) {
-                // change the quote results display type & trigger the display results to be 
-                // recalculated based on the new display type
-                this.changeDisplayType(this.appSettings.quote_type);
+            if(this.hasSearchResults) {
+                // @todo validate that the cached state search results haven't expired
+                // make sure that the search display state can still be used
+                if(this.displayType !== this.appSettings.quote_type) {
+                    // change the quote results display type & trigger the display results to be 
+                    // recalculated based on the new display type
+                    this.changeDisplayType(this.appSettings.quote_type);
+                }
             }
         }
     };
 </script>
-
-<style scoped>
-    ::v-deep .modal-container {
-        width: 55% !important;
-    }
-</style>
