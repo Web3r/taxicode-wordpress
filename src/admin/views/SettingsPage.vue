@@ -31,6 +31,11 @@
         },
 
         props : {
+            adminNonce : {
+                type : String,
+                default : ''
+            },
+            
             appSettings : {
                 type : Object,
                 required : true,
@@ -155,7 +160,7 @@
                 // just grab a self reference
                 const self = this;
                 // set the URL to post the updated settings to update the backend values
-                const biq_save_app_settings_url = `${this.appRESTBaseURL}settings-save/`;
+                const biq_save_app_settings_url = `${this.appRESTBaseURL}settings/`;
                 if(this.debugging) {
                     console.group(`Updating BIQ App Settings to '${biq_save_app_settings_url}'`);
                 }
@@ -182,7 +187,7 @@
                     console.groupEnd();
                 }
                 // update the app settings from the form data
-                form.post(biq_save_app_settings_url)
+                form.post(biq_save_app_settings_url, { headers : { "X-WP-Nonce" : self.adminNonce } })
                 .then(response => {
                     // set the update success notice message
                     self.flashMessage('Settings Updated', '', 'updated', self.flash_message_timeout);

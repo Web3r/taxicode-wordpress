@@ -2,9 +2,10 @@
   <div id="biq-admin-vue-app">
     <h1>{{app_title}}</h1>
     <router-view v-if="initialised" 
-        :debugging="appDebugEnabled"
+        :admin-nonce="admin_nonce"
         :app-settings="appSettings"
         :appRESTBaseURL="appURL"
+        :debugging="appDebugEnabled"
         @appSettingsUpdated="appSettingsUpdated" 
     ></router-view>
   </div>
@@ -22,9 +23,14 @@
     const APP_TITLE = `Booking Instant Quotes Admin v${APP_VERSION}`;
     
     // define the main BIQ Admin App component properties (inherits props from AppsMixin)
-    const props = {};
+    const props = {
+        adminNonce : {
+            type : String,
+            default : ''
+        }
+    };
     // define the main BIQ Admin App component computed property methods (inherits computed property methods from AppsMixin)
-    const computed = {};
+    const computed = { };
     // define the main BIQ Admin App component methods (inherits methods from AppsMixin)
     const methods = {
         appSettingsUpdated : updateAppSettings
@@ -44,6 +50,7 @@
         data() {
             return {
                 app_title : APP_TITLE,
+                admin_nonce : this.adminNonce,
                 settings : {
                     biq_api_host : biqConf.LIVE_API_HOST,
                     biq_pk : '',

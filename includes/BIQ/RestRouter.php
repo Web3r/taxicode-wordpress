@@ -2,8 +2,7 @@
 namespace BIQ;
 
 use WP_REST_Controller;
-use BIQ\RestRoutes\GetSettings;
-use BIQ\RestRoutes\UpdateSettings;
+use BIQ\RestRoutes\Settings;
 use BIQ\RestRoutes\BookingDetailsProxy;
 
 /**
@@ -28,8 +27,7 @@ class RestRouter extends WP_REST_Controller
      */
     public function register_routes()
     {
-        (new UpdateSettings())->register_routes();
-        (new GetSettings())->register_routes();
+        (new Settings())->register_routes();
         (new BookingDetailsProxy())->register_routes();
     }
 

@@ -2,31 +2,80 @@
 namespace BIQ\RestRoutes;
 
 use BIQ\PluginSettings;
+use WP_REST_Server;
 
 /**
  * BIQ Booking Details Proxy REST_API controller
  */
-class BookingDetailsProxy extends RouteReadable
+class BookingDetailsProxy extends Route
 {
+    /**
+     * @var string The REST API route 
+     */
+    const ROUTE = "booking-details";
+
     /**
      * [__construct description]
      */
     public function __construct()
     {
         parent::__construct();
-        $this->rest_base = "booking-details";
     }
 
     /**
-     * Retrieves a collection of items.
+     * Register the routes
+     */
+    public function register_routes()
+    {
+        // register the booking details route method handler
+        register_rest_route(
+            $this->namespace,
+            "/{$this->rest_base}",
+            $this->_route_for("get_api_booking_details", WP_REST_Server::READABLE, $this->get_api_booking_details_collection_params())
+        );
+    }
+
+    /**
+     * Retrieves the query params for the items collection.
+     *
+     * @return array Collection parameters.
+     */
+    public function get_api_booking_details_collection_params()
+    {
+        return [
+            // make sure the booking ref was set with the request
+            "booking_ref" => [
+                "type"              => "string",
+                "required"          => true,
+                "sanitize_callback" => "sanitize_text_field"
+            ],
+        ];
+    }
+
+    /**
+     * Checks if a given request has access to read the items.
+     *
+     * @param  WP_REST_Request $request Full details about the request.
+     * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+     * 
+     * @todo allow for the method to be removed and fall back to the [get_items_permissions_check]
+     *       with the [_route_for] update
+     */
+    public function get_api_booking_details_permissions_check($request)
+    {
+        // no restrictions here
+        return $this->get_items_permissions_check($request);
+    }
+
+    /**
+     * Get the booking details from the BIQ API using the affiliate private key authentication.
      *
      * @param WP_REST_Request $request Full details about the request.
      * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
      */
-    public function get_items($request)
+    public function get_api_booking_details($request)
     {
         $api_url = $this->get_api_booking_details_url($request["booking_ref"]);
-        // $api_url = https://api.taxicode.com//booking/details/?key=soPSNg0BDHIGjgRr&secret=7nuH6cf4GW6JqF81&id=
         // make the API call but no need to verify the SSL of the origin
         $api_call = wp_remote_get($api_url, ["sslverify" => false] );
         if(is_wp_error($api_call)) {
@@ -37,21 +86,16 @@ class BookingDetailsProxy extends RouteReadable
             // convert the response to assoc
             $processed_response = json_decode($api_response);
         }
-
         // make sure there is a response
         return rest_ensure_response($processed_response);
     }
-
-    /**
-     * Retrieves the query params for the items collection.
-     *
-     * @return array Collection parameters.
-     */
-    public function get_collection_params()
-    {
-        return [];
-    }
     
+    /**
+     * Get the BIQ API booking details URL to call using the affiliate private key authentication.
+     * 
+     * @param string $booking_ref The booking ref to get the details for
+     * @return string The BIQ API booking details URL to call
+     */
     protected function get_api_booking_details_url($booking_ref) 
     {
         // define the API URL pattern for retrieving the booking details
@@ -67,7 +111,7 @@ class BookingDetailsProxy extends RouteReadable
             // set the booking ref to get the details for
             $booking_ref
         );
-        // $api_url = https://api.taxicode.com//booking/details/?key=soPSNg0BDHIGjgRr&secret=7nuH6cf4GW6JqF81&id=
+        // $api_url = https://api.taxicode.com/booking/details/?key=XXXXXX&secret=XXXXXX&id=
         return $api_url;
     }
     

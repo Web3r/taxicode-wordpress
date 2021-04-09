@@ -47,7 +47,48 @@ class PluginSettings
         "recommend_upgrade"     => "recommend_upgrade",
         "complete_page_text"    => "complete_page_text"
     ];
-    
+
+    public static function get_update_rules()
+    {
+        // @todo set the option settings definitions & rules
+        return [
+
+        ];
+    }
+
+    /**
+     * Get the plugin option settings including restricted ones if the current user has the capability.
+     *
+     * @return array The list of exposable plugin options.
+     */
+    public static function get_all_settings()
+    {
+        $settings = static::get_exposable_settings();
+        // add the non exposed scope plugin options settings with an admin capability check
+        if(current_user_can(static::ADMIN_CAPABILITY)) {
+            // @todo remove legacy taxicode name reference
+            $settings["taxicode_private"] = static::get_option("taxicode_private", static::$_default_options["taxicode_private"]);
+            $settings["search_target_permalink"] = static::get_option("search_target_permalink", static::$_default_options["search_target_permalink"]);
+            $settings["custom_css"] = static::get_option("custom_css", static::$_default_options["custom_css"]);
+        }
+
+        return $settings;
+    }
+
+    /**
+     * Get the public exposable plugin option settings.
+     *
+     * @return array The list of exposable plugin options.
+     */
+    public static function get_exposable_settings()
+    {
+        $settings = [];
+        foreach(static::$_exposable_settings_map as $expose => $option) {
+            $settings[$expose] = static::get_option($option, static::$_default_options[$option]);
+        }
+        return $settings;
+    }
+     
     /**
      * Get a plugin setting from wordpress
      * 
@@ -87,45 +128,5 @@ class PluginSettings
         // update the plugin setting option value in wordpress (with option name prefix added)
         return update_option(sprintf("%s{$option_name}", BIQ_OPTIONS_NAME_PREFIX), $save_value);
     }
-
-    /**
-     * Get the public exposable plugin option settings.
-     *
-     * @return array The list of exposable plugin options.
-     */
-    public static function get_all_settings()
-    {
-        $settings = static::get_exposable_settings();
-        // add the non exposed scope plugin options
-        // @todo remove legacy taxicode name reference
-        $settings["taxicode_private"] = static::get_option("taxicode_private", static::$_default_options["taxicode_private"]);
-        $settings["search_target_permalink"] = static::get_option("search_target_permalink", static::$_default_options["search_target_permalink"]);
-        $settings["custom_css"] = static::get_option("custom_css", static::$_default_options["custom_css"]);
-        
-        // @todo get it to include all the settings with an admin capability check
-        if(current_user_can(static::ADMIN_CAPABILITY)) {
-            // @todo remove legacy taxicode name reference
-            $settings["taxicode_private"] = static::get_option("taxicode_private", static::$_default_options["taxicode_private"]);
-            $settings["search_target_permalink"] = static::get_option("search_target_permalink", static::$_default_options["search_target_permalink"]);
-            $settings["custom_css"] = static::get_option("custom_css", static::$_default_options["custom_css"]);
-        }
-
-        return $settings;
-    }
-
-    /**
-     * Get the public exposable plugin option settings.
-     *
-     * @return array The list of exposable plugin options.
-     */
-    public static function get_exposable_settings()
-    {
-        $settings = [];
-        foreach(static::$_exposable_settings_map as $expose => $option) {
-            $settings[$expose] = static::get_option($option, static::$_default_options[$option]);
-        }
-        return $settings;
-    }
-    
 
 }

@@ -78,6 +78,7 @@ class Admin
 <script>
     const biqAppURL = \'' . BIQ_REST_URL . '\';
     const biqAppDebugEnabled = ' . json_encode(BIQ_PLUGIN_DEBUG) . ';
+    const admin_nonce = \'' . wp_create_nonce("wp_rest") . '\';
     const biq_sk = \'' . PluginSettings::get_option("taxicode_private") . '\';
     const custom_css = ' . json_encode(PluginSettings::get_option("custom_css", '')) . ';
     const search_target_permalink = \'' . PluginSettings::get_option("search_target_permalink", "/booking-instant-quotes/") . '\';

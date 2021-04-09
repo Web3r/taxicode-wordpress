@@ -25,7 +25,7 @@ export const computed = {
 export const methods = {
     getAppSettings : function() {
         const app = this;
-        const URL = `${this.appURL}settings-get/`;
+        const URL = `${this.appURL}settings/`;
         if(this.appDebugEnabled) {
             console.group(`Loading App Settings from '${URL}'`);
         }

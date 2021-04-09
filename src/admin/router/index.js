@@ -11,7 +11,7 @@ export default new Router({
             props : {
                 biq_sk,
                 custom_css,
-                search_target_permalink : search_target_permalink
+                search_target_permalink
             }
         }
     ]

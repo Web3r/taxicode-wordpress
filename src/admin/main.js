@@ -13,6 +13,7 @@ menuFix('taxicode-app');
 
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+//window.axios.defaults.headers.common['X-Requested-With'] = admin_nonce;
 
 // start the import of the admin app code 
 import BIQAdminApp from 'admin/BIQAdminApp.vue';
@@ -22,6 +23,7 @@ import router from 'admin/router';
 new Vue({
     render : h => h(BIQAdminApp, {
         props : {
+            adminNonce : admin_nonce,
             appURL : biqAppURL,
             appDebugEnabled : devMode || biqAppDebugEnabled
         }
