@@ -2,12 +2,12 @@
 export const JOURNEY_TYPE_OPTION_SINGLE = 'One Way';
 export const JOURNEY_TYPE_OPTION_RETURN = 'Return';
 // define the available journey search options
-export const SEARCH_JOURNEY_OPTIONS = [
+export const JOURNEY_TYPE_OPTIONS = [
     JOURNEY_TYPE_OPTION_SINGLE, 
     JOURNEY_TYPE_OPTION_RETURN
 ];
 // set the default selected journey search option as the first 1
-export const SEARCH_JOURNEY_DEFAULT_OPTION = SEARCH_JOURNEY_OPTIONS[0];
+export const JOURNEY_TYPE_DEFAULT = JOURNEY_TYPE_OPTIONS[0];
 
 /**
  * Generate the list of field name = data form field structure for quotes search
@@ -15,11 +15,11 @@ export const SEARCH_JOURNEY_DEFAULT_OPTION = SEARCH_JOURNEY_OPTIONS[0];
  * @param {String} idp A string to prefix the fields ID attribute with
  * @returns Object
  */
-export const formFields = idp => {
+export const fF = idp => {
     return {
         journey_type : {
-            selected : SEARCH_JOURNEY_DEFAULT_OPTION,
-            options : SEARCH_JOURNEY_OPTIONS,
+            selected : JOURNEY_TYPE_DEFAULT,
+            options : JOURNEY_TYPE_OPTIONS,
             label : 'Journey type',
             required : false,
             error : null,
@@ -80,11 +80,11 @@ export const searchDateDefault = () => searchDatePlus(new Date(), 1, 2);
 export const az = n => (n < 10) ? '0' + n : n;
 
 // define the default initial state structure & values
-export const defaultState = () => {
+export const dState = () => {
     const d = searchDateDefault();
     return {
         search_details : {
-            journey_type : SEARCH_JOURNEY_DEFAULT_OPTION,
+            journey_type : JOURNEY_TYPE_DEFAULT,
             pickup : '',
             vias : [], 
             destination : '', 
@@ -97,6 +97,7 @@ export const defaultState = () => {
                 time : '', 
             }
         },
+        search_on_load : false,
         results : false,
         display_type : '',
         display_quotes : []
@@ -105,13 +106,13 @@ export const defaultState = () => {
 
 // create a default exportable object container
 const QuotesSearch = {
-    SEARCH_JOURNEY_OPTIONS,
-    SEARCH_JOURNEY_DEFAULT_OPTION,
-    formFields,
+    JOURNEY_TYPE_OPTIONS,
+    JOURNEY_TYPE_DEFAULT,
+    fF,
     searchDateDefault,
     searchDatePlus,
     az,
-    defaultState
+    dState
 };
 // export the default object container
 export default QuotesSearch;

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 Vue.use(Router);
-
+console.log(search_target_permalink);
 export default new Router({
     routes : [
         {
@@ -10,7 +10,8 @@ export default new Router({
             component : () => import(/* webpackChunkName: "BIQAdminSettings" */ 'admin/views/SettingsPage.vue'),
             props : {
                 biq_sk,
-                custom_css
+                custom_css,
+                search_target_permalink : search_target_permalink
             }
         }
     ]

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="biq-checkout-page">
         <the-biq-checkout-form
             ref="checkout"
             :biq-config="appConfig.biq"
@@ -13,16 +13,15 @@
             @biqCheckoutError="onCheckoutError"
         >
             <template #checkout-error="{ error }">
-                <div 
-                    id="tcplugin-payment-error" 
-                    class="col"
-                >{{error.message}}</div>
+                <div class="d-flex">{{error.message}}</div>
             </template>
         </the-biq-checkout-form>
         
-        <div class="row">
+        <div class="d-flex">
             <biq-quoted-journey-details
                 :price="price"
+                :labels="journey_details_labels"
+                id="biq-checkout-booking-details" 
             ></biq-quoted-journey-details>
         </div>
     </div>
@@ -39,6 +38,25 @@
     import TheCheckoutForm from 'BIQ/Forms/TheCheckoutForm.vue';
     // import the component to display the journey details being booked
     import QuotedJourneyDetails from 'BIQ/QuotedJourneyDetails.vue';
+    // import the Checkout specific CSS (webpack will chunk this with others & auto load / include separately)
+    import 'frontend/static-assets/css/checkout.css';
+    import 'frontend/static-assets/css/custom_checkout.css';
+
+    // define the component default text labels used (can be overridden with the 'labels' prop)
+    const defaultData = {
+        journey_details_labels : {
+            header : 'Booking Details',
+            journey : {
+                pickup : 'Travelling From : ',
+                destination : 'Going To : ',
+                via : 'Via : ',
+                passengers : 'Passengers : ',
+                date : 'Date : ',
+                return_date : 'Returning : ',
+                price : 'Price : '
+            }
+        }
+    };
     
     // define the Checkout Page component properties (inherits props from PagesMixin)
     const props = {
@@ -103,14 +121,29 @@
 
     export default {
         name : 'CheckoutPage',
-        props : {...props},
-        computed : {...computed},
-        methods : {...methods},
-        mixins : [PagesMixin],
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            PagesMixin
+        ],
 
         components : {
             'the-biq-checkout-form' : TheCheckoutForm,
             'biq-quoted-journey-details' : QuotedJourneyDetails
+        },
+
+        data() {
+            return { ...defaultData };
+        },
+
+        created() {
+            // make sure the checkout still has a price
+            if(this.price == 0) {
+                // invalid checkout state, go back to the search results
+                this.$router.back();
+            }
         }
     };
 </script>

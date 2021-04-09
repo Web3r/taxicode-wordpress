@@ -1,26 +1,9 @@
-// determine if the app is in dev or production mode
-const devMode = process.env.NODE_ENV !== 'production';
-
+// import the dev mode flag from the common app & plugins setup 
+import { devMode } from './app_setup_common';
+// import the CSS specific to the search lite app (webpack will chunk this  & auto load / include separately)
+import 'frontend/static-assets/css/search_lite_custom.css';
 // start importing & setting up the vue app
 import Vue from 'vue';
-Vue.config.productionTip = false;
-// allow the use of dev tools before the vuex store is created
-Vue.config.devtools = devMode;
-
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-// allow vue to use the plugin & ensure single inclusion
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlane, faTrain, faMapMarkerAlt, faUsers, faSuitcase } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-// add the additional icons
-library.add(faPlane, faTrain, faMapMarkerAlt, faUsers, faSuitcase);
-// register the component globally for use
-Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // start the import of the BIQ Search Lite app code 
 import BIQAppSearchLite from 'frontend/BIQAppSearchLite.vue';
@@ -36,7 +19,8 @@ new Vue({
         props : {
             appURL : biqAppURL,
             appDebugEnabled : devMode || biqAppDebugEnabled,
-            biqAppConfig : conf
+            biqAppConfig : conf,
+            biqSearchTarget
         }
     }),
     el : '#biq-vue-app'

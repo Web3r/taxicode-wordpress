@@ -1,7 +1,8 @@
 // import the method to generate the default state structure object
-import { defaultState } from '@/common/BIQ/QuotesSearch';
+import { dState } from '@BIQ/QuotesSearch';
 // import the method to generate quotes display type list
-import { DEFAULT_SORT, displayQuotes } from '@/common/BIQ/QuotesSearched';
+import { DEFAULT_SORT, displayQuotes } from '@BIQ/QuotesSearched';
+
 /**
  * Variable name replacement to help reduce production size
  * 
@@ -10,10 +11,11 @@ import { DEFAULT_SORT, displayQuotes } from '@/common/BIQ/QuotesSearched';
  */
 // define the state store module
 const SearchStateStore = {
-    state : defaultState(),
+    state : dState(),
     
     getters : {
         searchDetails : (s) => s.search_details,
+        searchOnLoad : (s) => s.search_on_load,
         hasSearchResults : (s) => s.results,
         displayType : (s) => s.display_type,
         displayQuotes : (s) => s.display_quotes
@@ -53,12 +55,18 @@ const SearchStateStore = {
     mutations : {
         resetSearchState(s) {
             // reset the state to the initial state
-            Object.assign(s, defaultState());
+            Object.assign(s, dState());
         },
 
         searchingQuotesFor(s, p) {
             // set the search form state details
             s.search_details = p;
+        },
+
+        searchForQuotes(s, p) {
+            // set the search form state details
+            s.search_details = p;
+            s.search_on_load = true;
         },
         
         displaying(s, p) {

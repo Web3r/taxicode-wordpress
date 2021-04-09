@@ -9,15 +9,22 @@ export const PAYMENT_TYPE_OPTIONS = [
 // set the default selected payment type option to CARD
 export const PAYMENT_TYPE_DEFAULT_OPTION = PAYMENT_TYPE_CARD;
 
-// define the form fields for the checkout form (does not include form section component fields)
-export const formFields = {
-    method : {
-        selected : PAYMENT_TYPE_DEFAULT_OPTION,
-        options : PAYMENT_TYPE_OPTIONS,
-        label : 'Select Payment Method:',
-        errorMsg : 'Cardholder name must be set',
-        id : 'tcplugin-payament-select'
-    }
+/**
+ * Generate the list of field name = data form field structure for quote checkout form
+ * (does not include form section component fields)
+ * @param {String} idp A string to prefix the fields ID attribute with
+ * @returns Object
+ */
+ export const fF = idp => {
+    return {
+        method : {
+            selected : PAYMENT_TYPE_DEFAULT_OPTION,
+            options : PAYMENT_TYPE_OPTIONS,
+            label : 'Select Payment Method:',
+            errorMsg : 'Invalid Payment Method',
+            id : `${idp}-method`
+        }
+    };
 };
 
 // define the list of events the component emits & can be listened for on the payment form
@@ -51,11 +58,6 @@ export const checkoutEvents = {
     }
 };
 
-// define methods to return string versions of date time sections for display
-export const journeyDate = ds => new Date(Date.parse(ds));
-export const journeyDateString = ds => journeyDate(ds).toDateString();
-export const journeyTimeString = ds => journeyDate(ds).toLocaleTimeString();
-
 // define the default initial state structure & values
 export const defaultState = () => {
     return {
@@ -76,12 +78,9 @@ export const defaultState = () => {
 const QuoteCheckout = {
     PAYMENT_TYPE_OPTIONS,
     PAYMENT_TYPE_DEFAULT_OPTION,
-    formFields,
+    fF,
     paymentEvents,
     checkoutEvents,
-    journeyDate,
-    journeyDateString,
-    journeyTimeString,
     defaultState
 };
 // export the default object container

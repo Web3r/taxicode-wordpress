@@ -2,13 +2,14 @@
     <div id="biq-search-lite-vue-app">
         <the-biq-search-form v-if="initialised" 
             :biq-public-key="appSettings.biq_pk"
-            :biq-places-lookup="`${appSettings.biq_api_host}${appConfig.biq.PLACES_URI}`"
-            :biq-quotes-from="`${appSettings.biq_api_host}${appConfig.biq.QUOTE_URI}`"
+            :biq-places-lookup="placesLookup"
+            :biq-quotes-from="quotesFrom"
             :search-on-load="search_on_load"
             :debugging="appDebugEnabled"
-            :use-buttons="appConfig.biq.useButtons" 
-            @biqSearchQuotes="onSearchQuotes"
+            @submit="onSearchQuotes"
             layout="compact"
+            :action="biqSearchTarget"
+            method="GET"
         ></the-biq-search-form>
     </div>
 </template>
@@ -19,14 +20,14 @@
     // import the mixin that sets values & validates field values
     import AppsMixin from 'mixins/AppsMixin';
     // import the BIQ static config just in case and the settings formatter
-    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, biqSettings } from 'BIQ/config';
+    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, updateAppSettings } from 'BIQ/config';
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/Search/TheSearchForm.vue';
 
     // define the APP release constants values
     const APP_VERSION = '1.0.1';
     const APP_NAME = 'BIQAppSearchLite';
-    const APP_TITLE = 'Taxicode Booking Instant Quotes - Search Lite';
+    const APP_TITLE = `Booking Instant Quotes - Search Lite v${APP_VERSION}`;
 
     // define the main app component properties (inherits props from AppsMixin)
     const props = {
@@ -38,6 +39,12 @@
                     biq : biqConf
                 };
             }
+        },
+        
+        biqSearchTarget : {
+            type : String,
+            required : true,
+            default : '/booking-instant-quotes/'
         }
     };
     // define the main app component computed property methods (inherits computed property methods from AppsMixin)
@@ -45,6 +52,7 @@
         ...mapGetters([
         // BIQ Quote Search state
             'searchDetails',
+            'searchOnLoad',
             'hasSearchResults',
             'displayType',
             'displayQuotes',
@@ -66,6 +74,14 @@
 
         appConfig : function() {
             return { ...this.biqAppConfig };
+        },
+
+        placesLookup : function() {
+            return `${this.appSettings.biq_api_host}${this.appConfig.biq.PLACES_URI}`;
+        },
+
+        quotesFrom : function() {
+            return `${this.appSettings.biq_api_host}${this.appConfig.biq.QUOTE_URI}`;
         }
     };
     // define the main app component methods (inherits methods from AppsMixin)
@@ -83,34 +99,29 @@
             'quoted'
         ]),
 
-        appSettingsUpdated : function(new_settings) {
-            if(this.appDebugEnabled) {
-                console.group('Updating BIQ App Settings');
-                console.log('BIQ App Settings', {...this.settings});
-                console.log('New BIQ Settings', new_settings);
-            }
-            const settings = biqSettings(new_settings, this.appDebugEnabled);
-            this.settings = settings;
-            if(this.appDebugEnabled) {
-                console.info('Updated Settings');
-                console.log('Settings', settings);
-                console.log('BIQ App Settings', {...this.settings});
-                console.groupEnd();
-            }
-        },
+        appSettingsUpdated : updateAppSettings,
 
         onSearchQuotes : function(evt) {
-            
+            if(!evt.data.validate()) {
+            // form hasn't validated, prevent the default of moving to form action target
+                return evt.preventDefault();
+            }
+            // overwrite the search form details state with what would be POSTed values to the server
+            // ad set a flag to indicate the search should be performed on the form action target page.
+            this.$store.commit('searchForQuotes', evt.data.formValues());
         }
     };
 
     export default {
         name : APP_NAME,
         version : APP_VERSION,
-        props : {...props},
-        computed : {...computed},
-        methods : {...methods},
-        mixins : [AppsMixin],
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            AppsMixin
+        ],
 
         components : {
             'the-biq-search-form' : TheSearchForm,
@@ -118,6 +129,7 @@
 
         data() {
             return {
+                app_title : APP_TITLE,
                 search_on_load : false,
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,

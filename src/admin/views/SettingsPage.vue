@@ -55,6 +55,11 @@
             custom_css : {
                 type : String,
                 default : ''
+            },
+            
+            search_target_permalink : {
+                type : String,
+                default : '/booking-instant-quotes/'
             }
 
         },
@@ -69,7 +74,9 @@
                     'paymentSettingsForm'
                 ],
                 validation_error_class : 'error',
-                validation_errors : {},
+                validation_errors : {
+                    search_target_permalink : false
+                },
                 // passed as a prop because it's a private key & shouldn't be 
                 // returned with the app settings, but is a mutatable form input value
                 taxicode_private : this.biq_sk,
@@ -77,6 +84,7 @@
                 // with the app settings, but is a mutatable form input value
                 custom_styles : this.custom_css,
                 form : new Form({
+                    search_target_permalink : this.search_target_permalink,
                     test_mode : 0,
                     quote_type : 'all',
                     recommend_upgrade : 0,
@@ -127,6 +135,7 @@
                 this.form.recommend_upgrade = (this.appSettings.recommend_upgrade) ? 1 : 0;
                 this.form.complete_page_text = this.appSettings.complete_page_text;
                 this.form.custom_css = this.custom_styles;
+                //this.form.search_target_permalink = this.search_target_permalink;
             },
 
             onSaveSettings : function(event) {
@@ -212,7 +221,9 @@
             validate : function() {
                 // reset the common validation error flags
                 let errors = 0;
-                let validation_errors = {};
+                let validation_errors = {
+                    search_target_permalink : false
+                };
                 // validate the BIQ settings form sections
                 this.form_sections.forEach(section => {
                     if(!this.$refs[section].validate()) {
@@ -223,6 +234,9 @@
                         errors++;
                     }
                 });
+                if(this.form.search_target_permalink == '') {
+                    validation_errors.search_target_permalink = 'Permalink to a page to display the search results & booking checkout is required.'
+                }
                 // set any validation errors
                 this.validation_errors = validation_errors;
                 // only valid if no errors encountered

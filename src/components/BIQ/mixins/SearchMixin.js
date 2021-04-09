@@ -4,15 +4,56 @@ import axios from 'axios';
 import { mapGetters, mapActions } from 'vuex';
 // import the mixin that sets values & validates field values and the form events
 import { ValidatesMixin, formEvents } from 'mixins/ValidatesMixin';
+// import the journey quote search form fields
+import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/QuotesSearch';
 // import the journey quotes searched events
 import { quotesSearchedEvents } from '@/common/BIQ/QuotesSearched';
-// import the journey quote search form fields
-import { JOURNEY_TYPE_OPTION_RETURN, formFields } from '@/common/BIQ/QuotesSearch';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
 
+// define the common props without the validation mixin props
+export const searchProps = {
+    biqPublicKey : {
+        type : String,
+        required : true,
+        default : ''
+    },
+    
+    biqPlacesLookup : {
+        type : String,
+        required : true,
+        default : '//places/?term='
+    },
+
+    biqQuotesFrom : {
+        type : String,
+        required : true,
+        default : '//booking/quote/'
+    },
+
+    idPrefix : {
+        type : String,
+        default : 'biq'
+    },
+
+    searchOnLoad : {
+        type : Boolean,
+        default : false
+    },
+
+    debugging : {
+        type : Boolean,
+        default : false
+    }
+};
+// define the combined events emitted by the search component mixin
+export const searchEvents = {
+    ...formEvents,
+    ...quotesSearchedEvents
+};
+
 // define the common stuff for the BIQ Search Form
-const biqSearchMixin = {
+export const biqSearchMixin = {
 
     components : {
         // can't use the lazy async loading approach as the component is used with multiple refs
@@ -23,49 +64,12 @@ const biqSearchMixin = {
     props : {
         // mix in the validates mixin props
         ...ValidatesMixin.props,
-
-        biqPublicKey : {
-            type : String,
-            required : true,
-            default : ''
-        },
-        
-        biqPlacesLookup : {
-            type : String,
-            required : true,
-            default : '//places/?term='
-        },
-
-        biqQuotesFrom : {
-            type : String,
-            required : true,
-            default : '//booking/quote/'
-        },
-
-        searchOnLoad : {
-            type : Boolean,
-            default : false
-        },
-
-        idPrefix : {
-            type : String,
-            default : 'biq'
-        },
-
-        debugging : {
-            type : Boolean,
-            default : false
-        },
-
-        useButtons : {
-            type : Boolean,
-            default : true
-        }
+        ...searchProps
     },
 
     data() {
         return {
-            fields : formFields(this.idPrefix),
+            fields : fF(this.idPrefix),
             // @todo incoporate the journey date & time into the fields
             date : '',
             time : '',
@@ -98,7 +102,7 @@ const biqSearchMixin = {
         this.setFieldValues();
         if(this.searchOnLoad) {
             // submit the journey quote search
-            this.onSearchQuotesFormSubmit();
+            this.onSearchQuotesFormSubmit({ });
         }
     },
 
@@ -178,15 +182,25 @@ const biqSearchMixin = {
             });
         },
 
-        onSearchQuotesFormSubmit : function(event) {
+        onSearchQuotesFormSubmit : function(evt) {
+            evt.data = {
+                // provide access to the form validation method
+                validate : () => this.validate(),
+                // provide access to the form values method
+                formValues : () => this.formValues(),
+                // provide access to a default form submit action method
+                defaultAction : () => {
+                    if(this.validate()) {
+                    // the form validated
+                        // make the BIQ API search
+                        this.searchApiQuotes(this.formValues());
+                    }
+                },
+                // provide access to the form BIQ API search method
+                searchApiQuotes : () => this.searchApiQuotes(this.formValues())
+            };
             // trigger the search form submit event
-            this.$emit(formEvents.submit.name, event);
-            // @todo need to be able to check if it needs to proceed with the search
-            //       could use a prop flag to supress the api ajax search to allow for
-            //       alternative method
-            if(this.validate()) {
-                this.searchApiQuotes();
-            }
+            this.$emit(searchEvents.submit.name, evt);
         },
 
         validate : function() {
@@ -240,7 +254,7 @@ const biqSearchMixin = {
 
         emitValidationEvent : function(validated) {
             // set the event name to be triggered (assume pass to start)
-            let emitEvent = formEvents.validated.name;
+            let emitEvent = searchEvents.validated.name;
             // create a validation event data
             const event = {
                 data : {
@@ -251,7 +265,7 @@ const biqSearchMixin = {
             if(!validated) {
             // the validation failed
                 // change the event to be triggered
-                emitEvent = formEvents.validationError.name;
+                emitEvent = searchEvents.validationError.name;
                 // add the validation errors to the event data
                 event.data.errors = {
                     ...this.validationErrors(),
@@ -268,30 +282,26 @@ const biqSearchMixin = {
             this.$emit(emitEvent, event);
         },
 
-        searchApiQuotes : function() {
-            const self = this;
-            const values = this.inputValues();
-            const journey = {
-                journey_type : values.journey_type,
-                pickup : values.pickup,
-                destination : values.destination, 
-                people : values.people, 
+        formValues : function() {
+            const v = this.inputValues();
+            const j = {
+                journey_type : v.journey_type,
+                pickup : v.pickup,
+                destination : v.destination, 
+                people : v.people, 
                 date : this.date, 
                 time : this.time
             };
-            let journey_id = null;
-            let apiQuotesURI = `pickup=${journey.pickup}&destination=${journey.destination}&date=${journey.date} ${journey.time}&people=${journey.people}`;
             if(this.hasReturn) {
             // @todo incoporate the journey date & time into the fields
             // add the optional return journey details
-                journey.returning = {
+                j.returning = {
                     date : this.return_date, 
                     time : this.return_time, 
                 };
-                apiQuotesURI = `${apiQuotesURI}&return=${journey.returning.date} ${journey.returning.time}`;
             } else {
                 // make sure the state doesn't have previous return date & time still included
-                journey.returning = {
+                j.returning = {
                     date : null, 
                     time : null, 
                 };
@@ -300,15 +310,29 @@ const biqSearchMixin = {
             if(via != '') {
             // add the optional journey via location(s)
                 // vias is expected as a list but only 1 via is available
-                journey.vias = [via];
-                apiQuotesURI = `${apiQuotesURI}&via=${via}`;
+                j.vias = [via];
             } else {
                 // make sure the state doesn't have previous via still included
-                journey.vias = [];
+                j.vias = [];
             }
+            return j;
+        },
+
+        searchApiQuotes : function(j) {
+            const self = this;
             // update the state with the journey details being quoted for
             // also updates the state flag for loading quotes
-            this.searchingQuotes(journey);
+            this.searchingQuotes(j);
+            let journey_id = null;
+            let apiQuotesURI = `pickup=${j.pickup}&destination=${j.destination}&date=${j.date} ${j.time}&people=${j.people}`;
+            if(this.hasReturn) {
+                apiQuotesURI = `${apiQuotesURI}&return=${j.returning.date} ${j.returning.time}`;
+            }
+            if(j.vias.length) {
+            // add the optional journey via location(s)
+                // vias is expected as a list but only 1 via is available
+                apiQuotesURI = `${apiQuotesURI}&via=${j.vias[0]}`;
+            }
             if(this.debugging) {
                 console.group(`Searching BIQ API Quotes from '${this.biqQuotesFrom}'`);
             }
@@ -337,11 +361,11 @@ const biqSearchMixin = {
                     }
                 };
                 // set the event name to be triggered
-                let emitEvent = quotesSearchedEvents.biqQuotesSearched.name;
+                let emitEvent = searchEvents.biqQuotesSearched.name;
                 if(Object.keys(response.data.quotes).length <= 0) {
                 // zero quotes returned
                     // change the event to be triggered
-                    emitEvent = quotesSearchedEvents.biqZeroQuotes.name;
+                    emitEvent = searchEvents.biqZeroQuotes.name;
                     // add the event error data
                     event.data.error = {
                         message : response.data.warnings[0]
@@ -360,12 +384,12 @@ const biqSearchMixin = {
                     data : {
                         quotes : [],
                         journey_id, 
-                        journey, 
+                        journey : j, 
                         error
                     }
                 };
                 // trigger the error event
-                self.$emit(quotesSearchedEvents.biqQuotesError.name, event);
+                self.$emit(searchEvents.biqQuotesError.name, event);
                 if(self.debugging) {
                     console.info('BIQ API Quotes Search Error');
                     console.groupEnd();

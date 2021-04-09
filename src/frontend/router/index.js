@@ -13,20 +13,12 @@ export default new Router({
         {
             path : '/',
             name : 'HomePage',
-            component : HomePageComponent,
-            props : {
-                searchFormData,
-                searchOnLoad
-            }
+            component : HomePageComponent
         },
         {
             path : '/:journey',
             name : 'HomePageSearched',
-            component : HomePageComponent,
-            props : {
-                searchFormData,
-                searchOnLoad
-            }
+            component : HomePageComponent
         },
         {
             path : '/checkout/:journey/:quote/:vehicle',

@@ -8,6 +8,7 @@ Author: Evil Wizard
 Author URI: https://taxicode.com/
 License: GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
+@todo remove legacy taxicode name reference
 Text Domain: taxicode
 Domain Path: /languages
 */
@@ -39,256 +40,89 @@ Domain Path: /languages
  */
 
 // don't call the file directly
-if ( !defined( 'ABSPATH' ) ) exit;
+if (!defined("ABSPATH")) {
+    exit;
+}
+// define the actual plugin file absolute 
+define("BIQ_PLUGIN", __FILE__);
+// define the plugins location on the server
+define("BIQ_PLUGIN_LOCATION", plugin_dir_path(BIQ_PLUGIN));
+// a flag to allow the plugin to be debugged
+$debugging = false;
 
-if( file_exists( dirname(__FILE__) . '/vendor/autoload.php')) {
-    require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
+/**
+ * Autoload namespaced Models.
+ * 
+ * @param	String $class_name The fully class name being requested.
+ * @return	Boolean TRUE if the Model was auto loaded.
+ */
+function biq_autoloader($class_name) {
+    // replace escaped namespace sections
+    $namespaced_class = str_replace("\\", '/', $class_name);
+    // get the FQCN
+    $full_file_path = BIQ_PLUGIN_LOCATION . "includes/{$namespaced_class}.php";
+    if(file_exists($full_file_path)) {
+    // require and use
+        require($full_file_path);
+        return TRUE;
+    } else {
+    // namespace file not found, look elsewhere
+        return FALSE;
+    }
+}
+// allow for autoloading without composer (when bundled as production ready)
+spl_autoload_register("biq_autoloader");
+// check if there's a vendors autoload to include
+if(file_exists(BIQ_PLUGIN_LOCATION . "/vendor/autoload.php")) {
+    require_once BIQ_PLUGIN_LOCATION . "/vendor/autoload.php";
 }
 
 
 /**
- * Taxicode class
+ * Taxicode BIQ plugin class
  *
- * @class Taxicode The class that holds the entire Taxicode plugin
+ * @class Taxicode BIQ Plugin class that holds the entire BIQ plugin
+ * @todo remove legacy taxicode name reference
  */
-final class Taxicode
+final class Taxicode extends BIQ\Plugin
 {
-
     /**
-     * Plugin version
-     *
-     * @var string
+     * @var string The plugin version string
      */
-    public $version = '1.0.1';
-
+    const VERSION = "1.0.1";
+    
     /**
-     * Holds various class instances
-     *
-     * @var array
+     * @var string The registered REST namespace base for routes
      */
-    private $container = array();
-
+    const REST_NAMESPACE = "taxicode/v1/";
+    
     /**
-     * Constructor for the Taxicode class
-     *
-     * Sets up all the appropriate hooks and actions
-     * within our plugin.
+     * @var string The language text domain to register 
      */
-    public function __construct()
-    {
-
-        $this->define_constants();
-
-        register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-
-        add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
-    }
-
+    const TEXT_DOMAIN = "taxicode";
+    
     /**
-     * Initializes the Taxicode() class
-     *
-     * Checks for an existing Taxicode() instance
-     * and if it doesn't find one, creates it.
+     * @var string The prefix to all the plugin wp options saved settings
      */
-    public static function init()
-    {
-        static $instance = false;
-
-        if (!$instance) {
-            $instance = new Taxicode();
-        }
-
-        return $instance;
-    }
+    const OPTIONS_NAME_PREFIX = "tcplugin_";
 
     /**
-     * Magic getter to bypass referencing plugin.
-     *
-     * @param $prop
-     *
-     * @return mixed
-     */
-    public function __get($prop)
-    {
-        if(array_key_exists($prop, $this->container)) {
-            return $this->container[ $prop ];
-        }
-
-        return $this->{$prop};
-    }
-
-    /**
-     * Magic isset to bypass referencing plugin.
-     *
-     * @param $prop
-     *
-     * @return mixed
-     */
-    public function __isset($prop)
-    {
-        return isset($this->{$prop}) || isset($this->container[$prop]);
-    }
-
-    /**
-     * Define the constants
-     *
-     * @return void
-     */
-    public function define_constants()
-    {
-        define('TAXICODE_VERSION', $this->version);
-        define('TAXICODE_FILE', __FILE__);
-        define('TAXICODE_PATH', dirname(TAXICODE_FILE));
-        define('TAXICODE_INCLUDES', TAXICODE_PATH . '/includes');
-        define('TAXICODE_URL', plugins_url('', TAXICODE_FILE));
-        define('TAXICODE_ASSETS', TAXICODE_URL . '/assets');
-    }
-
-    /**
-     * Load the plugin after all plugis are loaded
-     *
-     * @return void
-     */
-    public function init_plugin()
-    {
-        $this->includes();
-        $this->init_hooks();
-    }
-
-    /**
-     * Placeholder for activation function
-     *
-     * Nothing being called here yet.
+     * what to do when the plugin is activated / updated
      */
     public function activate()
     {
-
+        parent::activate();
+        // legacy plugin name in process of removal
+        // @todo remove legacy taxicode name reference
         $installed = get_option('taxicode_installed');
-
         if(!$installed) {
             update_option('taxicode_installed', time());
         }
-
-        update_option('taxicode_version', TAXICODE_VERSION);
+        update_option('taxicode_version', static::VERSION);
     }
 
-    /**
-     * Placeholder for deactivation function
-     *
-     * Nothing being called here yet.
-     */
-    public function deactivate()
-    {
+} // Booking Instant Quotes 
 
-    }
-
-    /**
-     * Include the required files
-     *
-     * @return void
-     */
-    public function includes()
-    {
-
-        require_once TAXICODE_INCLUDES . '/Assets.php';
-
-        if($this->is_request('admin')) {
-            require_once TAXICODE_INCLUDES . '/Admin.php';
-        }
-
-        if($this->is_request('frontend')) {
-            require_once TAXICODE_INCLUDES . '/Frontend.php';
-        }
-
-        if($this->is_request('search_lite')) {
-            require_once TAXICODE_INCLUDES . '/SearchLite.php';
-        }
-
-        if($this->is_request('ajax')) {
-            // require_once TAXICODE_INCLUDES . '/class-ajax.php';
-        }
-
-        require_once TAXICODE_INCLUDES . '/Api.php';
-    }
-
-    /**
-     * Initialize the hooks
-     *
-     * @return void
-     */
-    public function init_hooks()
-    {
-
-        add_action('init', array($this, 'init_classes'));
-
-        // Localize our plugin
-        add_action('init', array($this, 'localization_setup'));
-    }
-
-    /**
-     * Instantiate the required classes
-     *
-     * @return void
-     */
-    public function init_classes()
-    {
-
-        if($this->is_request('admin')) {
-            $this->container['admin'] = new Taxicode\Admin();
-        }
-
-        if($this->is_request( 'frontend')) {
-            $this->container['frontend'] = new Taxicode\Frontend();
-        }
-
-        if($this->is_request( 'search_lite')) {
-            $this->container['search_lite'] = new Taxicode\SearchLite();
-        }
-
-        if($this->is_request( 'ajax')) {
-            // $this->container['ajax'] =  new Taxicode\Ajax();
-        }
-
-        $this->container['api'] = new Taxicode\Api();
-        $this->container['assets'] = new Taxicode\Assets();
-    }
-
-    /**
-     * Initialize plugin for localization
-     *
-     * @uses load_plugin_textdomain()
-     */
-    public function localization_setup()
-    {
-        load_plugin_textdomain('taxicode', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-    }
-
-    /**
-     * What type of request is this?
-     *
-     * @param  string $type admin, ajax, cron or frontend.
-     *
-     * @return bool
-     */
-    private function is_request($type)
-    {
-        switch ($type) {
-            case 'admin' :
-                return is_admin();
-            case 'ajax' :
-                return defined('DOING_AJAX');
-            case 'rest' :
-                return defined('REST_REQUEST');
-            case 'cron' :
-                return defined('DOING_CRON');
-            case 'frontend' :
-                return (!is_admin() || defined('DOING_AJAX')) && !defined('DOING_CRON');
-            case 'search_lite' :
-                return (!is_admin() || defined('DOING_AJAX')) && !defined('DOING_CRON');
-        }
-    }
-
-} // Taxicode
-
-$taxicode = Taxicode::init();
+// @todo remove legacy taxicode name reference
+$taxicode = Taxicode::getInstance()
+                    ->init($debugging);

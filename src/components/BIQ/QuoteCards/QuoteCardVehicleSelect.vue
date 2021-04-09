@@ -30,7 +30,6 @@
                     :quoteID="quote.quote_id"
                     :selected-vehicle-index="selected_vehicle"
                     :label="c2aLabel"
-                    :useButtons="useButtons"
                     @c2aClick="onClick"
                 ></biq-book-now-c2a>
             </div>
@@ -91,11 +90,6 @@
             debugging : {
                 type : Boolean,
                 default : false
-            },
-
-            useButtons : {
-                type : Boolean,
-                default : true
             }
         },
 

@@ -19,13 +19,12 @@
                 <p 
                     v-html="displayPrice"
                     class="card-text text-center display-4"
-                ></p>
+                />
                 <biq-book-now-c2a
                     :journeyID="journeyID" 
                     :quoteID="quote.quote_id"
                     :selected-vehicle-index="selected_vehicle"
                     :label="c2aLabel"
-                    :use-buttons="useButtons"
                     @c2aClick="onClick"
                 ></biq-book-now-c2a>
             </div>
@@ -76,11 +75,6 @@
             debugging : {
                 type : Boolean,
                 default : false
-            },
-
-            useButtons : {
-                type : Boolean,
-                default : true
             }
         },
 

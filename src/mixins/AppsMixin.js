@@ -30,16 +30,16 @@ export const methods = {
             console.group(`Loading App Settings from '${URL}'`);
         }
         axios.get(URL)
-        .then(response => {
-            app.appSettingsUpdated(response.data);
+        .then(r => {
+            app.appSettingsUpdated(r.data);
             app.initialised = true;
         })
-        .catch(error => {
+        .catch(e => {
             if(app.appDebugEnabled) {
                 console.info('Updated Settings');
-                console.log(error);
+                console.log(e);
             }
-            console.error(error);
+            console.error(e);
         })
         .finally(() => {
             if(app.appDebugEnabled) {
@@ -51,17 +51,17 @@ export const methods = {
     appSettingsUpdated : function(ns) {
         if(this.appDebugEnabled) {
             console.group('Updating App Settings');
-            console.log('App Settings', {...this.settings});
+            console.log('App Settings', { ...this.settings });
             console.log('New Settings', ns);
         }
         // just extract all the supplied settings
-        const s = {...ns};
+        const s = { ...ns };
         // set the app settings provided
         this.settings = s;
         if(this.appDebugEnabled) {
             console.info('Updated Settings');
             console.log('Settings', s);
-            console.log('App Settings', {...this.settings});
+            console.log('App Settings', { ...this.settings });
             console.groupEnd();
         }
     }
@@ -76,7 +76,7 @@ export const AppsMixin = {
     data() {
         return {
             initialised : false,
-            settings : {}
+            settings : { }
         };
     }    
 };
