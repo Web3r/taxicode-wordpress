@@ -1,4 +1,4 @@
-# Taxicode For Wordpress
+# Booking Instant Quotes For Wordpress
 
 This is a wordpress plugin to allow booking with the Taxicode API, using Stripe for payments.
 

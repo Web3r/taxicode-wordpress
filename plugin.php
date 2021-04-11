@@ -47,41 +47,39 @@ if (!defined("ABSPATH")) {
 define("BIQ_PLUGIN", __FILE__);
 // define the plugins location on the server
 define("BIQ_PLUGIN_LOCATION", plugin_dir_path(BIQ_PLUGIN));
-// a flag to allow the plugin to be debugged
+// a flag to allow the plugin clientside apps to be debugged
 $debugging = false;
 
 /**
- * Autoload namespaced Models.
+ * Autoload namespaced classes.
  * 
- * @param	String $class_name The fully class name being requested.
- * @return	Boolean TRUE if the Model was auto loaded.
+ * @param string $class_name The fully class name being requested.
+ * @return boolean true if the class was auto loaded.
  */
 function biq_autoloader($class_name) {
     // replace escaped namespace sections
     $namespaced_class = str_replace("\\", '/', $class_name);
     // get the FQCN
     $full_file_path = BIQ_PLUGIN_LOCATION . "includes/{$namespaced_class}.php";
-    if(file_exists($full_file_path)) {
-    // require and use
-        require($full_file_path);
-        return TRUE;
-    } else {
+    if(!file_exists($full_file_path)) {
     // namespace file not found, look elsewhere
-        return FALSE;
+        return false;
     }
+    // return the result of requiring the file
+    return require($full_file_path);
 }
 // allow for autoloading without composer (when bundled as production ready)
 spl_autoload_register("biq_autoloader");
 // check if there's a vendors autoload to include
-if(file_exists(BIQ_PLUGIN_LOCATION . "/vendor/autoload.php")) {
-    require_once BIQ_PLUGIN_LOCATION . "/vendor/autoload.php";
+if(file_exists(BIQ_PLUGIN_LOCATION . "vendor/autoload.php")) {
+    require_once BIQ_PLUGIN_LOCATION . "vendor/autoload.php";
 }
 
 
 /**
- * Taxicode BIQ plugin class
+ * Taxicode Extend and customised the BIQ plugin
  *
- * @class Taxicode BIQ Plugin class that holds the entire BIQ plugin
+ * @class Taxicode
  * @todo remove legacy taxicode name reference
  */
 final class Taxicode extends BIQ\Plugin
@@ -112,6 +110,10 @@ final class Taxicode extends BIQ\Plugin
     public function activate()
     {
         parent::activate();
+        if(BIQPluginUpdater::treason(static::VERSION, get_option("biq_version", "0.0.0"))) {
+        // no version change, so nothing to do
+            return;
+        }
         // legacy plugin name in process of removal
         // @todo remove legacy taxicode name reference
         $installed = get_option('taxicode_installed');
@@ -121,7 +123,7 @@ final class Taxicode extends BIQ\Plugin
         update_option('taxicode_version', static::VERSION);
     }
 
-} // Booking Instant Quotes 
+}
 
 // @todo remove legacy taxicode name reference
 $taxicode = Taxicode::getInstance()

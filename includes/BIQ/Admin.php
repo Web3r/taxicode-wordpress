@@ -5,6 +5,8 @@ use BIQ\PluginSettings;
 
 /**
  * BIQ Plugin Admin Menu Page Handler
+ * 
+ * @class Admin
  */
 class Admin
 {

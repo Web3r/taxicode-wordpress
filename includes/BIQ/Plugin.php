@@ -1,13 +1,14 @@
 <?php
 namespace BIQ;
 
+use BIQPluginUpdater;
 use BIQ\Shortcodes\SearchLite;
 use BIQ\Shortcodes\Frontend;
 
 /**
- * BIQ plugin class
+ * The entire BIQ plugin
  *
- * @class Plugin The class that holds the entire BIQ plugin
+ * @class Plugin
  */
 class Plugin
 {
@@ -57,10 +58,7 @@ class Plugin
     protected $container = [];
 
     /**
-     * Constructor for the BIQ_Plugin class
-     *
-     * Sets up all the appropriate hooks and actions
-     * within our plugin.
+     * Sets up the activate, deactivate hooks and the plugin loaded actions
      */
     public function __construct()
     {
@@ -125,7 +123,9 @@ class Plugin
     }
 
     /**
-     * Define the constants
+     * Define the constants to make it easier for the plgin code
+     * 
+     * @param boolean $debugging Flag to indicate debugging status
      */
     public function define_constants($debugging)
     {
@@ -148,32 +148,6 @@ class Plugin
     public function init_plugin()
     {
         $this->init_hooks();
-    }
-
-    /**
-     * what to do when the plugin is activated / updated
-     */
-    public function activate()
-    {
-        // check if the plugin has been installed
-        $installed = get_option("biq_installed");
-        if(!$installed) {
-            // update / create the installed flag option
-            update_option("biq_installed", time());
-        }
-        // @todo check for version update & ...
-        // @todo check for settings option name changes & obsolete settings
-        update_option("biq_version", static::VERSION);
-    }
-
-    /**
-     * Placeholder for deactivation function
-     *
-     * Nothing being called here yet.
-     */
-    public function deactivate()
-    {
-
     }
 
     /**
@@ -203,7 +177,7 @@ class Plugin
         if($this->is_request(static::REQUEST_TYPE_FRONTEND)) {
             $this->container[static::REQUEST_TYPE_FRONTEND] = new Frontend();
         }
-        // register the main frontend shortcode app
+        // register the search lite shortcode app
         if($this->is_request(static::REQUEST_TYPE_SEARCH_LITE)) {
             $this->container[static::REQUEST_TYPE_SEARCH_LITE] = new SearchLite();
         }
@@ -211,26 +185,47 @@ class Plugin
 
     /**
      * Initialize plugin for localization
-     *
-     * @uses load_plugin_textdomain()
      */
     public function localization_setup()
     {
         load_plugin_textdomain(
             static::TEXT_DOMAIN, 
             false, 
-            BIQ_PLUGIN_LOCATION . "/languages/"
+            BIQ_PLUGIN_LOCATION . "languages/"
         );
+    }
+
+    /**
+     * what to do when the plugin is activated / updated
+     */
+    public function activate()
+    {
+        if(!BIQPluginUpdater::treason(static::VERSION, null, "0.0.0")) {
+        // no version change, so nothing to do
+            return;
+        }
+        // It's treason then
+        // execute order 66, well, install, update the plugin settings etc.
+        return BIQPluginUpdater::order66(static::VERSION);
+    }
+
+    /**
+     * Perform the deactivate plugin actions
+     */
+    public function deactivate()
+    {
+        BIQPluginUpdater::hitTheNose();
     }
 
     /**
      * What type of request is this?
      *
      * @param  string $type admin, ajax, cron or frontend.
-     * @return bool
+     * @return boolean 
      */
     protected function is_request($type)
     {
+        // this is equivelant to none of the above
         $what_she_said = (!is_admin() || defined("DOING_AJAX")) && !defined("DOING_CRON");
         switch($type) {
             case static::REQUEST_TYPE_ADMIN :

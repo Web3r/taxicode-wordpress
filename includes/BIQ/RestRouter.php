@@ -7,6 +7,8 @@ use BIQ\RestRoutes\BookingDetailsProxy;
 
 /**
  * BIQ REST API Router
+ * 
+ * @class RestRouter
  */
 class RestRouter extends WP_REST_Controller
 {
@@ -22,8 +24,6 @@ class RestRouter extends WP_REST_Controller
 
     /**
      * Register the API routes
-     *
-     * @return void
      */
     public function register_routes()
     {

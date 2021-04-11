@@ -4,7 +4,9 @@ namespace BIQ\Shortcodes;
 use BIQ\PluginSettings;
 
 /**
- * SearchLite Shortcode Handler
+ * BIQ SearchLite App Shortcode Handler
+ *
+ * @class SearchLite
  */
 class SearchLite
 {
@@ -22,13 +24,13 @@ class SearchLite
     }
 
     /**
-     * Render SearchLite app
+     * Get the content to render SearchLite app
      *
-     * @param  array $atts
-     * @param  string $content
-     * @return string
+     * @param array $atts Any shorcode attributes used
+     * @param string $content Any additional content to render with
+     * @return string The content to be rendered
      */
-    public function render($atts, $content=null)
+    public function render($atts, $content='')
     {
         // get the search page target for the search form action in order of precedence either from
         // the shortcode usage attribute
@@ -51,7 +53,7 @@ class SearchLite
     const biqSearchTarget = \'' . $search_target_permalink . '\';
 </script>
 <div id="biq-vue-app"></div>';
-
+        // return the content to render
         return $content;
     }
 

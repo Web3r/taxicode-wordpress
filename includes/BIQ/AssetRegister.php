@@ -2,7 +2,9 @@
 namespace BIQ;
 
 /**
- * Asset register for enqueuing Scripts and Styles Class
+ * Asset register for enqueuing Scripts and Styles
+ * 
+ * @class AssetRegister
  */
 class AssetRegister
 {
@@ -32,7 +34,7 @@ class AssetRegister
     /**
      * Register scripts
      *
-     * @param  array $scripts
+     * @param  array $scripts List of script assets to register
      */
     protected function register_scripts($scripts)
     {
@@ -57,7 +59,7 @@ class AssetRegister
     /**
      * Register styles
      *
-     * @param  array $styles
+     * @param  array $styles List of stylesheet assets to register
      */
     protected function register_styles($styles)
     {
@@ -72,7 +74,7 @@ class AssetRegister
     }
 
     /**
-     * Get all registered scripts
+     * Get scripts to register
      *
      * @return array
      */
@@ -120,12 +122,6 @@ class AssetRegister
                 "version"   => filemtime("{$asset_location}search_lite.js"),
                 "in_footer" => true
             ],
-            // yeah, not sure & target file doesn't exist
-            "taxicode-config" => [
-                "src"       => BIQ_PLUGIN_URL . "/settings.php",
-                "version"   => filemtime("{$asset_location}frontend.js"),
-                "in_footer" => false
-            ],
             // the webpack split chunck for the BIQ Admin app code
             "biq-admin" => [
                 "src"       => "{$asset_url}admin.js",
@@ -134,12 +130,11 @@ class AssetRegister
                 "in_footer" => true
             ]
         ];
-
         return $scripts;
     }
 
     /**
-     * Get registered styles
+     * Get styles to register
      *
      * @return array
      */
@@ -164,7 +159,6 @@ class AssetRegister
                 "src" =>  "{$asset_location}admin.css"
             ],
         ];
-
         return $styles;
     }
 

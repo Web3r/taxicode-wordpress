@@ -5,7 +5,9 @@ use BIQ\PluginSettings;
 use Braintree\Gateway;
 
 /**
- * Frontend Shortcode Handler
+ * BIQ Frontend App Shortcode Handler
+ *
+ * @class Frontend
  */
 class Frontend
 {
@@ -24,11 +26,11 @@ class Frontend
     }
 
     /**
-     * Render the BIQ frontend app
+     * Get the content to render the BIQ frontend app
      *
-     * @param  array $atts
-     * @param  string $content
-     * @return string
+     * @param array $atts Any shorcode attributes used
+     * @param string $content Any additional content to render with
+     * @return string The content to be rendered
      */
     public function render($atts, $content='')
     {
@@ -58,7 +60,7 @@ class Frontend
     const stripe_cardform_style = ' . PluginSettings::get_option("stripe_cardform_style", 0) . ';
 </script>
 <div id="biq-vue-app"></div>';
-
+        // return the content to render
         return $content;
     }
 

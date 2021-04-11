@@ -6,6 +6,8 @@ use WP_REST_Server;
 
 /**
  * BIQ Booking Details Proxy REST_API controller
+ * 
+ * @class BookingDetailsProxy
  */
 class BookingDetailsProxy extends Route
 {
@@ -15,15 +17,7 @@ class BookingDetailsProxy extends Route
     const ROUTE = "booking-details";
 
     /**
-     * [__construct description]
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Register the routes
+     * Register the booking details proxy routes
      */
     public function register_routes()
     {
@@ -36,7 +30,7 @@ class BookingDetailsProxy extends Route
     }
 
     /**
-     * Retrieves the query params for the items collection.
+     * Retrieves the request params for the booking details collection.
      *
      * @return array Collection parameters.
      */

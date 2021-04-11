@@ -6,6 +6,8 @@ use WP_REST_Server;
 
 /**
  * Plugin Settings REST_API controller
+ * 
+ * @class BookingDetailsProxy
  */
 class Settings extends Route
 {
@@ -15,15 +17,7 @@ class Settings extends Route
     const ROUTE = "settings";
 
     /**
-     * [__construct description]
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Register the routes
+     * Register the settings routes
      */
     public function register_routes()
     {
@@ -42,7 +36,7 @@ class Settings extends Route
     }
 
     /**
-     * Checks if a given request has access to read the items.
+     * Checks if a given request has access to the REST endpoint.
      *
      * @param  WP_REST_Request $request Full details about the request.
      * @return true|WP_Error True if the request has read access, WP_Error object otherwise.

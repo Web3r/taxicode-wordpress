@@ -5,7 +5,9 @@ use WP_REST_Controller;
 use WP_REST_Server;
 
 /**
- * Plugin readable route REST_API controller
+ * Abstract base for route REST_API controllers
+ * 
+ * @class Route
  */
 abstract class Route extends WP_REST_Controller
 {

@@ -3,6 +3,8 @@ namespace BIQ;
 
 /**
  * Static plugin settings handler
+ * 
+ * @class PluginSettings
  */
 class PluginSettings
 {
@@ -10,9 +12,10 @@ class PluginSettings
      * @var string The required wordpress user capability for plugin admin
      */
     const ADMIN_CAPABILITY = "manage_options";
-    
+
     /**
-     * @var array List of wordpress stored options without the plugin prefix 
+     * @var array List of wordpress stored options without the plugin prefix and 
+     *            the default value for the option
      */
     protected static $_default_options = [
         // @todo remove legacy taxicode name reference
@@ -29,11 +32,15 @@ class PluginSettings
         // @todo remove legacy taxicode name reference
         "taxicode_private"          => '',
         "search_target_permalink"   => "/booking-instant-quotes/",
-        "custom_css"                => ''
+        "custom_css"                => '',
+        // below are plugin version constants and are immutable
+        "version"                   => "0.0.0",
+        "installed"                 => ''
     ];
     
     /**
      * @var array List of wordpress stored options available for clientside exposure 
+     *            exposed name => option name (without prefix)
      */
     protected static $_exposable_settings_map = [
         // @todo remove legacy taxicode name reference
@@ -48,6 +55,11 @@ class PluginSettings
         "complete_page_text"    => "complete_page_text"
     ];
 
+    /**
+     * Retrieves the request params for the admin updatable settings items collection.
+     *
+     * @return array Collection parameters.
+     */
     public static function get_update_rules()
     {
         // @todo set the option settings definitions & rules
