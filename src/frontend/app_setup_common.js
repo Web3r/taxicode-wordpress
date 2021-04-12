@@ -25,4 +25,4 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 // import the CSS common to the apps (webpack will chunk this with others & auto load / include separately)
 import 'frontend/static-assets/css/forms.css';
 import 'frontend/static-assets/css/common.css';
-import 'frontend/static-assets/css/custom_common.css';
+import 'frontend/static-assets/css/customized/common.css';

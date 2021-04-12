@@ -35,7 +35,7 @@
     import BookingJourneyDetails from 'BIQ/BookingJourneyDetails.vue';
     // import the Complete specific CSS (webpack will chunk this with others & auto load / include separately)
     import 'frontend/static-assets/css/complete.css';
-    import 'frontend/static-assets/css/custom_complete.css';
+    import 'frontend/static-assets/css/customized/complete.css';
     
     // define the component data structure & the default / initial values (inherits extra data from PagesMixin)
     const defaultData = {

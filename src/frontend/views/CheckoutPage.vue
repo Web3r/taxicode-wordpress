@@ -40,7 +40,7 @@
     import QuotedJourneyDetails from 'BIQ/QuotedJourneyDetails.vue';
     // import the Checkout specific CSS (webpack will chunk this with others & auto load / include separately)
     import 'frontend/static-assets/css/checkout.css';
-    import 'frontend/static-assets/css/custom_checkout.css';
+    import 'frontend/static-assets/css/customized/checkout.css';
 
     // define the component default text labels used (can be overridden with the 'labels' prop)
     const defaultData = {

@@ -1,7 +1,7 @@
 // import the dev mode flag from the common app & plugins setup 
 import { devMode } from './app_setup_common';
 // import the app CSS (webpack will chunk this  & auto load / include separately)
-import 'frontend/static-assets/css/custom.css';
+import 'frontend/static-assets/css/customized/frontend.css';
 // start importing & setting up the vue app
 import Vue from 'vue';
 

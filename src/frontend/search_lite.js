@@ -1,7 +1,7 @@
 // import the dev mode flag from the common app & plugins setup 
 import { devMode } from './app_setup_common';
 // import the CSS specific to the search lite app (webpack will chunk this  & auto load / include separately)
-import 'frontend/static-assets/css/search_lite_custom.css';
+import 'frontend/static-assets/css/customized/search_lite.css';
 // start importing & setting up the vue app
 import Vue from 'vue';
 
