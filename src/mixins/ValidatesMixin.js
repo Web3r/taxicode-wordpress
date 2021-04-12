@@ -83,10 +83,10 @@ export const ValidatesMixin = {
             return {};
         },
 
-        errorStateClass : function(fieldname) {
-            return this.fields[fieldname].error == null 
+        errorStateClass : function(fname) {
+            return this.fields[fname].error == null 
                 ? '' 
-                : this.fields[fieldname].error 
+                : this.fields[fname].error 
                     ? this.errorClass 
                     : this.validClass;
         },
@@ -95,21 +95,21 @@ export const ValidatesMixin = {
             const self = this;
             if(this.debugging) {
                 console.group(`Setting ${this.$options._componentTag} values`);
-                console.log('Fields Before', {...this.fields});
+                console.log('Fields Before', { ...this.fields });
                 console.log('Values', this.values);
             }
-            Object.keys(this.values).forEach(fieldname => {
-                if(!self.fields.hasOwnProperty(fieldname)) {
+            Object.keys(this.values).forEach(fname => {
+                if(!self.fields.hasOwnProperty(fname)) {
                     if(self.debugging) {
-                        console.info(`${self.$options._componentTag} does not contain field '${fieldname}'`);
+                        console.info(`${self.$options._componentTag} does not contain field '${fname}'`);
                     }
                     return;
                 }
-                const prop = self.fields[fieldname].hasOwnProperty('value') ? 'value' : 'selected';
-                self.fields[fieldname][prop] = self.values[fieldname];
+                const prop = self.fields[fname].hasOwnProperty('value') ? 'value' : 'selected';
+                self.fields[fname][prop] = self.values[fname];
             });
             if(this.debugging) {
-                console.log('Fields After', {...this.fields});
+                console.log('Fields After', { ...this.fields });
                 console.groupEnd();
             }
         },
@@ -121,26 +121,26 @@ export const ValidatesMixin = {
             if(this.debugging) {
                 console.group(`Validating ${this.$options._componentTag} values`);
             }
-            Object.keys(this.fields).forEach(fieldname => {
+            Object.keys(this.fields).forEach(fname => {
                 // set the fields validation error message flag to null to indicate unchecked
-                self.fields[fieldname].error = null;
-                if(!self.fields[fieldname].required) {
+                self.fields[fname].error = null;
+                if(!self.fields[fname].required) {
                 // field is not required so it doesn't matter is it's empty
                     return;
                 }
-                const prop = self.fields[fieldname].hasOwnProperty('value') ? 'value' : 'selected';
-                if(self.fields[fieldname][prop] == '') {
+                const prop = self.fields[fname].hasOwnProperty('value') ? 'value' : 'selected';
+                if(self.fields[fname][prop] == '') {
                 // field is required & empty
                     // set the fields error message flag to the error messgae to inidcate validation error
-                    self.fields[fieldname].error = self.fields[fieldname].errorMsg;
+                    self.fields[fname].error = self.fields[fname].errorMsg;
                     if(self.debugging) {
-                        console.info(`Invalid field value for '${fieldname}' -- ${self.fields[fieldname].error}`);
+                        console.info(`Invalid field value for '${fname}' -- ${self.fields[fname].error}`);
                     }
                     errors++;
                 } else {
                 // field passes validation
                     // set the error message flag to empty to indicate it's valid
-                    self.fields[fieldname].error = '';
+                    self.fields[fname].error = '';
                 }
             });
             if(this.debugging) {
@@ -153,8 +153,8 @@ export const ValidatesMixin = {
         validationErrors : function() {
             const self = this;
             const errors = {};
-            Object.keys(this.fields).forEach(fieldname => {
-                errors[fieldname] = self.fields[fieldname].error;
+            Object.keys(this.fields).forEach(fname => {
+                errors[fname] = self.fields[fname].error;
             });
             return {
                 ...this.specialValidationErrors(),
@@ -165,9 +165,9 @@ export const ValidatesMixin = {
         inputValues : function() {
             const self = this;
             const values = {};
-            Object.keys(this.fields).forEach(fieldname => {
-                const prop = self.fields[fieldname].hasOwnProperty('value') ? 'value' : 'selected';
-                values[fieldname] = self.fields[fieldname][prop];
+            Object.keys(this.fields).forEach(fname => {
+                const prop = self.fields[fname].hasOwnProperty('value') ? 'value' : 'selected';
+                values[fname] = self.fields[fname][prop];
             });
             return {
                 ...this.specialInputValues(),

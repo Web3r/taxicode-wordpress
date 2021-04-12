@@ -1,6 +1,8 @@
 <template src="./templates/SettingsPage.html"></template>
 
 <script>
+    // import the wordpress admin request config function
+    import { wpAdminRequestConfig } from 'BIQ/config';
     // import the form handler
     import Form from '@/common/Form';
     // import the flash message to display messages about updating the settings
@@ -50,23 +52,7 @@
             debugging : {
                 type : Boolean,
                 default : false
-            },
-            
-            biq_sk : {
-                type : String,
-                default : ''
-            },
-            
-            custom_css : {
-                type : String,
-                default : ''
-            },
-            
-            search_target_permalink : {
-                type : String,
-                default : '/booking-instant-quotes/'
             }
-
         },
 
         data() {
@@ -82,65 +68,67 @@
                 validation_errors : {
                     search_target_permalink : false
                 },
-                // passed as a prop because it's a private key & shouldn't be 
-                // returned with the app settings, but is a mutatable form input value
-                taxicode_private : this.biq_sk,
-                // passed as a prop because it's external to the app & isn't returned 
-                // with the app settings, but is a mutatable form input value
-                custom_styles : this.custom_css,
                 form : new Form({
-                    search_target_permalink : this.search_target_permalink,
+                    search_target_permalink : '/booking-instant-quotes/',
                     test_mode : 0,
                     quote_type : 'all',
                     recommend_upgrade : 0,
                     complete_page_text : '',
-                    custom_css : this.custom_css,
+                    custom_css : '',
                     preserve_on_submit : true
-                })
+                }),
+                reloading : false
             };
         },
 
         created() {
-            this.propogateSettingsToFormData();
-            this.taxicode_private = this.biq_sk;
+            this.propagateSettingsToFormData();
         },
 
         computed: {
             apiSettingsValues : function() {
                 // return the values object for the BIQ API settings form section to populate with
-                return {
-                    taxicode_public : this.appSettings.biq_pk,
-                    taxicode_private : this.taxicode_private,
-                    biq_api_host : this.appSettings.biq_api_host
-                };
+                return (this.reloading) 
+                    ? null 
+                    : {
+                        taxicode_public : this.appSettings.biq_pk,
+                        taxicode_private : this.appSettings.biq_sk,
+                        biq_api_host : this.appSettings.biq_api_host
+                    };
             },
 
             paymentSettingsValues : function() {
                 // return the values object for the BIQ Payment settings form section to populate with
-                return {
-                    paypal_public : this.appSettings.paypal_pk,
-                    stripe_public : this.appSettings.stripe_pk,
-                    // this is a string from the REST & doesn't parse to JSON well :(
-                    stripe_cardform_style : this.appSettings.stripe_cardform_style
-                };
+                return (this.reloading) 
+                    ? { } 
+                    : {
+                        paypal_public : this.appSettings.paypal_pk,
+                        stripe_public : this.appSettings.stripe_pk,
+                        // this is a string from the REST & doesn't parse to JSON well :(
+                        stripe_cardform_style : this.appSettings.stripe_cardform_style
+                    };
             }
         },
 
         methods : {
             onReloadSettings : function() {
+                // set a flag to indicate changes need to propagate 
+                this.reloading = true;
                 // keep the display form & the settings in sync
-                this.propogateSettingsToFormData();
+                this.propagateSettingsToFormData();
+                // should be long enough for things to have been noticed
+                this.reloading = false;
             },
 
-            propogateSettingsToFormData : function() {
+            propagateSettingsToFormData : function() {
+                this.form.search_target_permalink = this.appSettings.search_target_permalink;
                 // convert to number for ease then to string for radio input value
                 this.form.test_mode = (this.appSettings.booking_test_mode) ? 1 : 0;
                 this.form.quote_type = this.appSettings.quote_type;
                 // convert to number for ease then to string for radio input value
                 this.form.recommend_upgrade = (this.appSettings.recommend_upgrade) ? 1 : 0;
                 this.form.complete_page_text = this.appSettings.complete_page_text;
-                this.form.custom_css = this.custom_styles;
-                //this.form.search_target_permalink = this.search_target_permalink;
+                this.form.custom_css = this.appSettings.custom_css;
             },
 
             onSaveSettings : function(event) {
@@ -181,43 +169,40 @@
                     ...this.form.data()
                 })
                 if(this.debugging) {
-                    console.log('BIQ Form Sections Data', {...settingsFormSectionsData});
-                    console.log('Form Data', {...this.form.data()});
-                    console.log('Post Form Data', {...form.data()});
+                    console.log('BIQ Form Sections Data', { ...settingsFormSectionsData });
+                    console.log('Form Data', { ...this.form.data() });
+                    console.log('Post Form Data', { ...form.data() });
                     console.groupEnd();
                 }
                 // update the app settings from the form data
-                form.post(biq_save_app_settings_url, { headers : { "X-WP-Nonce" : self.adminNonce } })
-                .then(response => {
+                form.post(biq_save_app_settings_url, wpAdminRequestConfig(this.adminNonce))
+                .then(r => {
                     // set the update success notice message
                     self.flashMessage('Settings Updated', '', 'updated', self.flash_message_timeout);
-                    // keep the value in sync with the property & the form value
-                    self.taxicode_private = form.taxicode_private;
-                    self.custom_styles = form.custom_css;
                     // create the update success response event data
                     const event = {
-                        ...response
+                        ...r
                     };
                     // trigger the settings updated event
                     self.$emit(emitEvents.appSettingsUpdated.name, event);
                 })
-                .catch(error => {
+                .catch(e => {
                 // well that's not good
                     // set a error details encountered an error while updating the settings
                     self.flashMessage('Failed to update settings!', '', 'error', self.flash_message_timeout);
                     // create the error event data
-                    const event = {
+                    const evt = {
                         data : {
-                            form : {...form.data()},
+                            form : { ...form.data() },
                             URL : biq_save_app_settings_url,
-                            error
+                            error : e
                         }
                     };
                     // trigger the update error error event
-                    self.$emit(emitEvents.updateSettingsError.name, event);
+                    self.$emit(emitEvents.updateSettingsError.name, evt);
                     if(self.debugging) {
                         console.info('Update Settings Error');
-                        console.log('Update Event', event);
+                        console.log('Update Event', evt);
                         console.groupEnd();
                     }
                 });
@@ -225,18 +210,18 @@
 
             validate : function() {
                 // reset the common validation error flags
-                let errors = 0;
+                let errs = 0;
                 let validation_errors = {
                     search_target_permalink : false
                 };
                 // validate the BIQ settings form sections
-                this.form_sections.forEach(section => {
-                    if(!this.$refs[section].validate()) {
+                this.form_sections.forEach(s => {
+                    if(!this.$refs[s].validate()) {
                         validation_errors = {
                             ...validation_errors,
-                            ...this.$refs[section].validationErrors()
+                            ...this.$refs[s].validationErrors()
                         }
-                        errors++;
+                        errs++;
                     }
                 });
                 if(this.form.search_target_permalink == '') {
@@ -245,19 +230,19 @@
                 // set any validation errors
                 this.validation_errors = validation_errors;
                 // only valid if no errors encountered
-                return (errors == 0);
+                return (errs == 0);
             },
 
-            flashMessage : function(heading, message, style_class, timeout) {
+            flashMessage : function(h, m, s, t) {
                 this.flash_message = {
-                    heading,
-                    message,
-                    class : style_class
+                    heading : h,
+                    message : m,
+                    class : s
                 };
                 // clear the message after x seconds
                 return setTimeout(() => { 
                     this.flash_message = false;
-                }, timeout);
+                }, t);
             }
         }
 

@@ -46,20 +46,30 @@ export const biqSettings = (s, d) => {
         complete_page_text : s.complete_page_text
     };
 };
+// used to add the wordpress admin nonce header for admin REST requests
+export const wpAdminRequestConfig = nonce => {
+    return { 
+        headers : { 
+            "X-WP-Nonce" : nonce 
+        } 
+    };
+};
 /**
  * Variable name replacement to help reduce production size
  * 
  * - ns = new settings
  */
 // expected to be imported as a vue component App method
-export const updateAppSettings = function(ns) {
+export const updateAppSettings = function(ns, cb) {
     if(this.appDebugEnabled) {
         console.group('Updating BIQ App Settings');
         console.log('BIQ App Settings', { ...this.settings });
         console.log('New BIQ Settings', ns);
     }
     // just extract all the supplied settings
-    const s = biqSettings(ns, this.appDebugEnabled);
+    const s = (typeof(cb) == 'function') 
+        ? cb.call(this, ns) 
+        : biqSettings(ns, this.appDebugEnabled);
     // set the app settings provided
     this.settings = s;
     if(this.appDebugEnabled) {
@@ -81,8 +91,7 @@ export const biqConf = {
     PAYMENT_URI : 'booking/pay/',
     PGH_CONF : {
         hidePostalCode : true
-    },
-    useButtons : true
+    }
 };
 // export the default configuration values object
 export default biqConf;

@@ -151,7 +151,13 @@
                     class="regular-text" 
                     rows="10" 
                     cols="50"
+                    aria-describedby="complete_page_textHelp" 
                 ></textarea>
+                <br />
+                <small 
+                    id="complete_page_textHelp" 
+                    class="form-text text-muted"
+                >This does not support HTML content.</small>
             </td>
         </tr>
         </tbody>
@@ -191,6 +197,6 @@
     &nbsp;
     <button 
         @click="onReloadSettings" 
-        class="button"
+        class="button button-secondary"
     >Reload Settings</button>
 </div>

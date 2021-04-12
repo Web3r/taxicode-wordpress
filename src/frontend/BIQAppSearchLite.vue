@@ -130,7 +130,6 @@
         data() {
             return {
                 app_title : APP_TITLE,
-                search_on_load : false,
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
@@ -141,7 +140,8 @@
                     quote_type : '',
                     recommend_upgrade : false,
                     complete_page_text : ''
-                }
+                },
+                search_on_load : false
             };
         },
 

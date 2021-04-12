@@ -23,20 +23,25 @@ export const computed = {
 };
 // define the main App component Mixin methods
 export const methods = {
-    getAppSettings : function() {
+    getAppSettings : function(rqc_cb, cb) {
         const app = this;
         const URL = `${this.appURL}settings/`;
         if(this.appDebugEnabled) {
             console.group(`Loading App Settings from '${URL}'`);
         }
-        axios.get(URL)
+        const rqc = (typeof(rqc_cb) == 'function') 
+            // use the return from the supplied callback
+            ? rqc_cb.call(this) 
+            // just extract all the supplied settings
+            : { };
+        axios.get(URL, rqc)
         .then(r => {
-            app.appSettingsUpdated(r.data);
+            app.appSettingsUpdated(r.data, cb);
             app.initialised = true;
         })
         .catch(e => {
             if(app.appDebugEnabled) {
-                console.info('Updated Settings');
+                console.info('Updated Settings Error');
                 console.log(e);
             }
             console.error(e);
@@ -48,14 +53,17 @@ export const methods = {
         });
     },
 
-    appSettingsUpdated : function(ns) {
+    appSettingsUpdated : function(ns, cb) {
         if(this.appDebugEnabled) {
             console.group('Updating App Settings');
             console.log('App Settings', { ...this.settings });
             console.log('New Settings', ns);
         }
-        // just extract all the supplied settings
-        const s = { ...ns };
+        const s = (typeof(cb) == 'function') 
+            // use the return from the supplied callback
+            ? cb.call(this, ns) 
+            // just extract all the supplied settings
+            : { ...ns };
         // set the app settings provided
         this.settings = s;
         if(this.appDebugEnabled) {

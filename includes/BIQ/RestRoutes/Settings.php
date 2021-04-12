@@ -83,14 +83,14 @@ class Settings extends Route
     public function update_settings($request)
     {
         // get all the current plugin setting options
-        $old = PluginSettings::get_all_settings();
+        $old = PluginSettings::get_exposable_settings();
         // loop through the settings & update any that changed
         foreach($old as $name => $value) {
             // update the plugin setting if the new request value for setting has changed
             PluginSettings::update_option($name, $request[$name], $value);
         }
         // return the new synced version of the plugin settings
-        return rest_ensure_response(PluginSettings::get_all_settings());
+        return rest_ensure_response(PluginSettings::get_exposable_settings());
     }
 
 }
