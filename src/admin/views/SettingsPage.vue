@@ -1,6 +1,8 @@
 <template src="./templates/SettingsPage.html"></template>
 
 <script>
+    // import the mixin that defines the common Page route Components
+    import PagesMixin from 'mixins/PagesMixin';
     // import the wordpress admin request config function
     import { wpAdminRequestConfig } from 'BIQ/config';
     // import the form handler
@@ -26,6 +28,10 @@
     export default {
         name : 'SettingsPage',
 
+        mixins : [
+            PagesMixin
+        ],
+
         components : {
             'flash-message' : FlashMessage,
             'biq-api-settings-form-section' : SettingsAPIForm,
@@ -37,21 +43,12 @@
                 type : String,
                 default : ''
             },
-            
-            appSettings : {
-                type : Object,
-                required : true,
-                default : null
-            },
 
             appRESTBaseURL : {
                 type : String,
-                default : '//'
-            },
-            
-            debugging : {
-                type : Boolean,
-                default : false
+                required : true,
+                default : '//',
+                // @todo add a validator to ensure the URL ends with a /
             }
         },
 

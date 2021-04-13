@@ -3,6 +3,7 @@
     <h1>{{app_title}}</h1>
     <router-view v-if="initialised" 
         :admin-nonce="admin_nonce"
+        :app-config="appConfig"
         :app-settings="appSettings"
         :appRESTBaseURL="appURL"
         :debugging="appDebugEnabled"
@@ -38,7 +39,14 @@
     };
     // define the main BIQ Admin App component computed property methods 
     // (inherits computed property methods from AppsMixin)
-    const computed = { };
+    const computed = {
+        appConfig : function() {
+            return {
+                biq : biqConf,
+                BOOKING_DETALS_URI : 'booking-details/?booking_ref='
+            };
+        }
+    };
     // define the main BIQ Admin App component methods 
     // (inherits methods from AppsMixin)
     const methods = {

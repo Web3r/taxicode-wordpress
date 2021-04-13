@@ -1,4 +1,5 @@
-const PagesMixin = {
+// define the Page Mixin for components to include & inherit from
+export const PagesMixin = {
     props: {
         appConfig : {
             type : Object,
@@ -22,5 +23,5 @@ const PagesMixin = {
         }
     }
 };
-
+// export the Page Mixin as the default object
 export default PagesMixin;

@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // define the main App component Mixin properties
-export const props = {
+const props = {
     appURL : {
         type : String,
         required : true,
@@ -16,13 +16,13 @@ export const props = {
     }
 };
 // define the main App component computed property Mixin methods
-export const computed = {
+const computed = {
     appSettings : function() {
         return { ...this.settings };
     }
 };
 // define the main App component Mixin methods
-export const methods = {
+const methods = {
     /**
      * Variable name replacement to help reduce production size
      * 
@@ -103,5 +103,5 @@ export const AppsMixin = {
         };
     }    
 };
-// export the default object container
+// export the App Mixin as the default object
 export default AppsMixin;
