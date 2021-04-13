@@ -23,6 +23,12 @@ export const computed = {
 };
 // define the main App component Mixin methods
 export const methods = {
+    /**
+     * Variable name replacement to help reduce production size
+     * 
+     * - rqc_cb = callback for request config to get settings
+     * - cb = callback to extract / remap the app settings
+     */
     getAppSettings : function(rqc_cb, cb) {
         const app = this;
         const URL = `${this.appURL}settings/`;
@@ -53,7 +59,13 @@ export const methods = {
         });
     },
 
-    appSettingsUpdated : function(ns, cb) {
+    /**
+     * Variable name replacement to help reduce production size
+     * 
+     * - ns = new settings
+     * - cb = callback to extract / remap the app settings
+     */
+     appSettingsUpdated : function(ns, cb) {
         if(this.appDebugEnabled) {
             console.group('Updating App Settings');
             console.log('App Settings', { ...this.settings });
@@ -82,6 +94,9 @@ export const AppsMixin = {
     methods,
 
     data() {
+        // use the following to extract the mixin data inside the component 
+        // data method as it destroys this object
+        // const mixinData = AppsMixin.data.call(this);
         return {
             initialised : false,
             settings : { }

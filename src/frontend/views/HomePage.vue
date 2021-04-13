@@ -50,10 +50,12 @@
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/Search/TheSearchForm.vue';
     
-    // define the Home Page component properties (inherits props from PagesMixin)
+    // define the Home Page component properties 
+    // (inherits props from PagesMixin)
     const props = {
     };
-    // define the Home Page component computed property methods (inherits computed property methods from PagesMixin)
+    // define the Home Page component computed property methods 
+    // (inherits computed property methods from PagesMixin)
     const computed = {
         ...mapGetters([
         // BIQ Quote Search state
@@ -88,7 +90,8 @@
             return (this.appSettings.recommend_upgrade && this.show_upgrade);
         }
     };
-    // define the Home Page component methods (inherits methods from PagesMixin)
+    // define the Home Page component methods 
+    // (inherits methods from PagesMixin)
     const methods = {
         ...mapActions([
         // BIQ Quote Search state

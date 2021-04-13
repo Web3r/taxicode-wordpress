@@ -28,16 +28,19 @@
     const APP_NAME = 'BIQAdminApp';
     const APP_TITLE = `Booking Instant Quotes Admin v${APP_VERSION}`;
     
-    // define the main BIQ Admin App component properties (inherits props from AppsMixin)
+    // define the main BIQ Admin App component properties 
+    // (inherits props from AppsMixin)
     const props = {
         adminNonce : {
             type : String,
             default : ''
         }
     };
-    // define the main BIQ Admin App component computed property methods (inherits computed property methods from AppsMixin)
+    // define the main BIQ Admin App component computed property methods 
+    // (inherits computed property methods from AppsMixin)
     const computed = { };
-    // define the main BIQ Admin App component methods (inherits methods from AppsMixin)
+    // define the main BIQ Admin App component methods 
+    // (inherits methods from AppsMixin)
     const methods = {
         appSettingsUpdated : updateAppSettings,
 
@@ -77,8 +80,12 @@
         ],
 
         data() {
+            // need to extract the mixin data as this method destroys that object
+            const mixinData = AppsMixin.data.call(this);
             return {
-                app_title : APP_TITLE,
+                // include the mixin data
+                ...mixinData,
+                // override the empty settings structure from the mixin
                 settings : {
                     // default exposable app settings
                     biq_api_host : biqConf.LIVE_API_HOST,
@@ -95,6 +102,8 @@
                     search_target_permalink : '/booking-instant-quotes/',
                     custom_css : ''
                 },
+                // component specific data
+                app_title : APP_TITLE,
                 admin_nonce : this.adminNonce
             }
         },

@@ -29,7 +29,8 @@
     const APP_NAME = 'BIQAppSearchLite';
     const APP_TITLE = `Booking Instant Quotes - Search Lite v${APP_VERSION}`;
 
-    // define the main app component properties (inherits props from AppsMixin)
+    // define the main app component properties 
+    // (inherits props from AppsMixin)
     const props = {
         biqAppConfig : {
             type : Object,
@@ -47,7 +48,8 @@
             default : '/booking-instant-quotes/'
         }
     };
-    // define the main app component computed property methods (inherits computed property methods from AppsMixin)
+    // define the main app component computed property methods 
+    // (inherits computed property methods from AppsMixin)
     const computed = {
         ...mapGetters([
         // BIQ Quote Search state
@@ -84,8 +86,10 @@
             return `${this.appSettings.biq_api_host}${this.appConfig.biq.QUOTE_URI}`;
         }
     };
-    // define the main app component methods (inherits methods from AppsMixin)
+    // define the main app component methods 
+    // (inherits methods from AppsMixin)
     const methods = {
+        appSettingsUpdated : updateAppSettings,
         ...mapActions([
         // BIQ Quote Search state
             'resetSearch',
@@ -98,8 +102,6 @@
             'apiQuotesError',
             'quoted'
         ]),
-
-        appSettingsUpdated : updateAppSettings,
 
         onSearchQuotes : function(evt) {
             if(!evt.data.validate()) {
@@ -128,8 +130,12 @@
         },
 
         data() {
+            // need to extract the mixin data as this method destroys that object
+            const mixinData = AppsMixin.data.call(this);
             return {
-                app_title : APP_TITLE,
+                // include the mixin data
+                ...mixinData,
+                // override the empty settings structure from the mixin
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
@@ -141,6 +147,8 @@
                     recommend_upgrade : false,
                     complete_page_text : ''
                 },
+                // component specific data
+                app_title : APP_TITLE,
                 search_on_load : false
             };
         },

@@ -22,7 +22,8 @@
     const APP_NAME = 'BIQApp';
     const APP_TITLE = `Booking Instant Quotes v${APP_VERSION}`;
 
-    // define the main BIQ Frontend App component properties (inherits props from AppsMixin)
+    // define the main BIQ Frontend App component properties 
+    // (inherits props from AppsMixin)
     const props = {
         biqAppConfig : {
             type : Object,
@@ -35,7 +36,8 @@
             }
         }
     };
-    // define the main BIQ Frontend App component computed property methods (inherits computed property methods from AppsMixin)
+    // define the main BIQ Frontend App component computed property methods 
+    // (inherits computed property methods from AppsMixin)
     const computed = {
         ...mapGetters([
         // BIQ Quote Search state
@@ -73,7 +75,8 @@
             return { ...this.biqAppConfig };
         }
     };
-    // define the main BIQ Frontend App component methods (inherits methods from AppsMixin)
+    // define the main BIQ Frontend App component methods 
+    // (inherits methods from AppsMixin)
     const methods = {
         ...mapActions([
         // BIQ Quote Search state
@@ -109,8 +112,12 @@
         ],
 
         data() {
+            // need to extract the mixin data as this method destroys that object
+            const mixinData = AppsMixin.data.call(this);
             return {
-                app_title : APP_TITLE,
+                // include the mixin data
+                ...mixinData,
+                // override the empty settings structure from the mixin
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
@@ -121,7 +128,9 @@
                     quote_type : '',
                     recommend_upgrade : false,
                     complete_page_text : ''
-                }
+                },
+                // component specific data
+                app_title : APP_TITLE
             };
         },
 
