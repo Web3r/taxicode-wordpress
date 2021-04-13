@@ -274,7 +274,6 @@
         }
     };
 
-
     export default {
         name: 'HomePage',
         props,

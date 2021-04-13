@@ -8,6 +8,19 @@
 </template>
 
 <script>
+    // define the component properties
+    const props = {
+    };
+    // define the list of events the component emits & can be listened for
+    const emitEvents = {
+    };
+    // define the component computed property methods
+    const computed = {
+    };
+    // define the component methods
+    const methods = {
+    };
+    
     export default {
         name : 'FlashMessage',
 

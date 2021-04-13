@@ -68,6 +68,9 @@
   /* Home page (search quotes results) container div */
   width: 100%;
 }
+#biq-search-results #results .quote-card {
+  width: 18rem;
+}
 /*
  * End of the BIQ search form common theme settings 
  */ 

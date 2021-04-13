@@ -81,60 +81,72 @@
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
 
+    // define the component properties
+    const props = {
+        values : {
+            type : Object,
+            // @todo add a validator to make sure that all the fieldname keys are supplied
+            default : function() { 
+                return {
+                    taxicode_public : '',
+                    taxicode_private : '',
+                    biq_api_host : 'https://api.taxicode.com/'
+                };
+            }
+        }
+    };
+    
+    /**
+     * Generate the list of field name = data form field structure for passenger details form
+     * @param {String} idp A string to prefix the fields ID attribute with
+     * @returns Object
+     */
+    const fF = idp => {
+        return {
+            taxicode_public : {
+                value : '',
+                label : 'Taxicode Public API Key',
+                required : true,
+                error : null,
+                errorMsg : 'Value required for Taxicode Public API Key',
+                id : `${idp}taxicode_public`,
+                placeholder : 'Enter your Public Taxicode API Key',
+                help : 'The Taxicode affiliate API public key assigned to your account.'
+            },
+            taxicode_private : {
+                value : '',
+                label : 'Taxicode Private API Key',
+                required : true,
+                error : null,
+                errorMsg : 'Value required for Taxicode Private API Key',
+                id : `${idp}taxicode_private`,
+                placeholder : 'Enter your Private Taxicode API Key',
+                help : 'The Taxicode affiliate API Private key assigned to your account, do not share your key with anyone else.'
+            },
+            biq_api_host : {
+                value : '',
+                label : 'Taxicode BIQ API Host',
+                required : true,
+                error : null,
+                errorMsg : 'Value required for Taxicode BIQ API Host',
+                id : `${idp}biq_api_host`,
+                placeholder : 'The Taxicode API host address',
+                help : 'The hostname of the Taxicode API to use e.g. "https://api.taxicode.com/"'
+            }
+        }
+    };
+
     export default {
         name : 'SettingsAPIForm',
+        props,
 
         mixins : [
             ValidatesMixin
         ],
 
-        props : {
-            values : {
-                type : Object,
-                default : function() { 
-                    return {
-                        taxicode_public : '',
-                        taxicode_private : '',
-                        biq_api_host : 'https://api.taxicode.com/'
-                    };
-                }
-            }
-        },
-
         data() {
             return {
-                fields : {
-                    taxicode_public : {
-                        value : '',
-                        label : 'Taxicode Public API Key',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Value required for Taxicode Public API Key',
-                        id : 'taxicode_public',
-                        placeholder : 'Enter your Public Taxicode API Key',
-                        help : 'The Taxicode affiliate API public key assigned to your account.'
-                    },
-                    taxicode_private : {
-                        value : '',
-                        label : 'Taxicode Private API Key',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Value required for Taxicode Private API Key',
-                        id : 'taxicode_private',
-                        placeholder : 'Enter your Private Taxicode API Key',
-                        help : 'The Taxicode affiliate API Private key assigned to your account, do not share your key with anyone else.'
-                    },
-                    biq_api_host : {
-                        value : '',
-                        label : 'Taxicode BIQ API Host',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Value required for Taxicode BIQ API Host',
-                        id : 'biq_api_host',
-                        placeholder : 'The Taxicode API host address',
-                        help : 'The hostname of the Taxicode API to use e.g. "https://api.taxicode.com/"'
-                    }
-                }
+                fields : fF('')
             };
         },
 

@@ -88,60 +88,72 @@
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
 
+    // define the component properties
+    const props = {
+        values : {
+            type : Object,
+            // @todo add a validator to make sure that all the fieldname keys are supplied
+            default : function() { 
+                return {
+                    paypal_public : '',
+                    stripe_public : '',
+                    stripe_cardform_style : ''
+                };
+            }
+        }
+    };
+    
+    /**
+     * Generate the list of field name = data form field structure for passenger details form
+     * @param {String} idp A string to prefix the fields ID attribute with
+     * @returns Object
+     */
+    const fF = idp => {
+        return {
+            paypal_public : {
+                value : '',
+                label : 'Paypal Client ID',
+                required : true,
+                error : null,
+                errorMsg : 'Value required for Paypal Client ID',
+                id : `${idp}paypal_public`,
+                placeholder : 'Enter the Paypal Client ID',
+                help : 'The public Paypal Client ID assigned to you.'
+            },
+            stripe_public : {
+                value : '',
+                label : 'Stripe Public API Key',
+                required : true,
+                error : null,
+                errorMsg : 'Value required for Stripe Public API Key',
+                id : `${idp}stripe_public`,
+                placeholder : 'Enter the Stripe Public API Key',
+                help : 'The Stripe Public API Key assigned to you.'
+            },
+            stripe_cardform_style : {
+                value : '',
+                label : 'Stripe Cardform Custom Style',
+                required : false,
+                error : null,
+                errorMsg : '',
+                id : `${idp}stripe_cardform_style`,
+                placeholder : '',
+                help : ''
+            }
+        }
+    };
+
     export default {
         name : 'SettingsPaymentForm',
+        props,
 
         mixins : [
             ValidatesMixin
         ],
 
-        props : {
-            values : {
-                type : Object,
-                default : function() { 
-                    return {
-                        paypal_public : '',
-                        stripe_public : '',
-                        stripe_cardform_style : ''
-                    };
-                }
-            }
-        },
-
         data() {
             return {
-                fields : {
-                    paypal_public : {
-                        value : '',
-                        label : 'Paypal Client ID',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Value required for Paypal Client ID',
-                        id : 'paypal_public',
-                        placeholder : 'Enter the Paypal Client ID',
-                        help : 'The public Paypal Client ID assigned to you.'
-                    },
-                    stripe_public : {
-                        value : '',
-                        label : 'Stripe Public API Key',
-                        required : true,
-                        error : null,
-                        errorMsg : 'Value required for Stripe Public API Key',
-                        id : 'stripe_public',
-                        placeholder : 'Enter the Stripe Public API Key',
-                        help : 'The Stripe Public API Key assigned to you.'
-                    },
-                    stripe_cardform_style : {
-                        value : '',
-                        label : 'Stripe Cardform Custom Style',
-                        required : false,
-                        error : null,
-                        errorMsg : '',
-                        id : 'stripe_cardform_style',
-                        placeholder : '',
-                        help : ''
-                    }
-                }
+                fields : fF('')
             };
         },
 
