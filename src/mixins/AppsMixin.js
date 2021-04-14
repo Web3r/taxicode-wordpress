@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // define the main App component Mixin properties
-const props = {
+export const appProps = {
     appURL : {
         type : String,
         required : true,
@@ -89,14 +89,14 @@ const methods = {
 
 // define the App Mixin for components to include & inherit from
 export const AppsMixin = {
-    props,
+    props : appProps,
     computed,
     methods,
 
+    // use the following to extract the mixin data inside the component 
+    // data method as it destroys this object
+    // const mixinData = AppsMixin.data.call(this);
     data() {
-        // use the following to extract the mixin data inside the component 
-        // data method as it destroys this object
-        // const mixinData = AppsMixin.data.call(this);
         return {
             initialised : false,
             settings : { }

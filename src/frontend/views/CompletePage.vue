@@ -71,6 +71,7 @@
         appRESTBase : {
             type : String,
             default : '//'
+            // @todo add a validator to ensure the URL ends with a /
         }
     };
     // define the Complete Page component computed property methods (inherits computed property methods from PagesMixin)

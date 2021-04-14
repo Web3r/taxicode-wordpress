@@ -3,7 +3,7 @@ import { quoteBookingEvents } from '@/common/BIQ/QuotesSearched';
 // import the Book Now Call To Action button
 import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
 
-// define the BIQ Quote Card component properties
+// define the BIQ Quote Card component Mixin properties
 export const quoteCardProps = {
     journeyID : {
         type : String,
@@ -34,37 +34,40 @@ export const quoteCardProps = {
 export const quoteCardEvents = {
     ...quoteBookingEvents
 };
+// define the BIQ Quote Card component computed property Mixin methods
+const computed = {
+    displayPrice : function() {
+        return '&pound;' + new Number(this.quote_price).toFixed(2);
+    }
+};
+// define the BIQ Quote Card component Mixin methods
+const methods = {
+    onClick : function(evt) {
+        // bubble the call to action click event
+        this.$emit(quoteCardEvents.biqQuoteBookNow.name, evt);
+    }
+};
 
-// define the common stuff for the BIQ Quote Card
+// define the BIQ Quote Card Mixin for components to include & inherit from
 export const biqQuoteCardMixin = {
+    props : quoteCardProps,
+    computed,
+    methods,
+
     components : {
         'biq-book-now-c2a' : BookNowC2A
     },
 
-    props : {
-        ...quoteCardProps
-    },
-
+    // use the following to extract the mixin data inside the component 
+    // data method as it destroys this object
+    // const mixinData = QuoteCardMixin.data.call(this);
     data() {
         return {
             selected_vehicle : this.quote.selected_vehicle,
             quote_price : this.quote.price,
             display_vehicle_src : ''
         };
-    },
-
-    computed : {
-        displayPrice : function() {
-            return '&pound;' + new Number(this.quote_price).toFixed(2);
-        }
-    },
-
-    methods : {
-        onClick : function(evt) {
-            // bubble the call to action click event
-            this.$emit(quoteCardEvents.biqQuoteBookNow.name, evt);
-        },
     }
 };
-// export the default object container
+// export the BIQ Quote Card Mixin as the default object
 export default biqQuoteCardMixin;

@@ -11,7 +11,7 @@ import { quotesSearchedEvents } from '@/common/BIQ/QuotesSearched';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
 
-// define the common props without the validation mixin props
+// define the BIQ Search component Mixin properties
 export const searchProps = {
     biqPublicKey : {
         type : String,
@@ -46,14 +46,48 @@ export const searchProps = {
         default : false
     }
 };
-// define the combined events emitted by the search component mixin
+// define the combined list of events the BIQ Search component emits & can be listened for
 export const searchEvents = {
     ...formEvents,
     ...quotesSearchedEvents
 };
+// define the BIQ Search component computed property Mixin methods
+const computed = {
+    hasReturn : function() {
+        return (this.fields.journey_type.selected === JOURNEY_TYPE_OPTION_RETURN);
+    }
+};
+// define the BIQ Search component Mixin methods
+const methods = {
+    // @todo finish abstracting the search methods responsibilities
+    //       form field handling (setting / updating values)
+    //       form validation (and event emitting)
+    //       form submit (including on valid action)
+    journeyDateTimeErrorState : function(fname) {
+        return (this.errors[fname] !== null)
+            // validation has been run & errors encountered
+            // returning false will set the state as failed validation
+            ? (this.errors[fname].length) ? false : true
+            // returning null will not set any validation state associated styles
+            : null;
+    },
 
-// define the common stuff for the BIQ Search Form
+    onPlacesLookupError : function(evt) {
+        if(this.debugging) {
+            console.group(evt.data.message);
+            console.log(evt);
+            console.groupEnd();
+        }
+    }
+};
+
+// define the BIQ Search Mixin for components to include & inherit from
 export const biqSearchMixin = {
+    props : {
+        // include the validates mixin props
+        ...ValidatesMixin.props,
+        ...searchProps
+    },
 
     components : {
         // can't use the lazy async loading approach as the component is used with multiple refs
@@ -61,14 +95,12 @@ export const biqSearchMixin = {
         'biq-process-form-submit' : () => import(/* webpackChunkName: "BIQProcessFormSubmits", webpackPrefetch: true */ 'BIQ/Forms/ProcessFormSubmit.vue')
     },
 
-    props : {
-        // mix in the validates mixin props
-        ...ValidatesMixin.props,
-        ...searchProps
-    },
-
+    // use the following to extract the mixin data inside the component 
+    // data method as it destroys this object
+    // const mixinData = SearchMixin.data.call(this);
     data() {
         return {
+            // generate the form fields definition list
             fields : fF(this.idPrefix),
             // @todo incoporate the journey date & time into the fields
             date : '',
@@ -107,72 +139,54 @@ export const biqSearchMixin = {
     },
 
     computed : {
+        // include the state
         ...mapGetters([
         // BIQ Quote Search state
             'searchDetails',
         // BIQ Quoting state
             'loadingQuotes'
         ]),
-
-        hasReturn : function() {
-            return (this.fields.journey_type.selected === JOURNEY_TYPE_OPTION_RETURN);
-        }
+        ...computed
     },
 
     methods : {
-        // mix in the validates mixin methods
-        ...ValidatesMixin.methods,
-
+        // include the state
         ...mapActions([
         // BIQ Quote Search state
             'searchingQuotes', 
         // BIQ Quoting state
             'apiQuotesError'
         ]),
-
-        journeyDateTimeErrorState : function(fname) {
-            return (this.errors[fname] !== null)
-                // validation has been run & errors encountered
-                // returning false will set the state as failed validation
-                ? (this.errors[fname].length) ? false : true
-                // returning null will not set any validation state associated styles
-                : null;
-        },
-
-        onPlacesLookupError : function(evt) {
-            if(this.debugging) {
-                console.group(evt.data.message);
-                console.log(evt);
-                console.groupEnd();
-            }
-        },
+        // include the validates mixin methods
+        ...ValidatesMixin.methods,
+        ...methods,
 
         setFieldValues : function() {
             // first set the form to current search form state
-            const searchState = this.searchDetails;
+            const sState = this.searchDetails;
             if(this.debugging) {
-                console.log('BIQ Search Form from State', searchState);
+                console.log('BIQ Search Form from State', sState);
             }
-            this.fields.journey_type.selected = searchState.journey_type;
-            this.fields.pickup.value = searchState.pickup;
-            this.fields.destination.value = searchState.destination;
-            if(searchState.vias.length) {
+            this.fields.journey_type.selected = sState.journey_type;
+            this.fields.pickup.value = sState.pickup;
+            this.fields.destination.value = sState.destination;
+            if(sState.vias.length) {
                 // set the first via (as there is only 1 via but it's expected as a list)
-                this.fields.via.value = searchState.vias[0];
+                this.fields.via.value = sState.vias[0];
             }
-            this.fields.people.value = searchState.people;
+            this.fields.people.value = sState.people;
             // @todo incoporate the journey date & time into the fields
             // @todo check that the date is in the future & adjust if not
-            this.date = searchState.date;
+            this.date = sState.date;
             // @todo check that the date and time is in the future & adjust if not
-            this.time = searchState.time;
-            if(this.hasReturn && searchState.returning.date !== null) {
+            this.time = sState.time;
+            if(this.hasReturn && sState.returning.date !== null) {
             // @todo check that the date is in the future and after the outbound date & adjust if not
-                this.return_date = searchState.returning.date;
+                this.return_date = sState.returning.date;
             }
-            if(this.hasReturn && searchState.returning.time !== null) {
+            if(this.hasReturn && sState.returning.time !== null) {
             // @todo check that the date and time is in the future and after the outbound date time & adjust if not
-                this.return_time = searchState.returning.time;
+                this.return_time = sState.returning.time;
             }
             // set the PlacesLookup field input refs
             this.$nextTick(() => {
@@ -338,37 +352,37 @@ export const biqSearchMixin = {
             }
             // get the quotes for the specified journey details
             axios.get(`${this.biqQuotesFrom}?key=${this.biqPublicKey}&${apiQuotesURI}`)
-            .then(response => {
+            .then(r => {
                 if(self.debugging) {
-                    console.log(response);
+                    console.log('response', r);
                 }
-                if(response.data.status != 'OK') {
+                if(r.data.status != 'OK') {
                 // throw new error event & let the catch() handle creating the event
                     // there's nothing usable in the response except the error
-                    throw new ErrorEvent(response.data.status, {
+                    throw new ErrorEvent(r.data.status, {
                         error : new Error('BIQ API Quotes Error'),
-                        message : response.data[response.data.status.toLowerCase()]
+                        message : r.data[r.data.status.toLowerCase()]
                     });
                 }
-                journey_id = response.data.journey_id;
+                journey_id = r.data.journey_id;
                 // create the event data to inform the container of the API Quote Journey ID, 
                 // API Quote journey details and the API Quote results
                 const event = {
                     data : {
                         journey_id, 
-                        journey : response.data.journey, 
-                        quotes : response.data.quotes
+                        journey : r.data.journey, 
+                        quotes : r.data.quotes
                     }
                 };
                 // set the event name to be triggered
                 let emitEvent = searchEvents.biqQuotesSearched.name;
-                if(Object.keys(response.data.quotes).length <= 0) {
+                if(Object.keys(r.data.quotes).length <= 0) {
                 // zero quotes returned
                     // change the event to be triggered
                     emitEvent = searchEvents.biqZeroQuotes.name;
                     // add the event error data
                     event.data.error = {
-                        message : response.data.warnings[0]
+                        message : r.data.warnings[0]
                     }
                 }
                 // trigger the quotes searched event 
@@ -398,5 +412,5 @@ export const biqSearchMixin = {
         }
     }
 };
-// export the default object container
+// export the BIQ Search Mixin as the default object
 export default biqSearchMixin;
