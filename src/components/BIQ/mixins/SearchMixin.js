@@ -303,10 +303,10 @@ export const biqSearchMixin = {
             if(via != '') {
             // add the optional journey via location(s)
                 // vias is expected as a list but only 1 via is available
-                j.vias = [via];
+                j.vias = [ via ];
             } else {
                 // make sure the state doesn't have previous via still included
-                j.vias = [];
+                j.vias = [ ];
             }
             return j;
         }

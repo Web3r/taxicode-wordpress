@@ -151,7 +151,7 @@ export const searchQuotes = (URL, k, j, d) => {
 /**
  * Variable name replacement to help reduce production size
  * 
- * - URL = BIQ API quotes URL base
+ * - URL = BIQ API booking pay URL
  * - k = BIQ API public affiliate key
  * - f = the payment form data object
  * - d = debugging flag
