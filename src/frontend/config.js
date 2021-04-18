@@ -1,5 +1,38 @@
 module.exports = {
-    QUOTE_URL: 'https://api.taxicode.com/booking/quote/',
-    JOURNEY_URL: 'https://api.taxicode.com/booking/journey/?id=',
-    PAYMENT_URL: 'https://api.taxicode.com/booking/pay/',
-}
+    DEV                : {
+        PLACES_URI : '/places/?term=',
+        AUTH_URI : '/auth/',
+        QUOTE_URI : '/booking/quote/',
+        JOURNEY_URI : '/booking/journey/?id=',
+        CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
+        PAYMENT_URI : '/booking/pay/',
+        BOOKING_DETALS_URI : 'booking-details/?booking_ref=',
+        PGH_CONF : {
+            hidePostalCode : true
+        }
+    },
+    STAGING                : {
+        PLACES_URI : '/places/?term=',
+        AUTH_URI : '/auth/',
+        QUOTE_URI : '/booking/quote/',
+        JOURNEY_URI : '/booking/journey/?id=',
+        CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
+        PAYMENT_URI : '/booking/pay/',
+        BOOKING_DETALS_URI : 'booking-details/?booking_ref=',
+        PGH_CONF            : {
+            hidePostalCode  : true
+        }
+    },
+    LIVE                : {
+        PLACES_URI : '/places/?term=',
+        AUTH_URI : '/auth/',
+        QUOTE_URI : '/booking/quote/',
+        JOURNEY_URI : '/booking/journey/?id=',
+        CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
+        PAYMENT_URI : '/booking/pay/',
+        BOOKING_DETALS_URI : 'booking-details/?booking_ref=',
+        PGH_CONF            : {
+            hidePostalCode  : true
+        }
+    }
+};

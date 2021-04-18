@@ -56,6 +56,14 @@ class Admin {
      * @return void
      */
     public function plugin_page() {
-        echo '<div class="wrap"><div id="vue-admin-app"></div></div>';
+
+        $content = '
+<script>
+    const biq_app_debug_enabled = true;
+    const biq_app_url = \'' . get_rest_url('', '/taxicode/v1/') . '\';
+    const biq_sk = \'' . get_option('tcplugin_taxicode_private') . '\';
+</script>
+<div class="wrap"><div id="biq-admin-vue-app"></div></div>';
+        echo $content;
     }
 }

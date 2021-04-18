@@ -2,79 +2,184 @@
 
 <script>
     import axios from 'axios';
+    import { mapGetters, mapActions } from 'vuex';
+    import StripeCardFormHandler from 'common/StripeCardFormHandler';
+
     export default {
         name: "Checkout",
+
         props: {
-            card_created: {
-                type: Boolean,
-                default: true
+            cardFormHandler : {
+                type : Object,
+                default : null
             },
-        },
-        computed: {
-            price() {
-                return this.$store.state.price
+            tc_public_key : {
+                type : String,
+                default : ''
+            },
+            paypal_key : {
+                type : String,
+                default : ''
+            },
+            gateway_api_key : {
+                type : String,
+                default : ''
+            },
+            test_mode : {
+                type : Boolean,
+                default : false
             }
         },
+
         data() {
             return {
-                name: 'Alasdair Test',
-                email: 'alasdair@alasdair.biz',
-                telephone: '07789000228',
+                name: '',
+                email: '',
+                telephone: '',
                 flight_number: null,
-                quote_id: null,
-                journey_id: null,
-                vehicle: 0,
-                journey_data: {},
+                cardholder_name: '',
+                billing_postcode: '',
                 errors: {
                     name: false,
                     email: false,
                     telephone: false,
                 },
-                test_mode: 0,
                 loading: false,
                 payment_method: 'Pay with card',
                 payment_options: ['Pay with card','Pay with Paypal'],
                 posterror: false,
             }
         },
-        created() {
-            this.paypal_token = paypal_token;
-            this.test_mode = test_mode;
-            this.quote_id = this.$route.params.quote_id;
-            this.journey_id = this.$route.params.journey_id;
-            axios.get(config.JOURNEY_URL+this.journey_id+'&include_quote=true')
-                .then(function(response) {
-                    console.log(response.data);
-                this.journey_data = response.data.journey;
-                }.bind(this));
-        },
-        mounted: function () {
-            card = elements.create('card');
-            card.mount(this.$refs.card);
-            this.card_created = true;
-        },
-        methods:{
-            validate: function()
-            {
-                var errors = true;
-                if(this.name=='')
-                {
-                    this.errors.name='Booking name must be set';
-                    errors = false;
-                }
 
-                if(this.email=='')
-                {
-                    this.errors.email='Email location must be set';
-                    errors = false;
-                }
-                if(this.telephone=='')
-                {
-                    this.errors.telephone = 'Telephone must be set';
-                    errors = false;
-                }
-                return errors;
+        created() {
+            const checkout = this;
+            /** create a new stripe card form payment option */
+            this.cardFormHandler = new StripeCardFormHandler(
+            /** The Stripe public key */
+                    // Stripe public key is set in the page JS 
+                    // before vue load, and imported here
+                    this.gateway_api_key,
+            /** The transaction success handler */
+                    function(handler, paymentIntent) {
+                        checkout.makeBooking(paymentIntent.id, handler.getHandlerName(), function(formData) {
+                            console.log(paymentIntent);
+                            // add the API field values for additional payment related data
+                            formData.append('card_cardholder', checkout.cardholder_name);
+                            // @todo Add the additional card field values from the 
+                            // payment intent response
+                            // - card_type
+                            // - card_number (xxxxxxxxxxxx1234)
+                            // - card_expiry
+                            // - card_address1 (if available?)
+                            formData.append('postcode', checkout.billing_postcode);
+                            // - city (if available?)
+                        });
+                    },
+            /** The transaction failed handler */
+                    function(handler, error) {
+                        checkout.loading = 0;
+                        checkout.hasCardErrors = true;
+                        checkout.posterror = error.message;
+                        checkout.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
+                    },
+            /** The URI to get the client secret from */
+                    config.CLIENT_SECRET_URL
+                );
+            console.log("created");
+        },
+
+        mounted: function () {
+            this.cardFormHandler.setAmount(this.price, "Taxi journey");
+            this.cardFormHandler.initialise(this.$refs.card.id, stripe_cardform_css, config.PGH_CONF.hidePostalCode);
+            this.cardFormHandler.mountElement();
+            console.log("mounted");
+        },
+
+        computed: mapGetters([
+        // Journey quoting state
+            'journeyID', 
+            'journeyDetails',
+            'journeyDate', 
+            'journeyTime', 
+            'journeyHasReturn', 
+            'journeyReturnDate', 
+            'journeyReturnTime', 
+            'journeyHasVias', 
+        // Book Now Checkout state
+            'basket',
+            'quoteID',
+            'vehicleIndex',
+            'price',
+            'quoteData',
+            'quoteVehicleData',
+        ]),
+
+        methods: {
+            ...mapActions([
+            // Journey quoting state
+                'quoting', 
+                'quoted',
+            // Book Now Checkout state
+                'bookNow'
+            ]),
+
+            isCardPayment : function() {
+                return (this.payment_method == 'Pay with card');
             },
+
+            validate: function() {
+                // reset the common validation error flags
+                this.errors = {
+                    name: false,
+                    email: false,
+                    telephone: false
+                }
+                // just keep a track of any errors
+                let errors = 0;
+                // check the required fields for invalid input
+                if(this.name == '') {
+                    this.errors.name = 'Booking name must be set';
+                    errors++;
+                }
+                if(this.email == '') {
+                    this.errors.email='Email location must be set';
+                    errors++;
+                }
+                if(this.telephone == '') {
+                    this.errors.telephone = 'Telephone must be set';
+                    errors++;
+                }
+                if(this.isCardPayment()) {
+                // card payment transactions have additional fields to validate
+                    // set / reset / add the validation error flags for the addition field names
+                    this.errors.cardholder_name = false;
+                    this.errors.billing_postcode = false;
+                    // check the required fields for invalid input
+                    if(this.cardholder_name == '') {
+                        this.errors.cardholder_name = 'Cardholder name must be set';
+                        errors++;
+                    }
+                    if(this.billing_postcode == '') {
+                        this.errors.billing_postcode = 'Billing address postcode must be set';
+                        errors++;
+                    }
+                    
+                }
+                // only valid if no errors encountered
+                return (errors == 0);
+            },
+
+            onMethodChanged : function() {
+                if(this.isCardPayment()) {
+                    const checkout = this;
+                    this.$nextTick(function() {
+                        checkout.cardFormHandler.mountElement();
+                    });
+                } else {
+                    this.cardFormHandler.unmountElement();
+                }
+            },
+
             onPaypalSubmit: function(payload) {
                 if(this.validate()) {
                     this.posterror = false;
@@ -82,111 +187,61 @@
                     this.makeBooking(payload.nonce, 'paypal')
                 }
             },
+
             onPaypalError: function(error) {
+                console.error(error);
+            },
 
+            onPaypalLoadFail: function(error){
+                console.error(error);
             },
-            onLoadFail: function(error){
-                console.log(error);
+
+            onStripeSubmit: function() {
+                if(this.validate()) {
+                    this.posterror = false;
+                    this.loading = 1;
+                    // the card form handler has a success & error callback set (see the created method)
+                    this.cardFormHandler.getSourceCardToken(tc_public_key, this.quoteID, this.vehicleIndex, this.cardholder_name, this.billing_postcode);
+                }
             },
-            makeBooking: function(token,method)
-            {
-                //this is a bit annoying - our API can't handle standard axios requests on POST
-                //for some reason, so I've had to abandon my form class and hand crank this
-                //request.
-                var self = this;
-                let formData = new FormData();
-                formData.append('email', self.email);
-                formData.append('name', self.name);
-                formData.append('telephone', self.telephone);
-                formData.append('key',tc_public_key);
-                formData.append('quote', self.quote_id);
-                formData.append('vehicle', self.vehicle);
-                formData.append('test', self.test_mode);
+
+            makeBooking: function(token, method, formdataAppend) {
+                // this is a bit annoying - our API can't handle standard axios requests on POST
+                // for some reason, so I've had to abandon my form class and hand crank this
+                // request.
+                const formData = new FormData();
+                formData.append('key', this.tc_public_key);
+                formData.append('quote', this.quoteID);
+                formData.append('vehicle', this.vehicleIndex);
                 formData.append('new_pay', true);
+                formData.append('email', this.email);
+                formData.append('name', this.name);
+                formData.append('telephone', this.telephone);
                 formData.append('payment_token', token);
-                if(method=='stripe')
-                {
-                    formData.append('method', 'googlepay');
+                formData.append('method', method);
+                if(typeof(formdataAppend) == 'function') {
+                // allow the calling method to add payment method specific fields to the API call
+                    formdataAppend(formData);
                 }
-                else
-                {
-                    formData.append('method', 'paypal');
+                if(this.test_mode) {
+                // make the booking in test mode
+                    formData.append('test', '1');
                 }
-
-                axios.post(config.PAYMENT_URL,formData,{
+                axios.post(config.PAYMENT_URL, formData, {
                     headers: {
                         'Content-Type': 'application/application/x-www-form-urlencoded',
                     }
-                })
-                    .then(function(response) {
-                        if(response.data.status=='OK')
-                        {
-                            this.$router.push( { name: 'Complete', params: { booking_ref: response.data.reference } })
-                        }
-                        else
-                        {
-                            this.posterror = response.data.error;
-                            this.loading=0;
-                        }
-                    }.bind(this))
-                    .catch(function (error) {
-                        this.loading = 0;
-                    }.bind(this));
-            },
-            onSubmit: function()
-            {
-                if(this.validate())
-                {
-                    if(this.payment_method=='Pay with card')
-                    {
-                        this.onStripeSubmit();
+                }).then(function(response) {
+                    if(response.data.status == 'OK') {
+                        this.$router.push( { name: 'Complete', params: { booking_ref: response.data.reference } })
+                    } else {
+                        this.posterror = response.data.error;
+                        this.loading=0;
                     }
-                    else
-                    {
-                        this.onPaypalSubmit();
-                    }
-                }
-            },
-            onStripeSubmit: function() {
-                this.posterror = false;
-                this.loading = 1;
-                var self = this;
-                stripe.createToken(card).then(function(result) {
-                    if (result.error) {
-                        this.loading = 0;
-                        self.hasCardErrors = true;
-                        self.$forceUpdate(); // Forcing the DOM to update so the Stripe Element can update.
-                        return;
-                    }
-                    let stripetoken = result.token.id;
-
-                    this.makeBooking(stripetoken,'stripe');
-
-
+                }.bind(this))
+                .catch(function (error) {
+                    this.loading = 0;
                 }.bind(this));
-
-
-
-            },
-            mountStripe: function() {
-                if(this.payment_method=='Pay with card')
-                {
-                    this.$nextTick(function () {
-                        if(!this.card_created)
-                        {
-                            console.log('creting card');
-                            card = elements.create('card');
-                            this.card_created = true;
-                        }
-                        console.log('mounting card')
-                        card.mount(this.$refs.card);
-                    });
-
-                }
-                else
-                {
-                    card.unmount(this.$refs.card);
-                }
             }
         }
     }
