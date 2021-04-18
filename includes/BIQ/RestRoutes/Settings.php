@@ -24,6 +24,12 @@ class Settings extends Route
         // register the get settings route method handler
         register_rest_route(
             $this->namespace,
+            "/{$this->rest_base}/paypal-token",
+            $this->_route_for("get_paypal_token", WP_REST_Server::READABLE, [])
+        );
+        // register the get settings route method handler
+        register_rest_route(
+            $this->namespace,
             "/{$this->rest_base}",
             $this->_route_for("get_settings", WP_REST_Server::READABLE, [])
         );
@@ -33,6 +39,32 @@ class Settings extends Route
             "/{$this->rest_base}",
             $this->_route_for("update_settings", WP_REST_Server::EDITABLE, PluginSettings::get_update_rules())
         );
+    }
+
+    /**
+     * Checks if a given request has access to the REST endpoint.
+     *
+     * @param  WP_REST_Request $request Full details about the request.
+     * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+     * 
+     * @todo allow for the method to be removed and fall back to the [get_items_permissions_check]
+     *       with the [_route_for] update
+     */
+    public function get_paypal_token_permissions_check($request)
+    {
+        // no restrictions here
+        return $this->get_items_permissions_check($request);
+    }
+
+    /**
+     * Get the public exposable plugin options mapped to setting names.
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+     */
+    public function get_paypal_token($request)
+    {
+        return rest_ensure_response(["paypal_token" => PluginSettings::paypalClientToken()]);
     }
 
     /**

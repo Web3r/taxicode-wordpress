@@ -42,7 +42,7 @@ const SearchStateStore = {
             // inform the quotes store module of the API journey quotes response
             dispatch('quoted', p, { root : true });
             // set the quotes to be displayed in the results
-            if(Object.keys(p.quotes).length > 0) {
+            if(p.count) {
                 commit('displaying', displayQuotes(p.quotes, p.display_type, DEFAULT_SORT));
             }
         },

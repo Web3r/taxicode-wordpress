@@ -1,6 +1,9 @@
 <?php
 namespace BIQ;
 
+use Braintree\Gateway as PaypalGateway;
+use Exception;
+
 /**
  * Static plugin settings handler
  * 
@@ -46,7 +49,7 @@ class PluginSettings
         // @todo remove legacy taxicode name reference
         "taxicode_public"       => "taxicode_public",
         "biq_api_host"          => "biq_api_host",
-        "paypal_public"         => "paypal_public",
+//        "paypal_public"         => "paypal_public",
         "stripe_public"         => "stripe_public",
         "stripe_cardform_style" => "stripe_cardform_style",
         "test_mode"             => "test_mode",
@@ -99,6 +102,7 @@ class PluginSettings
         // add the non exposed scope plugin options settings with an admin capability check
         if(current_user_can(static::ADMIN_CAPABILITY)) {
             // @todo remove legacy taxicode name reference
+            $settings["paypal_public"] = static::get_option("paypal_public", static::$_default_options["paypal_public"]);
             $settings["taxicode_private"] = static::get_option("taxicode_private", static::$_default_options["taxicode_private"]);
             $settings["search_target_permalink"] = static::get_option("search_target_permalink", static::$_default_options["search_target_permalink"]);
             $settings["custom_css"] = static::get_option("custom_css", static::$_default_options["custom_css"]);
@@ -144,6 +148,26 @@ class PluginSettings
                 : $name;
         // update the plugin setting option value in wordpress (with option name prefix added)
         return update_option(sprintf("%s{$option_name}", BIQ_OPTIONS_NAME_PREFIX), $save_value);
+    }
+
+    /**
+     * Generate a Paypal Gateway client token
+     * 
+     * @return string The generated token or an error string (deal with it, frontend lol)
+     */
+    public static function paypalClientToken()
+    {
+        try {
+            // get a Braintree paypal gateway client token
+            $paypalGateway = new PaypalGateway(["accessToken" => static::get_option("paypal_public")]);
+            $paypalClientToken = $paypalGateway->clientToken()
+                                                ->generate();
+        } catch(Exception $ex) {
+        // something went wrong
+            // @todo look at logging this in the wordpress error logs
+            $paypalClientToken = $ex->getMessage();
+        }
+        return $paypalClientToken;
     }
 
 }

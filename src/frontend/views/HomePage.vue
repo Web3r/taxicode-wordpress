@@ -50,10 +50,6 @@
     // import the BIQ search components
     import TheSearchForm from 'BIQ/Forms/Search/TheSearchForm.vue';
     
-    // define the Home Page component properties 
-    // (inherits props from PagesMixin)
-    const props = {
-    };
     // define the Home Page component computed property methods 
     // (inherits computed property methods from PagesMixin)
     const computed = {
@@ -120,7 +116,7 @@
                 console.log(evt);
             }
             // update the quotes search state with the results
-            this.updateSearchState(evt.data);
+            this.updateSearchState(evt);
             if(this.debugging) {
                 console.groupEnd();
             }
@@ -140,9 +136,9 @@
                 console.log(evt);
             }
             // log the error
-            console.error(evt.data.error);
+            console.error(evt.warnings[0]);
             // update the quotes search state with the results
-            this.updateSearchState(evt.data);
+            this.updateSearchState(evt);
             if(this.debugging) {
                 console.groupEnd();
             }
@@ -225,10 +221,10 @@
                 console.log('Confirm Modal Event', evt);
             }
             // get the recommended upgrade 
-            const recommendedUpgrade = evt.data.recommendedUpgrade;
+            const u = evt.data.recommendedUpgrade;
             if(this.debugging) {
                 console.group('Quote Upgrade Recommendation Accepted');
-                console.log('recommendedUpgrade', recommendedUpgrade);
+                console.log('recommendedUpgrade', u);
                 console.groupEnd();
             }
             // flag the modal popup to close
@@ -236,8 +232,8 @@
             // the upgrade offer was accepted, so ...
             // set the upgrade quote as the selected quote and ...
             this.selected.quote = {
-                id : recommendedUpgrade.upgradeQuoteId,
-                vehicle : recommendedUpgrade.upgradeVehicleIndex
+                id : u.upgradeQuoteId,
+                vehicle : u.upgradeVehicleIndex
             };
             // we're done, next page
             this.gotoCheckout();
@@ -261,17 +257,17 @@
             });
         }, 
 
-        updateSearchState : function(data) {
+        updateSearchState : function(s) {
             if(this.debugging) {
                 console.group('BIQ Quotes Search State Updated');
-                console.log('Search data', data);
+                console.log('Search data', s);
                 console.log('Quote type', this.appSettings.quote_type);
                 console.groupEnd();
             }
             // update the search state with the quote search results so the display 
             // results can be calculated & the results changed
             this.searchedQuotes({ 
-                ...data,
+                ...s,
                 display_type : this.appSettings.quote_type 
             });
         }
@@ -279,7 +275,6 @@
 
     export default {
         name: 'HomePage',
-        props,
         computed,
         methods,
 

@@ -68,6 +68,7 @@
             }
         },
         
+        // @todo make this come from the settings
         paypalClientToken : {
             type : String,
             required : true,

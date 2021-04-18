@@ -103,6 +103,8 @@
     } from '@BIQ/QuoteCheckout';
     // import the component for the passenger details form section of the checkout
     import PassengerDetailsForm from 'BIQ/Forms/PassengerDetailsForm.vue';
+    // import the BIQ API booking pay
+    import { makeBooking } from '@BIQ/API';
 
     // define the component properties
     const props = {
@@ -306,47 +308,24 @@
             const formData = this.assembleData(token, method, formdataAppend);
             const apiCheckoutURL = `${this.appSettings.biq_api_host}${this.biqConfig.PAYMENT_URI}`;
             if(this.debugging) {
-                console.info(`BIQ Checkout transaction attempt to API '${apiCheckoutURL}'`);
+                console.info(`BIQ Checkout booking attempt to API '${apiCheckoutURL}'`);
             }
-            // make the API pay request
-            axios.post(apiCheckoutURL, formData, {
-                headers: {
-                    'Content-Type': 'application/application/x-www-form-urlencoded',
-                }
-            })
-            .then(response => {
-                if(response.data.status != 'OK') {
-                // throw new error event & let the catch() handle creating the event
-                    // there's nothing usable in the response except the error
-                    throw new ErrorEvent(response.data.status, {
-                        error : new Error('BIQ API Checkout Error'),
-                        message : response.data[response.data.status.toLowerCase()]
-                    });
-                }
+            makeBooking(apiCheckoutURL, this.appSettings.biq_pk, formData, this.debugging)
+            .then(d => {
                 // checkout is complete & the journey booked
-                self.checkoutComplete(response.data);
+                self.checkoutComplete(d);
             })
-            .catch(error => {
+            .catch(e => {
                 self.has_errors = true;
-                self.error_message = error.message || 'Unknown BIQ API Checkout Error';
+                self.error_message = e.data.message;
                 // update the processing state flags
                 this.bookingFailed();
-                // create the error event data
-                const event = {
-                    data : {
-                        type : 'booking',
-                        booking : {
-                            URL : apiCheckoutURL,
-                            refunded : false, 
-                            token, 
-                            method, 
-                            formData
-                        },
-                        error
-                    }
-                };
+                // add the not refunded yet flag
+                // @todo make the refund or something because this is bad
+                e.data.booking.refunded = false;
                 // trigger the checkout error event, a refund will be needed
-                self.$emit(emitEvents.biqCheckoutError.name, event);
+                self.$emit(emitEvents.biqCheckoutError.name, e);
+
             });
         },
 
@@ -357,7 +336,6 @@
             const formData = new FormData();
             const passengerDetails = this.$refs.passengerForm.inputValues();
             console.log(passengerDetails);
-            formData.append('key', this.appSettings.biq_pk);
             formData.append('quote', this.quoteID);
             formData.append('vehicle', this.vehicleIndex);
             formData.append('new_pay', true);

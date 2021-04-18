@@ -43,7 +43,8 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    // import the BIQ API places lookup
+    import { placesLookup } from '@BIQ/API';
     // import underscore for the ability to debounce the autocomplete lookup function
     import _ from 'underscore';
     // import the component for the autocomplete input & options list
@@ -190,7 +191,7 @@
         methods : {
             locationSearch : function(term) {
                 // make sure there is a point in even attempting the lookup
-                if(term === null || typeof(term) !== 'string' || term.length < 3) {
+                if(term === null || typeof(term) !== 'string' || term.length < 1) {
                     return;
                 }
                 if(this.debugging) {
@@ -199,57 +200,20 @@
                 }
                 this.force_lookup = false;
                 this.$refs.locationfield.inputValue = term;
+                // needs to return the data structure of an option for use in the typeahead listitem
+                const sortMap = (string, type) => { return { string, type }; };
                 const self = this;
-                const apiPlacesLookupURL = `${this.biqPlacesLookup}${term}`;
-                let airports = [];
-                let stations = [];
-                let locations = [];
-                axios.get(`${apiPlacesLookupURL}&key=${this.biqPublicKey}`)
-                .then(response => {
-                    // @todo make sure results are usable
-                    if(self.debugging) {
-                        console.log(`BIQ Places ${this.label} response`, response);
-                    }
-                    if(response.data.status != 'OK') {
-                    // throw new error event & let the catch() handle creating the event
-                        // there's nothing usable in the response except the error
-                        throw new ErrorEvent(response.data.status, {
-                            error : new Error(`BIQ Places ${self.label} lookup to API Error`),
-                            message : response.data[response.data.status.toLowerCase()]
-                        });
-                    }
-                    const results = response.data.results;
-                    // needs to return the data structure of an option for use in the typeahead listitem
-                    const sortMap = (string, type) => { return { string, type }; };
-                    // check for train station locations
-                    if(typeof(results.STATION) != 'undefined') {
-                        stations = results.STATION.map(name => sortMap(name, 'station'));
-                    }
-                    // check for airport locations
-                    if(typeof(results.AIRPORT) != 'undefined') {
-                        airports = results.AIRPORT.map(name => sortMap(name, 'airport'));
-                    }
-                    // check for POI locations
-                    if(typeof(results.LOCATION) != 'undefined') {
-                        locations = results.LOCATION.map(name => sortMap(name, 'location'));
-                    }
-                    const google = results.GOOGLE.map(data => sortMap(data.string, (data.poi) ? 'poi' : 'general'));
-                    // construct the places lookup location options in order of precidence
-                    self.locations = airports.concat(stations, locations, google);
+                // make the api places look up call
+                placesLookup(this.biqPlacesLookup, this.biqPublicKey, term, sortMap, this.debugging)
+                .then(r => {
+                    // set the location results
+                    self.locations = r;
                 })
-                .catch(error => {
+                .catch(err => {
+                    // no locations available
                     self.locations = [];
-                    // create the error event data
-                    const event = {
-                        data : {
-                            id : self.id,
-                            URL : apiPlacesLookupURL,
-                            message : error.message || `Unknown BIQ Places ${self.label} lookup to API Error`,
-                            error
-                        }
-                    };
                     // trigger the error event
-                    self.$emit(emitEvents.biqPlacesLookupError.name, event);
+                    self.$emit(emitEvents.biqPlacesLookupError.name, err);
                 });
             },
 

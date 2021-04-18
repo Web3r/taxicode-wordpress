@@ -1,5 +1,3 @@
-// import the plugin to handle the Xhr AJAX API Search request
-import axios from 'axios';
 // import the state getters & actions mappers
 import { mapGetters, mapActions } from 'vuex';
 // import the mixin that sets values & validates field values and the form events
@@ -10,6 +8,8 @@ import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/QuotesSearch';
 import { quotesSearchedEvents } from '@/common/BIQ/QuotesSearched';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
+// import the BIQ API places lookup
+import { searchQuotes } from '@BIQ/API';
 
 // define the BIQ Search component Mixin properties
 export const searchProps = {
@@ -304,9 +304,10 @@ export const biqSearchMixin = {
                 destination : v.destination, 
                 people : v.people, 
                 date : this.date, 
-                time : this.time
+                time : this.time,
+                hasReturn : this.hasReturn
             };
-            if(this.hasReturn) {
+            if(j.hasReturn) {
             // @todo incoporate the journey date & time into the fields
             // add the optional return journey details
                 j.returning = {
@@ -337,73 +338,28 @@ export const biqSearchMixin = {
             // update the state with the journey details being quoted for
             // also updates the state flag for loading quotes
             this.searchingQuotes(j);
-            let journey_id = null;
-            let apiQuotesURI = `pickup=${j.pickup}&destination=${j.destination}&date=${j.date} ${j.time}&people=${j.people}`;
-            if(this.hasReturn) {
-                apiQuotesURI = `${apiQuotesURI}&return=${j.returning.date} ${j.returning.time}`;
-            }
-            if(j.vias.length) {
-            // add the optional journey via location(s)
-                // vias is expected as a list but only 1 via is available
-                apiQuotesURI = `${apiQuotesURI}&via=${j.vias[0]}`;
-            }
             if(this.debugging) {
                 console.group(`Searching BIQ API Quotes from '${this.biqQuotesFrom}'`);
             }
-            // get the quotes for the specified journey details
-            axios.get(`${this.biqQuotesFrom}?key=${this.biqPublicKey}&${apiQuotesURI}`)
+            // make the api search quotes call
+            searchQuotes(this.biqQuotesFrom, this.biqPublicKey, j, this.debugging)
             .then(r => {
-                if(self.debugging) {
-                    console.log('response', r);
-                }
-                if(r.data.status != 'OK') {
-                // throw new error event & let the catch() handle creating the event
-                    // there's nothing usable in the response except the error
-                    throw new ErrorEvent(r.data.status, {
-                        error : new Error('BIQ API Quotes Error'),
-                        message : r.data[r.data.status.toLowerCase()]
-                    });
-                }
-                journey_id = r.data.journey_id;
-                // create the event data to inform the container of the API Quote Journey ID, 
-                // API Quote journey details and the API Quote results
-                const event = {
-                    data : {
-                        journey_id, 
-                        journey : r.data.journey, 
-                        quotes : r.data.quotes
-                    }
-                };
-                // set the event name to be triggered
-                let emitEvent = searchEvents.biqQuotesSearched.name;
-                if(Object.keys(r.data.quotes).length <= 0) {
-                // zero quotes returned
-                    // change the event to be triggered
-                    emitEvent = searchEvents.biqZeroQuotes.name;
-                    // add the event error data
-                    event.data.error = {
-                        message : r.data.warnings[0]
-                    }
-                }
+                const emitEvent = (r.count) 
+                    // set the quotes searched event to be triggered
+                    ? searchEvents.biqQuotesSearched.name
+                    // set the zero quotes returned event to be triggered
+                    // it's still successfull, but no results
+                    : searchEvents.biqZeroQuotes.name;
                 // trigger the quotes searched event 
-                self.$emit(emitEvent, event);
+                self.$emit(emitEvent, r);
                 if(self.debugging) {
                     console.info('BIQ API Quotes Searched');
                     console.groupEnd();
                 }
             })
-            .catch(error => {
-                // create the error event data
-                const event = {
-                    data : {
-                        quotes : [],
-                        journey_id, 
-                        journey : j, 
-                        error
-                    }
-                };
+            .catch(e => {
                 // trigger the error event
-                self.$emit(searchEvents.biqQuotesError.name, event);
+                self.$emit(searchEvents.biqQuotesError.name, e);
                 if(self.debugging) {
                     console.info('BIQ API Quotes Search Error');
                     console.groupEnd();
