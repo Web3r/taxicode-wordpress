@@ -1,203 +1,142 @@
 <template>
-  <div id="biq-vue-app">
-    <router-view v-if="initialised" 
-        :debugging=biq_app_debug_enabled
-        :appRESTBaseURL=biq_app_url
-        :appConfig=appConfig 
-        :appSettings=appSettings 
-    />
-  </div>
+    <div id="biq-vue-app">
+        <router-view v-if="initialised" 
+            :app-config="appConfig"
+            :app-settings="appSettings" 
+            :appRESTBase="appURL"
+            :debugging="appDebugEnabled"
+        ></router-view>
+    </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import { mapGetters, mapActions } from 'vuex'
+    // import the state getters & actions mappers
+    import { mapGetters, mapActions } from 'vuex';
+    // import the mixin that sets values & validates field values
+    import AppsMixin from 'mixins/AppsMixin';
+    // import the BIQ static config just in case and the settings formatter
+    import { DEFAULT_STRIPE_CARD_STYLE, biqConf, updateAppSettings } from 'BIQ/config';
 
-    export default {
-        name : 'BIQApp',
-        version : '1.0.1',
+    // define the BIQ Frontend App release constants values
+    const APP_VERSION = '1.0.1';
+    const APP_NAME = 'BIQApp';
+    const APP_TITLE = `Booking Instant Quotes v${APP_VERSION}`;
 
-        props : {
-            biq_app_url : {
-                type : String,
-                default : ''
-            },
-
-            biq_app_debug_enabled : {
-                type : Boolean,
-                default : false
-            },
-
-            biq_config : {
-                type : Object,
-                default : {
-                    PLACES_URI : '/places/',
-                    AUTH_URI : '/auth/',
-                    QUOTE_URI : '/booking/quote/',
-                    JOURNEY_URI : '/booking/journey/?id=',
-                    CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
-                    PAYMENT_URI : '/booking/pay/',
-                }
-            }
-        },
-
-        data() {
-            return {
-                initialised : false,
-
-                settings : {
-                    biq_api_host : 'https://api.taxicode.com/',
-                    biq_pk : '',
-                    paypal_pk : '',
-                    stripe_pk : '',
-                    stripe_cardform_style : {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    },
-                    quote_type : '',
-                    complete_page_text : '',
-                    custom_css : '',
-                    booking_test_mode : false
-                },
-
-                config : {
-                    PLACES_URI : '/places/?term=',
-                    AUTH_URI : '/auth/',
-                    QUOTE_URI : '/booking/quote/',
-                    JOURNEY_URI : '/booking/journey/?id=',
-                    CLIENT_SECRET_URI : '/booking/client_gateway_secret/',
-                    PAYMENT_URI : '/booking/pay/',
+    // define the main BIQ Frontend App component properties 
+    // (inherits props from AppsMixin)
+    const props = {
+        biqAppConfig : {
+            type : Object,
+            required : true,
+            default : function() { 
+                return {
+                    biq : biqConf,
                     BOOKING_DETALS_URI : 'booking-details/?booking_ref='
-                }
-
-            }
-        },
-
-        created() {
-            this.getAppSettings();
-            this.config = this.biq_config;
-        },
-
-        computed : {
-            ...mapGetters([
-            // BIQ Quote Search state
-                'searchDetails',
-                'displayQuotes',
-            // BIQ Quoting state
-                'loadingQuotes', 
-                'quotesLoaded', 
-                'zeroQuotes', 
-                'journeyID', 
-                'journeyDetails', 
-                'journeyDate', 
-                'journeyTime', 
-                'journeyHasReturn', 
-                'journeyReturnDate', 
-                'journeyReturnTime', 
-                'journeyHasVias', 
-                'journeyQuotes',
-            // BIQ Book Now Checkout state
-                'basket',
-                'quoteID',
-                'vehicleIndex',
-                'price',
-                'quoteData',
-                'quoteVehicleData',
-            ]),
-
-            appConfig : function() {
-                return { ...this.config };
-            },
-
-            appSettings : function() {
-                return { ...this.settings };
-            }
-        },
-
-        methods : {
-            ...mapActions([
-            // BIQ Quote Search state
-                'resetSearch',
-                'searchingQuotes', 
-                'searchedQuotes',
-            // BIQ Quoting state
-                'resetQuotes',
-                'quoting', 
-                'apiQuotesError',
-                'quoted',
-            // BIQ Book Now Checkout state
-                'resetCheckout',
-                'bookNow',
-                'booked'
-            ]),
-
-            getAppSettings : function() {
-                const app = this;
-                const biq_app_settings_url = `${this.biq_app_url}settings-get/`;
-                if(this.biq_app_debug_enabled) {
-                    console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
-                }
-                axios.get(biq_app_settings_url)
-                .then(response => {
-                    if(app.biq_app_debug_enabled) {
-                        console.group("Loaded Settings");
-                        console.info({...app.settings});
-                        console.info({...response.data});
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop is an 
-                        // object. It's dirty, but needs must for now 2021
-                        console.log(typeof(app.stripe_cardform_style));
-                        console.log(app.stripe_cardform_style);
-                        console.log(typeof(response.data.stripe_cardform_style));
-                        console.log(response.data.stripe_cardform_style);
-                        try {
-                            console.log(JSON.parse(response.data.stripe_cardform_style));
-                        } catch(e) {
-                            console.error(e);
-                        }
-                    }
-                    const settings = {
-                        biq_pk : response.data.taxicode_public,
-                        biq_api_host : response.data.biq_api_host,
-                        paypal_pk : response.data.paypal_public,
-                        stripe_pk : response.data.stripe_public,
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        // but the echoed string inside the script tag to be supplied as a prop is an 
-                        // object. It's dirty, but needs must for now 2021 so use the supplied prop 
-                        // version which is an object
-                        stripe_cardform_style : app.stripe_cardform_style,
-                        quote_type : response.data.quote_type,
-                        complete_page_text : response.data.complete_page_text,
-                        custom_css : response.data.custom_css,
-                        booking_test_mode : response.data.test_mode
-                    };
-                    app.settings = settings;
-                    app.initialised = true;
-                    if(app.biq_app_debug_enabled) {
-                        console.info({...settings});
-                        console.info({...app.settings});
-                        console.groupEnd();
-                    }
-                })
-                .catch(error => {
-                    let message = 'Unknown Error';
-                    if(error.hasOwnProperty('message') && error.message) {
-                        message = error.message;
-                    }
-                    console.error(message);
-                    console.info({...error});
-                });
+                };
             }
         }
     };
+    // define the main BIQ Frontend App component computed property methods 
+    // (inherits computed property methods from AppsMixin)
+    const computed = {
+        ...mapGetters([
+        // BIQ Quote Search state
+            'searchDetails',
+            'hasSearchResults',
+            'displayType',
+            'displayQuotes',
+        // BIQ Quoting state
+            'loadingQuotes', 
+            'quotesError', 
+            'quotesLoaded', 
+            'zeroQuotes', 
+            'journeyID', 
+            'journeyDetails', 
+            'journeyDate', 
+            'journeyTime', 
+            'journeyHasReturn', 
+            'journeyReturnDate', 
+            'journeyReturnTime', 
+            'journeyHasVias', 
+            'journeyQuotes',
+        // BIQ Book Now Checkout state
+            'processed',
+            'processing',
+            'basket',
+            'quoteID',
+            'vehicleIndex',
+            'price',
+            'quoteData',
+            'quoteVehicleData',
+            'bookingRef'
+        ]),
+
+        appConfig : function() {
+            return { ...this.biqAppConfig };
+        }
+    };
+    // define the main BIQ Frontend App component methods 
+    // (inherits methods from AppsMixin)
+    const methods = {
+        ...mapActions([
+        // BIQ Quote Search state
+            'resetSearch',
+            'searchingQuotes', 
+            'searchedQuotes',
+            'changeDisplayType',
+        // BIQ Quoting state
+            'resetQuotes',
+            'quoting', 
+            'apiQuotesError',
+            'quoted',
+        // BIQ Book Now Checkout state
+            'resetCheckout',
+            'bookNow',
+            'booking',
+            'bookingFailed',
+            'booked'
+        ]),
+
+        appSettingsUpdated : updateAppSettings
+    };
+
+    export default {
+        name : APP_NAME,
+        version : APP_VERSION,
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            AppsMixin
+        ],
+
+        data() {
+            // need to extract the mixin data as this method destroys that object
+            const mixinData = AppsMixin.data.call(this);
+            return {
+                // include the mixin data
+                ...mixinData,
+                // override the empty settings structure from the mixin
+                settings : {
+                    biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
+                    biq_pk : '',
+                    paypal_pk : '',
+                    stripe_pk : '',
+                    stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,
+                    booking_test_mode : false,
+                    quote_type : '',
+                    recommend_upgrade : false,
+                    complete_page_text : ''
+                },
+                // component specific data
+                app_title : APP_TITLE
+            };
+        },
+
+        created() {
+            // get the app settings from the backend
+            this.getAppSettings();
+        }
+    };
 </script>
-
-<style scoped>
-
-</style>

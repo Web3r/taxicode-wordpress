@@ -1,0 +1,202 @@
+<div class="app-settings">
+    <h3>{{page_title}}</h3>
+
+    <flash-message v-if="flash_message"
+        :heading="flash_message.heading"
+        :message="flash_message.message"
+        :message-class="flash_message.class"
+    ></flash-message>
+
+    <h3>Taxicode Affiliate Settings</h3>
+    <biq-api-settings-form-section
+        ref="apiSettingsForm"
+        :values="apiSettingsValues"
+        :error-class="validation_error_class"
+        :debugging="debugging"
+    ></biq-api-settings-form-section>
+
+    <h3>Payment Settings</h3>
+    <biq-payment-settings-form-section
+        ref="paymentSettingsForm"
+        :values="paymentSettingsValues"
+        :error-class="validation_error_class"
+        :debugging="debugging"
+    ></biq-payment-settings-form-section>
+
+    <h3>Plugin Settings</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+        <tr>
+            <th scope="row">
+                <label 
+                    for="search_target_permalink"
+                >Search Page Permalink</label>
+            </th>
+            <td>
+                <input 
+                    v-model="form.search_target_permalink" 
+                    id="search_target_permalink" 
+                    placeholder="/permalink-page/" 
+                    :required="true"
+                    :class="validation_errors.search_target_permalink" 
+                    type="text" 
+                    class="regular-text" 
+                    aria-describedby="search_target_permalinkHelp" 
+                />
+                <br />
+                <small 
+                    id="search_target_permalinkHelp" 
+                    class="form-text text-muted"
+                >The permalink target the main client app shortcode will appear on</small>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label>Booking Test Mode</label>
+            </th>
+            <td>
+                <legend class="screen-reader-text">
+                    <span>Quotes</span>
+                </legend>
+                <label>
+                    <input 
+                        v-model="form.test_mode" 
+                        name="test_mode" 
+                        type="radio" 
+                        value="1"
+                    > Making Bookings In Test Mode
+                </label>
+                <br />
+                <label>
+                    <input 
+                        v-model="form.test_mode" 
+                        name="test_mode" 
+                        type="radio" 
+                        value="0"
+                    > Make Live Bookings
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label>Quote Display</label>
+            </th>
+            <td>
+                <legend class="screen-reader-text">
+                    <span>Quotes</span>
+                </legend>
+                <label>
+                    <input 
+                        v-model="form.quote_type" 
+                        name="quote_type" 
+                        type="radio" 
+                        value="all"
+                    > All
+                </label>
+                <br />
+                <label>
+                    <input 
+                        v-model="form.quote_type" 
+                        name="quote_type" 
+                        type="radio" 
+                        value="best"
+                    > Only Best
+                </label>
+                <br />
+                <label><input 
+                        v-model="form.quote_type" 
+                        name="quote_type" 
+                        type="radio" 
+                        value="type_class"
+                    > Cheapest by type and class
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label>Recommend Quote Upgrade</label>
+            </th>
+            <td>
+                <legend class="screen-reader-text">
+                    <span>Quotes</span>
+                </legend>
+                <label>
+                    <input 
+                        v-model="form.recommend_upgrade" 
+                        name="recommend_upgrade" 
+                        type="radio" 
+                        value="1"
+                    > Offer Available Recommended Quote Upgrade
+                </label>
+                <br />
+                <label>
+                    <input 
+                        v-model="form.recommend_upgrade" 
+                        name="recommend_upgrade" 
+                        type="radio" 
+                        value="0"
+                    > Do Not Offer Quote Upgrade
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="complete_page_text">Complete Page Text</label>
+            </th>
+            <td>
+                <textarea 
+                    v-model="form.complete_page_text" 
+                    id="complete_page_text" 
+                    name="complete_page_text" 
+                    class="regular-text" 
+                    rows="10" 
+                    cols="50"
+                    aria-describedby="complete_page_textHelp" 
+                ></textarea>
+                <br />
+                <small 
+                    id="complete_page_textHelp" 
+                    class="form-text text-muted"
+                >This does not support HTML content.</small>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Custom CSS</h3>
+    <table class="form-table" role="presentation">
+        <tbody>
+        <tr>
+            <th scope="row">
+                <label for="custom_css">Custom CSS</label>
+            </th>
+            <td>
+                <textarea 
+                    v-model="form.custom_css" 
+                    id="custom_css" 
+                    name="custom_css" 
+                    class="regular-text code" 
+                    rows="10" 
+                    cols="50"
+                ></textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <flash-message v-if="flash_message"
+        :heading="flash_message.heading"
+        :message="flash_message.message"
+        :message-class="flash_message.class"
+    ></flash-message>
+
+    <button 
+        @click="onSaveSettings" 
+        class="button button-primary"
+    >Save Settings</button>
+    &nbsp;
+    <button 
+        @click="onReloadSettings" 
+        class="button button-secondary"
+    >Reload Settings</button>
+</div>

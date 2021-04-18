@@ -1,45 +1,40 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+// import the app router plugin
+import Router from 'vue-router';
+
+// make the component load async to reduce chunk size
+const HomePageComponent = () => import(/* webpackChunkName: "BIQSearch", webpackPrefetch: true */ 'frontend/views/HomePage.vue')
+
+// allow vue to use the web router plugin & ensure single inclusion
 Vue.use(Router);
 
-// import the app page components
-import Home from 'frontend/views/Home.vue'
-import Checkout from 'frontend/views/Checkout.vue'
-import Complete from 'frontend/views/Complete.vue'
-
 export default new Router({
-    routes: [
+    routes : [
         {
-            path: '/',
-            name: 'Home',
-            component: Home,
-            props: {
-                searchFormData,
-                search_on_load
-            }
+            path : '/',
+            name : 'HomePage',
+            component : HomePageComponent
         },
         {
-            path: '/:journey',
-            name: 'HomeSearched',
-            component: Home,
-            props: {
-                searchFormData,
-                search_on_load
-            }
+            path : '/:journey',
+            name : 'HomePageSearched',
+            component : HomePageComponent
         },
         {
-            path: '/checkout/:journey/:quote/:vehicle',
-            name: 'Checkout',
-            component: Checkout,
-            props: {
+            path : '/checkout/:journey/:quote/:vehicle',
+            name : 'CheckoutPage',
+            // make the component load async to reduce chunk size
+            component : () => import(/* webpackChunkName: "BIQCheckout", webpackPrefetch: true */ 'frontend/views/CheckoutPage.vue'),
+            props : {
                 stripe_cardform_style,
-                paypal_client_token
+                paypalClientToken
             }
         },
         {
-            path: '/complete/:booking_ref',
-            name: 'Complete',
-            component: Complete
+            path : '/complete/:booking_ref',
+            name : 'CompletePage',
+            // make the component load async to reduce chunk size
+            component : () => import(/* webpackChunkName: "BIQComplete", webpackPrefetch: true */ 'frontend/views/CompletePage.vue')
         }
     ]
 });

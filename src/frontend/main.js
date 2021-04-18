@@ -1,50 +1,34 @@
-import Vue from 'vue'
-Vue.config.productionTip = false;
-// allow the use of dev tools before the vuex store is created
-//Vue.config.devtools = true;
+// import the dev mode flag from the common app & plugins setup 
+import { devMode } from './app_setup_common';
+// import the app CSS (webpack will chunk this  & auto load / include separately)
+import 'frontend/static-assets/css/customized/frontend.css';
+// start importing & setting up the vue app
+import Vue from 'vue';
 
-import Vuex from 'vuex'
-
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
-
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-Vue.use(VueBootstrapTypeahead);
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-library.add(faPlane, faTrain, faMapMarkerAlt, faUsers, faSuitcase);
-
-import { faPlane, faTrain, faMapMarkerAlt, faUsers, faSuitcase } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-
-// is this really needed at app level? 
-// should it not be imported in the checkout where it is used?
-import vuebraintree from 'vue-braintree'
+// import the vue braintree paypal plugin
+import vuebraintree from 'vue-braintree';
+// allow vue to use the plugin & ensure single inclusion
 Vue.use(vuebraintree);
 
-// start the import of the app code 
-import BIQApp from './BIQApp.vue'
-import router from './router'
-import store from './store'
-Vue.use(Vuex);
-
-// environment aware config
-const config = require('./config.js');
+// start the import of the main BIQ app code 
+import BIQApp from 'frontend/BIQApp.vue';
+// import the setup main BIQ app router to use
+import router from 'frontend/router';
+// import the setup BIQ app state manager to use
+import store from 'frontend/store';
+// import the BIQ app config
+import conf from 'frontend/config';
 
 /* eslint-disable no-new */
 new Vue({
     store,
-    render: h => h(BIQApp, {
-        props: {
-            biq_app_url,
-            biq_app_debug_enabled,
-            biq_config: config.LIVE
+    render : h => h(BIQApp, {
+        props : {
+            appURL : biqAppURL,
+            appDebugEnabled : devMode || biqAppDebugEnabled,
+            biqAppConfig : conf
         }
     }),
-    el: '#biq-vue-app',
+    el : '#biq-vue-app',
     router
 });

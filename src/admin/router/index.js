@@ -1,21 +1,16 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+// import the app router plugin
+import Router from 'vue-router';
+
+// allow vue to use the web router plugin & ensure single inclusion
 Vue.use(Router);
 
-// import the app page components
-// import Home from 'admin/pages/Home.vue'
-// import Settings from 'admin/pages/Settings.vue'
-import Settings from 'admin/views/Settings.vue'
-
 export default new Router({
-    routes: [
+    routes : [
         {
-            path: '/',
-            name: 'Settings',
-            component: Settings,
-            props: {
-                biq_sk
-            }
+            path : '/',
+            name : 'SettingsPage',
+            component : () => import(/* webpackChunkName: "BIQAdminSettings" */ 'admin/views/SettingsPage.vue')
         }
     ]
-})
+});

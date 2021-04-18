@@ -1,127 +1,124 @@
 <template>
   <div id="biq-admin-vue-app">
-    <h1>Taxicode Booking Instant Quotes Admin</h1>
+    <h1>{{app_title}}</h1>
     <router-view v-if="initialised" 
-        :debugging=biq_app_debug_enabled
-        :appSettings=appSettings 
-        :appRESTBaseURL=biq_app_url
-        @appSettingsUpdated=appSettingsUpdated 
-    />
+        :admin-nonce="admin_nonce"
+        :app-config="appConfig"
+        :app-settings="appSettings"
+        :appRESTBaseURL="appURL"
+        :debugging="appDebugEnabled"
+        @appSettingsUpdated="appSettingsUpdated" 
+    ></router-view>
   </div>
 </template>
 
 <script>
-    export default {
-        name : 'BIQAdminApp',
-        version : '1.0.1',
-        
-        props : {
-            biq_app_url : {
-                type : String,
-                default : '',
-            },
+    // import the mixin that sets values & validates field values
+    import AppsMixin from 'mixins/AppsMixin';
+    // import the BIQ static config just in case and the settings formatter
+    import { 
+        DEFAULT_STRIPE_CARD_STYLE, 
+        biqConf, 
+        updateAppSettings, 
+        biqSettings, 
+        wpAdminRequestConfig
+    } from 'BIQ/config';
 
-            biq_app_debug_enabled : {
-                type : Boolean,
-                default : false
-            }
-        },
+    // define the BIQ Admin App release constants values
+    const APP_VERSION = '1.0.1';
+    const APP_NAME = 'BIQAdminApp';
+    const APP_TITLE = `Booking Instant Quotes Admin v${APP_VERSION}`;
+    
+    // define the main BIQ Admin App component properties 
+    // (inherits props from AppsMixin)
+    const props = {
+        adminNonce : {
+            type : String,
+            default : ''
+        }
+    };
+    // define the main BIQ Admin App component computed property methods 
+    // (inherits computed property methods from AppsMixin)
+    const computed = {
+        appConfig : function() {
+            return {
+                biq : biqConf,
+                BOOKING_DETALS_URI : 'booking-details/?booking_ref='
+            };
+        }
+    };
+    // define the main BIQ Admin App component methods 
+    // (inherits methods from AppsMixin)
+    const methods = {
+        appSettingsUpdated : updateAppSettings,
+
+        getAdminSettings : function() {
+            // get the app settings from the backend
+            this.getAppSettings(
+                // add the axios request config 
+                () => {
+                    // add the wordpress admin nonce request header to the request config
+                    return wpAdminRequestConfig(this.adminNonce);
+                }, 
+                // override the default update settings map to include the admin only settings
+                ns => {
+                    // return the combined admin settings
+                    return {
+                        // let the default settings be extracted as usual
+                        ...biqSettings(ns, this.appDebugEnabled),
+                        // add the admin only protected scope settings
+                        biq_sk : ns.taxicode_private,
+                        search_target_permalink : ns.search_target_permalink,
+                        custom_css : ns.custom_css
+                    };
+                }
+            );
+        }
+    };
+
+    export default {
+        name : APP_NAME,
+        version : APP_VERSION,
+        props,
+        computed,
+        methods,
+
+        mixins : [
+            AppsMixin
+        ],
 
         data() {
+            // need to extract the mixin data as this method destroys that object
+            const mixinData = AppsMixin.data.call(this);
             return {
-                initialised : false,
+                // include the mixin data
+                ...mixinData,
+                // override the empty settings structure from the mixin
                 settings : {
-                    biq_api_host : 'https://api.taxicode.com/',
+                    // default exposable app settings
+                    biq_api_host : biqConf.LIVE_API_HOST,
                     biq_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
-                    stripe_cardform_style : {
-                        base : {
-                            fontFamily : "'Muli', sans-serif",
-                            fontSize : '14px',
-                            color : '#333'
-                        },
-                        invalid : {
-                            color : 'red'
-                        }
-                    },
+                    stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,
+                    booking_test_mode : false,
                     quote_type : '',
+                    recommend_upgrade : false,
                     complete_page_text : '',
-                    custom_css : '',
-                    booking_test_mode : false
-                }
+                    // admin only protected scope settings
+                    biq_sk : '',
+                    search_target_permalink : '/booking-instant-quotes/',
+                    custom_css : ''
+                },
+                // component specific data
+                app_title : APP_TITLE,
+                admin_nonce : this.adminNonce
             }
         },
 
         created() {
-            this.getAppSettings();
-        },
-
-        computed : {
-            appSettings : function() {
-                return { ...this.settings };
-            }
-        },
-
-        methods : {
-            getAppSettings : function() {
-                const app = this;
-                const biq_app_settings_url = `${this.biq_app_url}settings-get/`;
-                if(this.biq_app_debug_enabled) {
-                    console.info(`Loading BIQ App Settings from '${biq_app_settings_url}'`);
-                }
-                axios.get(biq_app_settings_url)
-                .then(response => {
-                    app.appSettingsUpdated(response.data);
-                    app.initialised = true;
-                })
-                .catch(error => {
-                    let message = 'Unknown Error';
-                    if(error.hasOwnProperty('message') && error.message) {
-                        message = error.message;
-                    }
-                    console.error(message);
-                    console.info({...error});
-                });
-            },
-
-            appSettingsUpdated : function(new_settings) {
-                if(this.biq_app_debug_enabled) {
-                    console.group('Updating BIQ App Settings');
-                    console.info({...this.settings});
-                    console.info({...new_settings});
-                    try {
-                        // this is a string from the REST & doesn't parse to JSON well :(
-                        console.log(new_settings.stripe_cardform_style);
-                        console.log(typeof(new_settings.stripe_cardform_style));
-                        console.log(JSON.parse(new_settings.stripe_cardform_style));
-                    } catch(e) {
-                        console.error(e);
-                    }
-                }
-                const settings = {
-                    biq_pk : new_settings.taxicode_public,
-                    biq_api_host : new_settings.biq_api_host,
-                    paypal_pk : new_settings.paypal_public,
-                    stripe_pk : new_settings.stripe_public,
-                    // this is a string from the REST & doesn't parse to JSON well :(
-                    stripe_cardform_style : new_settings.stripe_cardform_style,
-                    quote_type : new_settings.quote_type,
-                    complete_page_text : new_settings.complete_page_text,
-                    custom_css : new_settings.custom_css,
-                    booking_test_mode : new_settings.test_mode
-                };
-                this.settings = settings;
-                if(this.biq_app_debug_enabled) {
-                    console.info({...settings});
-                    console.info({...this.settings});
-                    console.groupEnd();
-                }
-            }
+            // get the admin settings
+            this.getAdminSettings();
         }
     };
 </script>
-
-<style scoped>
-
-</style>
