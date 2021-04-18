@@ -195,7 +195,6 @@
                     return;
                 }
                 if(this.debugging) {
-                    console.info();
                     console.log(`BIQ Places ${this.label} lookup to API '${this.biqPlacesLookup}'`, term);
                 }
                 this.force_lookup = false;
@@ -209,11 +208,11 @@
                     // set the location results
                     self.locations = r;
                 })
-                .catch(err => {
+                .catch(e => {
                     // no locations available
                     self.locations = [];
                     // trigger the error event
-                    self.$emit(emitEvents.biqPlacesLookupError.name, err);
+                    self.$emit(emitEvents.biqPlacesLookupError.name, e);
                 });
             },
 

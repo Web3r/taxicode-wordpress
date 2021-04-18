@@ -1,15 +1,11 @@
 // import the state getters & actions mappers
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters } from 'vuex';
 // import the mixin that sets values & validates field values and the form events
 import { ValidatesMixin, formEvents } from 'mixins/ValidatesMixin';
 // import the journey quote search form fields
 import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/QuotesSearch';
-// import the journey quotes searched events
-import { quotesSearchedEvents } from '@/common/BIQ/QuotesSearched';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
-// import the BIQ API places lookup
-import { searchQuotes } from '@BIQ/API';
 
 // define the BIQ Search component Mixin properties
 export const searchProps = {
@@ -47,9 +43,8 @@ export const searchProps = {
     }
 };
 // define the combined list of events the BIQ Search component emits & can be listened for
-export const searchEvents = {
-    ...formEvents,
-    ...quotesSearchedEvents
+const emitEvents = {
+    ...formEvents
 };
 // define the BIQ Search component computed property Mixin methods
 const computed = {
@@ -150,13 +145,6 @@ export const biqSearchMixin = {
     },
 
     methods : {
-        // include the state
-        ...mapActions([
-        // BIQ Quote Search state
-            'searchingQuotes', 
-        // BIQ Quoting state
-            'apiQuotesError'
-        ]),
         // include the validates mixin methods
         ...ValidatesMixin.methods,
         ...methods,
@@ -202,19 +190,9 @@ export const biqSearchMixin = {
                 validate : () => this.validate(),
                 // provide access to the form values method
                 formValues : () => this.formValues(),
-                // provide access to a default form submit action method
-                defaultAction : () => {
-                    if(this.validate()) {
-                    // the form validated
-                        // make the BIQ API search
-                        this.searchApiQuotes(this.formValues());
-                    }
-                },
-                // provide access to the form BIQ API search method
-                searchApiQuotes : () => this.searchApiQuotes(this.formValues())
             };
             // trigger the search form submit event
-            this.$emit(searchEvents.submit.name, evt);
+            this.$emit(emitEvents.submit.name, evt);
         },
 
         validate : function() {
@@ -268,18 +246,18 @@ export const biqSearchMixin = {
 
         emitValidationEvent : function(validated) {
             // set the event name to be triggered (assume pass to start)
-            let emitEvent = searchEvents.validated.name;
+            let emitEvent = emitEvents.validated.name;
             // create a validation event data
             const event = {
                 data : {
                     // add the input values to the event data
-                    values : {...this.inputValues()}
+                    values : { ...this.inputValues() }
                 }
             };
             if(!validated) {
             // the validation failed
                 // change the event to be triggered
-                emitEvent = searchEvents.validationError.name;
+                emitEvent = emitEvents.validationError.name;
                 // add the validation errors to the event data
                 event.data.errors = {
                     ...this.validationErrors(),
@@ -287,7 +265,7 @@ export const biqSearchMixin = {
                 };
                 if(this.debugging) {
                     console.group('BIQ Search Form Validation Error');
-                    console.log('Validation Error Fields', {...this.validationErrors()});
+                    console.log('Validation Error Fields', { ...this.validationErrors() });
                     console.log('Validation Error', event.data.errors);
                     console.groupEnd();
                 }
@@ -331,40 +309,6 @@ export const biqSearchMixin = {
                 j.vias = [];
             }
             return j;
-        },
-
-        searchApiQuotes : function(j) {
-            const self = this;
-            // update the state with the journey details being quoted for
-            // also updates the state flag for loading quotes
-            this.searchingQuotes(j);
-            if(this.debugging) {
-                console.group(`Searching BIQ API Quotes from '${this.biqQuotesFrom}'`);
-            }
-            // make the api search quotes call
-            searchQuotes(this.biqQuotesFrom, this.biqPublicKey, j, this.debugging)
-            .then(r => {
-                const emitEvent = (r.count) 
-                    // set the quotes searched event to be triggered
-                    ? searchEvents.biqQuotesSearched.name
-                    // set the zero quotes returned event to be triggered
-                    // it's still successfull, but no results
-                    : searchEvents.biqZeroQuotes.name;
-                // trigger the quotes searched event 
-                self.$emit(emitEvent, r);
-                if(self.debugging) {
-                    console.info('BIQ API Quotes Searched');
-                    console.groupEnd();
-                }
-            })
-            .catch(e => {
-                // trigger the error event
-                self.$emit(searchEvents.biqQuotesError.name, e);
-                if(self.debugging) {
-                    console.info('BIQ API Quotes Search Error');
-                    console.groupEnd();
-                }
-            });
         }
     }
 };
