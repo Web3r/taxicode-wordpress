@@ -1,4 +1,3 @@
-
 // define an empty journey location structured object
 export const emptyLocation = {
     string : '',
@@ -20,22 +19,32 @@ export const emptyJourneyDetails = {
     is_airport : false,
     hourly : false
 };
+// define default labels for the journey details
+// @todo add the missing journey details labels
+export const journeyDetailsLabels = {
+    pickup : 'Pickup : ',
+    destination : 'Destination : ',
+    via : 'Via : ',
+    passengers : 'Passengers : ',
+    date : 'Date : ',
+    return_date : 'Returning : ',
+};
 
 // define a function to create a journey details object from an expected API journey data set
-export const journeyDetails = journey => {
+export const journeyDetails = j => {
     return {
-        pickup : journey.pickup,
-        destination : journey.destination,
-        vias : journey.vias,
-        people : journey.people,
-        return : journey.return,
-        date : journey.date,
-        distance : journey.distance,
-        duration : journey.duration,
-        duration_text : journey.duration_text,
-        quote_type : journey.quote_type,
-        is_airport : journey.is_airport,
-        hourly : journey.hourly
+        pickup : j.pickup,
+        destination : j.destination,
+        vias : j.vias,
+        people : j.people,
+        return : j.return,
+        date : j.date,
+        distance : j.distance,
+        duration : j.duration,
+        duration_text : j.duration_text,
+        quote_type : j.quote_type,
+        is_airport : j.is_airport,
+        hourly : j.hourly
     }
 }
 
@@ -51,6 +60,7 @@ export const journeyTimeString = ds => toLocaleTimeString(journeyDate(ds));
 const Journey = {
     emptyLocation,
     emptyJourneyDetails,
+    journeyDetailsLabels,
     journeyDetails,
     toDateString,
     toLocaleTimeString,

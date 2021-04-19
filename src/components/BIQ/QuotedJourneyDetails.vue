@@ -51,17 +51,14 @@
 <script>
     // import the state getters mapper
     import { mapGetters } from 'vuex';
+    // import the date & time string functions for display
+    import { journeyDetailsLabels } from '@BIQ/Journey';
 
     // define the component default text labels used (can be overridden with the 'labels' prop)
     const defaultLabels = {
         header : 'Booking Details',
         journey : {
-            pickup : 'Pickup : ',
-            destination : 'Destination : ',
-            via : 'Via : ',
-            passengers : 'Passengers : ',
-            date : 'Date : ',
-            return_date : 'Returning : ',
+            ...journeyDetailsLabels,
             price : 'Price : '
         }
     };
