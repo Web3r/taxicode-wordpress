@@ -9,6 +9,7 @@
 
             <async-biq-booking-journey-details
                 :booking-details-from="bookingDetailsFrom"
+                :biq-public-key="appSettings.biq_pk"
                 :booking-ref="$route.params.booking_ref"
                 :labels="booking_details_labels"
                 :debugging="debugging"
@@ -44,14 +45,14 @@
         booking_details_labels : {
             header : 'Booking Details',
             booking : {
-                ref : 'Booking Reference : ',
-                name : 'Name : ',
-                passengers : '',
                 pickup : 'Travelling From : ',
                 destination : 'Going To : ',
+                passengers : '',
                 via : '',
                 date : 'Date : ',
-                return_date : ''
+                return_date : '',
+                name : 'Name : ',
+                ref : 'Booking Reference : '
             },
         },
         loading_details : {

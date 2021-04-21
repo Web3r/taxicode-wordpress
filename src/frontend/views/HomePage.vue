@@ -148,14 +148,8 @@
         },
 
         onQuotesError : function(evt) {
-            if(this.debugging) {
-                console.group('BIQ Quotes Search Error');
-                console.log(evt);
-                console.groupEnd();
-            }
             // make sure the error has a message
             const message = evt.data.error.message || 'Unknown BIQ Quotes API Error';
-            console.error(evt.data.error);
             // update the quotes state with the API error
             this.apiQuotesError(message);
         },

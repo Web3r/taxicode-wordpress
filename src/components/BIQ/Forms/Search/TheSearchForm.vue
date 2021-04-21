@@ -14,7 +14,7 @@
 
 <script>
     // import the BIQ API places lookup
-    import { searchQuotes } from '@BIQ/API';
+    import { searchQuotes } from '@BIQ/API/Quote';
     // import the mixin that controls the BIQ search without form layout worries
     import { searchProps } from 'BIQ/mixins/SearchMixin';
     // import the mixin that sets values & validates field values and the form events
@@ -128,10 +128,12 @@
                 }
             })
             .catch(e => {
+                if(self.debugging) {
+                    console.error(e.data.message, e.data);
+                }
                 // trigger the error event
                 self.$emit(emitEvents.biqQuotesError.name, e);
                 if(self.debugging) {
-                    console.info('BIQ API Quotes Search Error');
                     console.groupEnd();
                 }
             });

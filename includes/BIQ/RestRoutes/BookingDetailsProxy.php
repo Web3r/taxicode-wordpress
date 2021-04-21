@@ -43,6 +43,12 @@ class BookingDetailsProxy extends Route
                 "required"          => true,
                 "sanitize_callback" => "sanitize_text_field"
             ],
+            // make sure the BIQ Public key was set with the request
+            "key" => [
+                "type"              => "string",
+                "required"          => true,
+                "sanitize_callback" => "sanitize_text_field"
+            ]
         ];
     }
 
@@ -58,6 +64,7 @@ class BookingDetailsProxy extends Route
     public function get_api_booking_details_permissions_check($request)
     {
         // no restrictions here
+        // @todo verify the public key matches the one stored
         return $this->get_items_permissions_check($request);
     }
 

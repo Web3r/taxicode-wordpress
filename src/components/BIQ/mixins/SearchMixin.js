@@ -68,11 +68,7 @@ const methods = {
     },
 
     onPlacesLookupError : function(evt) {
-        if(this.debugging) {
-            console.group(evt.data.message);
-            console.log(evt);
-            console.groupEnd();
-        }
+        // not really much to do as it's already been logged if needed
     }
 };
 
