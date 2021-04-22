@@ -21,7 +21,7 @@ export const apiResponseParse = (URL, k, r, d) => {
     // Danger Will Robinson! Danger!
         // there's nothing usable in the response except the error
         // get the error / warning messages (could be multiple)
-        const m = r.data[r.data.status.toLowerCase()];
+        const m = r.data[r.data.status] || r.data[r.data.status.toLowerCase()];
         // log a warning things are not OK
         console.warn(m);
         // throw the error to be caught & properly handled

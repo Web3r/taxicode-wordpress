@@ -87,7 +87,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
     // import the state getters & actions mappers
     import { mapGetters, mapActions } from 'vuex';
     // import the mixin that sets values & validates field values
@@ -104,7 +103,7 @@
     // import the component for the passenger details form section of the checkout
     import PassengerDetailsForm from 'BIQ/Forms/PassengerDetailsForm.vue';
     // import the BIQ API booking pay
-    import { makeBooking } from '@BIQ/API';
+    import { makeBooking } from '@BIQ/API/Checkout';
 
     // define the component properties
     const props = {
@@ -325,37 +324,35 @@
                 e.data.booking.refunded = false;
                 // trigger the checkout error event, a refund will be needed
                 self.$emit(emitEvents.biqCheckoutError.name, e);
-
             });
         },
 
         assembleData : function(token, method, formdataAppend) {
-            // this is a bit annoying - our API can't handle standard axios requests on POST
-            // for some reason, so I've had to abandon my form class and hand crank this
-            // request.
-            const formData = new FormData();
-            const passengerDetails = this.$refs.passengerForm.inputValues();
-            console.log(passengerDetails);
-            formData.append('quote', this.quoteID);
-            formData.append('vehicle', this.vehicleIndex);
-            formData.append('new_pay', true);
-            formData.append('email', passengerDetails.email);
-            formData.append('name', passengerDetails.name);
-            formData.append('telephone', passengerDetails.telephone);
-            formData.append('payment_token', token);
-            formData.append('method', method);
+            // create a new form to actually use
+            const f = new FormData();
+            // get the passenger details form section values
+            const pdf = this.$refs.passengerForm.inputValues();
+            console.log(pdf);
+            f.append('quote', this.quoteID);
+            f.append('vehicle', this.vehicleIndex);
+            f.append('new_pay', true);
+            f.append('email', pdf.email);
+            f.append('name', pdf.name);
+            f.append('telephone', pdf.telephone);
+            f.append('payment_token', token);
+            f.append('method', method);
             if(typeof(formdataAppend) == 'function') {
             // allow the calling method to add payment method specific fields to the API call
-                formdataAppend(formData);
+                formdataAppend(f);
             }
-            if(passengerDetails.flight_number) {
-                formData.append('flight_number', passengerDetails.flight_number);
+            if(pdf.flight_number) {
+                f.append('flight_number', pdf.flight_number);
             }
             if(this.appSettings.booking_test_mode) {
             // make the booking in test mode
-                formData.append('test', '1');
+                f.append('test', '1');
             }
-            return formData;
+            return f;
         },
 
         checkoutComplete : function(data) {

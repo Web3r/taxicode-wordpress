@@ -83,6 +83,7 @@ export const updateAppSettings = function(ns, cb) {
 // import the BIQ API details
 import { LIVE_API_HOST, TEST_API_HOST, AUTH_URI } from '@BIQ/API';
 import { PLACES_URI, QUOTE_URI, JOURNEY_URI } from '@BIQ/API/Quote';
+import { CLIENT_SECRET_URI, PAYMENT_URI } from '@BIQ/API/Checkout';
 
 // define the BIQ config to be used
 export const biqConf = {
@@ -92,8 +93,8 @@ export const biqConf = {
     PLACES_URI,
     QUOTE_URI,
     JOURNEY_URI,
-    CLIENT_SECRET_URI : 'booking/client_gateway_secret/',
-    PAYMENT_URI : 'booking/pay/',
+    CLIENT_SECRET_URI,
+    PAYMENT_URI,
     PGH_CONF : {
         hidePostalCode : true
     }
