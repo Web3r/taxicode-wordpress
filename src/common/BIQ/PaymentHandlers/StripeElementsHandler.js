@@ -172,45 +172,51 @@ export default class StripeElementsHandler extends BasePaymentHandler {
                         }
                     }
                 }
-            }
+            };
             // Confirm the PaymentIntent without handling potential next actions (yet).
             Stripe.confirmCardPayment(secret, payment, { handleActions : false })
             .then(result => {
-                if (result.error) {
+                if(result.error) {
                     // Report to the browser that the payment failed, prompting it to
                     // re-show the payment interface, or show an error message and close
                     // the payment interface.
                     onTransactionFail(handler, result.error);
-                } else {
-                    // Report to the browser that the confirmation was successful, prompting
-                    // it to close the browser payment method collection interface.
-                    if(result.paymentIntent.hasOwnProperty('status') && result.paymentIntent.status === 'succeeded') {
-                        // The payment has succeeded.
-                        onTransactionSuccess(handler, result.paymentIntent);
+                    // we're done here
+                    return;
+                }
+                // Report to the browser that the confirmation was successful, prompting
+                // it to close the browser payment method collection interface.
+                if(result.paymentIntent.hasOwnProperty('status') && result.paymentIntent.status === 'succeeded') {
+                    // The payment has succeeded.
+                    onTransactionSuccess(handler, result.paymentIntent);
+                    // we're done here
+                    return;
+                }
+                // Let Stripe.js handle the rest of the payment flow.
+                Stripe.confirmCardPayment(secret)
+                .then(result3DS => {
+                    if(result3DS.error) {
+                        // The payment failed -- ask your customer for a new payment method.
+                        onTransactionFail(handler, result3DS.error);
+                        // we're done here
                         return;
                     }
-                    // Let Stripe.js handle the rest of the payment flow.
-                    Stripe.confirmCardPayment(secret)
-                    .then(result3DS => {
-                        if (result3DS.error) {
-                          // The payment failed -- ask your customer for a new payment method.
-                          onTransactionFail(handler, result3DS.error);
-                        } else {
-                          // The payment has succeeded.
-                          onTransactionSuccess(handler, result3DS.paymentIntent);
-                        }
-                    });
-                }
+                    // The payment has succeeded.
+                    onTransactionSuccess(handler, result3DS.paymentIntent);
+                });
             })
             .catch(error => {
+            // something went wrong with the stripe transaction interaction
                 onTransactionFail(handler, error);
             });
         })
         .catch(err => {
+        // something went wrong getting a client secret token to use
             if(d) {
                 console.error(err);
                 console.log("error", err);
             }
+            // the negotiations never started 
             onTransactionFail(handler, err.data);
         });
     }
