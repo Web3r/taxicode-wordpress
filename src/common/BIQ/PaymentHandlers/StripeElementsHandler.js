@@ -1,5 +1,7 @@
-import BasePaymentHandler from './BasePaymentHandler';
+import BasePaymentHandler from '@BIQ/PaymentHandlers/BasePaymentHandler';
 import axios from 'axios';
+// import the BIQ API transaction client secret request
+import { getClientSecretIntent } from '@BIQ/API/Checkout';
 
 export default class StripeElementsHandler extends BasePaymentHandler {
         
@@ -23,7 +25,6 @@ export default class StripeElementsHandler extends BasePaymentHandler {
         this.unmountElement = this.unmountElement.bind(this);
         this.getCustomerToken = this.getCustomerToken.bind(this);
         this.setCustomerToken = this.setCustomerToken.bind(this);
-        this.getClientSecretIntent = this.getClientSecretIntent.bind(this);
         // override / set the payment handler specific name
         this.paymentHandlerName = 'jstoken_stripe';
         // set the initial state of mutatable properties
@@ -150,111 +151,73 @@ export default class StripeElementsHandler extends BasePaymentHandler {
         } = setup;
         const Stripe = this.stripe;
         const card = this.card;
-        this.getClientSecretIntent(key, quote, vehicle)
-        .then(clientSecret => {
-            // Confirm the PaymentIntent without handling potential next actions (yet).
-            Stripe.confirmCardPayment(
-                clientSecret,
-                { payment_method : {
-                        card : card,
-                        billing_details : { 
-                            name : cardholder_name,
-                            address : {
-                                postal_code : billing_postcode
-                            }
+        const handler = publicHandler();
+        const d = this.debugging;
+        return getClientSecretIntent(
+            this.intent_secret_uri, 
+            key, 
+            handler.getHandlerName(), 
+            quote, 
+            vehicle, 
+            d
+        )
+        .then(secret => {
+            const payment = { 
+                payment_method : {
+                    card : card,
+                    billing_details : { 
+                        name : cardholder_name,
+                        address : {
+                            postal_code : billing_postcode
                         }
-                }},
-                { handleActions : false }
-            ).then(confirmResult => {
-                if (confirmResult.error) {
+                    }
+                }
+            };
+            // Confirm the PaymentIntent without handling potential next actions (yet).
+            Stripe.confirmCardPayment(secret, payment, { handleActions : false })
+            .then(result => {
+                if(result.error) {
                     // Report to the browser that the payment failed, prompting it to
                     // re-show the payment interface, or show an error message and close
                     // the payment interface.
-                    onTransactionFail(publicHandler(), confirmResult.error);
-                } else {
-                    // Report to the browser that the confirmation was successful, prompting
-                    // it to close the browser payment method collection interface.
-                    if(confirmResult.paymentIntent.hasOwnProperty('status') && confirmResult.paymentIntent.status === 'succeeded') {
-                        // The payment has succeeded.
-                        onTransactionSuccess(publicHandler(), confirmResult.paymentIntent);
+                    onTransactionFail(handler, result.error);
+                    // we're done here
+                    return;
+                }
+                // Report to the browser that the confirmation was successful, prompting
+                // it to close the browser payment method collection interface.
+                if(result.paymentIntent.hasOwnProperty('status') && result.paymentIntent.status === 'succeeded') {
+                    // The payment has succeeded.
+                    onTransactionSuccess(handler, result.paymentIntent);
+                    // we're done here
+                    return;
+                }
+                // Let Stripe.js handle the rest of the payment flow.
+                Stripe.confirmCardPayment(secret)
+                .then(result3DS => {
+                    if(result3DS.error) {
+                        // The payment failed -- ask your customer for a new payment method.
+                        onTransactionFail(handler, result3DS.error);
+                        // we're done here
                         return;
                     }
-                    // Let Stripe.js handle the rest of the payment flow.
-                    Stripe.confirmCardPayment(clientSecret)
-                    .then(result => {
-                        if (result.error) {
-                          // The payment failed -- ask your customer for a new payment method.
-                          onTransactionFail(publicHandler(), result.error);
-                        } else {
-                          // The payment has succeeded.
-                          onTransactionSuccess(publicHandler(), result.paymentIntent);
-                        }
-                    });
-                }
+                    // The payment has succeeded.
+                    onTransactionSuccess(handler, result3DS.paymentIntent);
+                });
             })
             .catch(error => {
-                onTransactionFail(publicHandler(), error);
+            // something went wrong with the stripe transaction interaction
+                onTransactionFail(handler, error);
             });
+        })
+        .catch(err => {
+        // something went wrong getting a client secret token to use
+            if(d) {
+                console.error(err);
+                console.log("error", err);
+            }
+            // the negotiations never started 
+            onTransactionFail(handler, err.data);
         });
-    }
-    
-    /**
-     * Promise to return a payment intent client secret to use with the wallet transaction
-     * @param {String} key The API key being used
-     * @param {String} quote The selected quote ID
-     * @param {String} vehicle The selected quote vehicle array index
-     * @returns {Promise}
-     */
-    getClientSecretIntent(key, quote, vehicle) {
-        const handler = this.getPublicHandler();
-        const intent_secret_uri = this.intent_secret_uri;
-        const debugging = this.debugging;
-        if(this.debugging) {
-            console.group(`Getting client secret from ${intent_secret_uri}`);
-        }
-        return new Promise((resolve, reject) => {
-			// need to have at least 1 POSTed input value to trigger the POST method
-            const formData = new FormData();
-            formData.append('handler', handler.getHandlerName());
-            formData.append('key', key);
-            formData.append('quote', quote);
-            formData.append('vehicle', vehicle);
-            // make the request to create a payment intent for the transaction
-			axios({
-				url : intent_secret_uri,
-				method : 'post',
-				data : formData,
-				responseType : 'json',
-                headers : {
-                    'Content-Type': 'application/application/x-www-form-urlencoded',
-                }
-            })
-            .then(response => {
-                // resolve the client secret as promised
-                if(debugging) {
-                    console.log(response);
-                    console.groupEnd();
-                }
-                resolve(response.data.response.intent.client_secret);
-            })
-            .catch(error => {
-                let reason = error;
-                if(error.response) {
-                    reason = error.response;
-                } else if(error.request) {
-                    reason = error.request;
-                } else {
-                    reason = error.message;
-                }
-                console.error(error);
-                if(debugging) {
-                    console.warn(`The error message received was: '${reason}'`);
-                    console.info(formData);
-                    console.groupEnd();
-                }
-                // reject the response as an error
-                reject(reason);
-            });
-		});
     }
 }

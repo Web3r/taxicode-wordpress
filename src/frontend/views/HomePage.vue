@@ -91,6 +91,7 @@
     const methods = {
         ...mapActions([
         // BIQ Quote Search state
+            'searchingQuotes',
             'searchedQuotes', 
             'changeDisplayType', 
         // BIQ Quoting state
@@ -100,13 +101,15 @@
         ]),
 
         onQuotesSearchSubmit : function(evt) {
-            const {
-                validate,
-                searchApiQuotes
-            } = evt.data;
             // run the form validation & get the quotes if able
-            if(validate()) {
-                searchApiQuotes();
+            if(evt.data.validate()) {
+                // get the journey details to search for
+                const j = evt.data.formValues();
+                // update the state with the journey details being quoted for
+                // also updates the state flag for loading quotes
+                this.searchingQuotes(j);
+                // perform the BIQ API quotes search
+                evt.data.searchApiQuotes(j);
             }
         },
 
@@ -145,14 +148,8 @@
         },
 
         onQuotesError : function(evt) {
-            if(this.debugging) {
-                console.group('BIQ Quotes Search Error');
-                console.log(evt);
-                console.groupEnd();
-            }
             // make sure the error has a message
             const message = evt.data.error.message || 'Unknown BIQ Quotes API Error';
-            console.error(evt.data.error);
             // update the quotes state with the API error
             this.apiQuotesError(message);
         },

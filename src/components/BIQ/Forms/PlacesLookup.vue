@@ -44,7 +44,7 @@
 
 <script>
     // import the BIQ API places lookup
-    import { placesLookup } from '@BIQ/API';
+    import { placesLookup } from '@BIQ/API/Quote';
     // import underscore for the ability to debounce the autocomplete lookup function
     import _ from 'underscore';
     // import the component for the autocomplete input & options list
@@ -195,7 +195,6 @@
                     return;
                 }
                 if(this.debugging) {
-                    console.info();
                     console.log(`BIQ Places ${this.label} lookup to API '${this.biqPlacesLookup}'`, term);
                 }
                 this.force_lookup = false;
@@ -209,11 +208,14 @@
                     // set the location results
                     self.locations = r;
                 })
-                .catch(err => {
+                .catch(e => {
                     // no locations available
                     self.locations = [];
+                    if(self.debugging) {
+                        console.error(e.data.message, e.data);
+                    }
                     // trigger the error event
-                    self.$emit(emitEvents.biqPlacesLookupError.name, err);
+                    self.$emit(emitEvents.biqPlacesLookupError.name, e);
                 });
             },
 

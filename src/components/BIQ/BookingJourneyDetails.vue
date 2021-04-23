@@ -39,20 +39,15 @@
 
 <script>
     // import the date & time string functions for display
-    import { toDateString, toLocaleTimeString } from '@BIQ/Journey';
+    import { journeyDetailsLabels, toDateString, toLocaleTimeString } from '@BIQ/Journey';
 
     // define the component default text labels used (can be overridden with the 'labels' prop)
     const defaultLabels = {
         header : 'Booking Details',
         booking : {
-            ref : 'Booking Reference : ',
+            ...journeyDetailsLabels,
             name : 'Name : ',
-            passengers : 'Passengers : ',
-            pickup : 'Pickup : ',
-            destination : 'Destination : ',
-            via : 'Via : ',
-            date : 'Date : ',
-            return_date : 'Returning : '
+            ref : 'Booking Reference : '
         }
     };
     // define the component data structure & the default / initial values

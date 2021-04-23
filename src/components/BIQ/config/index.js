@@ -79,16 +79,22 @@ export const updateAppSettings = function(ns, cb) {
         console.groupEnd();
     }
 }
+
+// import the BIQ API details
+import { LIVE_API_HOST, TEST_API_HOST, AUTH_URI } from '@BIQ/API';
+import { PLACES_URI, QUOTE_URI, JOURNEY_URI } from '@BIQ/API/Quote';
+import { CLIENT_SECRET_URI, PAYMENT_URI } from '@BIQ/API/Checkout';
+
 // define the BIQ config to be used
 export const biqConf = {
-    LIVE_API_HOST : 'https://api.taxicode.com/',
-    TEST_API_HOST : 'https://api.stagingtaxis.co.uk/',
-    PLACES_URI : 'places/?term=',
-    AUTH_URI : 'auth/',
-    QUOTE_URI : 'booking/quote/',
-    JOURNEY_URI : 'booking/journey/?id=',
-    CLIENT_SECRET_URI : 'booking/client_gateway_secret/',
-    PAYMENT_URI : 'booking/pay/',
+    LIVE_API_HOST,
+    TEST_API_HOST,
+    AUTH_URI,
+    PLACES_URI,
+    QUOTE_URI,
+    JOURNEY_URI,
+    CLIENT_SECRET_URI,
+    PAYMENT_URI,
     PGH_CONF : {
         hidePostalCode : true
     }

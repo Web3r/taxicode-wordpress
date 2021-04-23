@@ -109,7 +109,7 @@
                 return evt.preventDefault();
             }
             // overwrite the search form details state with what would be POSTed values to the server
-            // ad set a flag to indicate the search should be performed on the form action target page.
+            // and set a flag to indicate the search should be performed on the form action target page.
             this.$store.commit('searchForQuotes', evt.data.formValues());
         }
     };
