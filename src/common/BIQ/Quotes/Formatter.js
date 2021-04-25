@@ -1,5 +1,5 @@
 // import the method to sort the quotes according to order types
-import { sort } from '@/common/BIQ/QuotesSorter';
+import { sort } from '@/common/BIQ/Quotes/Sorter';
 
 const debugging = true;
 

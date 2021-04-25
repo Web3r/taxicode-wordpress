@@ -1,7 +1,7 @@
 // import the methods to format the quote data for display
-import { formatQuotes, reduceToTypeAndClass } from '@BIQ/QuotesFormatter';
+import { formatQuotes, reduceToTypeAndClass } from '@BIQ/Quotes/Formatter';
 // import the sort by price sort type 
-import { SORT_TYPE_PRICE } from '@BIQ/QuotesSorter';
+import { SORT_TYPE_PRICE } from '@BIQ/Quotes/Sorter';
 // import the methods to display the journey date & times
 import { emptyJourneyDetails, journeyDetails } from '@BIQ/Journey';
 

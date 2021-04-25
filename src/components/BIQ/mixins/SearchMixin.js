@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex';
 // import the mixin that sets values & validates field values and the form events
 import { ValidatesMixin, formEvents } from 'mixins/ValidatesMixin';
 // import the journey quote search form fields
-import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/QuotesSearch';
+import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/Quotes/Search';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
 

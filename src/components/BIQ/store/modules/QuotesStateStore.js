@@ -1,5 +1,5 @@
 // import the methods to generate the default state structure & journey detail objects
-import { defaultState } from '@BIQ/QuotesSearched';
+import { defaultState } from '@BIQ/Quotes/Searched';
 // import the methods to format the provided journey data, display the journey date & times
 import { journeyDetails, journeyDateString, journeyTimeString } from '@BIQ/Journey';
 

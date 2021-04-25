@@ -1,7 +1,7 @@
 // import the method to generate the default state structure object
-import { dState } from '@BIQ/QuotesSearch';
+import { dState } from '@BIQ/Quotes/Search';
 // import the method to generate quotes display type list
-import { DEFAULT_SORT, displayQuotes } from '@BIQ/QuotesSearched';
+import { DEFAULT_SORT, displayQuotes } from '@BIQ/Quotes/Searched';
 
 /**
  * Variable name replacement to help reduce production size

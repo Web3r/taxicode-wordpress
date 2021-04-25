@@ -1,5 +1,5 @@
 // import the journey quotes searched booking events
-import { quoteBookingEvents } from '@/common/BIQ/QuotesSearched';
+import { quoteBookingEvents } from '@/common/BIQ/Quotes/Searched';
 // import the Book Now Call To Action button
 import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
 
