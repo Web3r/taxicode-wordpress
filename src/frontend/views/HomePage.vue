@@ -149,7 +149,7 @@
 
         onQuotesError : function(evt) {
             // make sure the error has a message
-            const message = evt.data.error.message || 'Unknown BIQ Quotes API Error';
+            const message = evt.getCulprit().message || 'Unknown BIQ Quotes API Error';
             // update the quotes state with the API error
             this.apiQuotesError(message);
         },

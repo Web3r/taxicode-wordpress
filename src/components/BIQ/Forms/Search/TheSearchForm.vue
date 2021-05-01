@@ -128,9 +128,6 @@
                 }
             })
             .catch(e => {
-                if(self.debugging) {
-                    console.error(e.data.message, e.data);
-                }
                 // trigger the error event
                 self.$emit(emitEvents.biqQuotesError.name, e);
                 if(self.debugging) {

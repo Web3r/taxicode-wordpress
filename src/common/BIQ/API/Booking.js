@@ -1,28 +1,24 @@
 // import the BIQ API response handlers
-import { apiResponseParse, hmmm } from '@BIQ/API';
-// import the plugin to handle the Xhr AJAX API requests
-import axios from 'axios';
+import { apiGet, rejected } from '@BIQ/API';
 
 // export the API Booking URIs
 export const DETAILS_URI = 'booking/details/?secret=';
 
 /**
- * Variable name replacement to help reduce production size
- * 
- * - URL = BIQ API booking details URL
- * - k = BIQ API public affiliate key
- * - ref = the booking ref to get the details for
- * - d = debugging flag
+ * Promise to return the booking detils response
+ * @param {String} URL The BIQ API booking details URL
+ * @param {String} k The BIQ API public affiliate key
+ * @param {String} ref The booking ref to get the details for
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The booking details or rejected APIError
  */
-// promise to return the booking detils response
-export const getDetails  = (URL, k, ref, d) => {
+ export const getDetails  = (URL, k, ref, d) => {
+     // define the method to convert the date string
     const journeyDate = ds => new Date(Date.parse(ds));
     return new Promise((rslv, rej) => {
         // let the wordpress backend plugin get the booking details as the API 
         // call needs the private key as well
-        axios.get(`${URL}${ref}&key=${k}`)
-        // parse the api response for status OK
-        .then(r => apiResponseParse(URL, k, r, d))
+        apiGet(`${URL}${ref}`, k, d)
         // extract the booking details from the response data
         .then (data => data.booking)
         // build the booking details data
@@ -38,25 +34,17 @@ export const getDetails  = (URL, k, ref, d) => {
                 vias : b.vias,
                 date : journeyDate(b.date),
                 return_date : null
-            }
+            };
             if(b.return) {
             // the booking has a return journey leg
                 booking.return_date = journeyDate(b.return);
             }
-            rslv(booking)
+            return rslv(booking);
         })
         .catch(e => {
-            // get the error message
-            const m = e.message || 'Unknown';
-            // construct the base error object
-            const err = hmmm(URL, k, e, `BIQ API Booking Details Load Error - ${m}`);
-            // add the booking error event data
-            err.data.bookingRef = ref;
-            // reject the failure for handling
-            rej(err);
+            return rejected(rej, e, 'BIQ API Booking Details Load Error', d);
         });
     });
-
 };
 
 // create a default exportable object container

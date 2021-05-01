@@ -132,9 +132,6 @@
             // well that's not good
                 // set a flag to indicate the booking details encountered an error while loading
                 self.error = true;
-                if(self.debugging) {
-                    console.error(e.data.message, e.data);
-                }
                 // trigger the error event
                 self.$emit(emitEvents.detailsLoadError.name, e);
                 if(self.debugging) {

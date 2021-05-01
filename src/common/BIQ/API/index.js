@@ -1,3 +1,8 @@
+// import the plugin to handle the Xhr AJAX API requests
+import axios from 'axios';
+// import the API Error 
+import APIError from '@BIQ/Errors/APIError';
+
 // define the BIQ API hosts
 export const LIVE_API_HOST = 'https://api.taxicode.com/';
 export const TEST_API_HOST = 'https://api.stagingtaxis.co.uk/';
@@ -5,16 +10,96 @@ export const TEST_API_HOST = 'https://api.stagingtaxis.co.uk/';
 export const AUTH_URI = 'auth/';
 
 /**
- * Variable name replacement to help reduce production size
- * 
- * - URL = API URL
- * - k = BIQ API public affiliate key
- * - r = response payload
- * - d = debugging flag
+ * Reject the outcome of an API call and update the error descriptor
+ * @param {Function} rej The API promise reject callback
+ * @param {APIError} e The BIQ API public affiliate key
+ * @param {String} desc The error description update
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The rejected Promise
  */
-// parse the API response payload for status OK
+export const rejected = (rej, e, desc, d) => {
+    if(!!d) {
+        console.log(desc, { ...e });
+        console.info(e.toString(), e.toJSON());
+        console.error(e);
+    }
+    // get the error message
+    const m = e.message || 'Unknown';
+    e.setDesc(`${desc} - ${m}`);
+    // reject the failure for handling
+    return rej(e);
+};
+
+/**
+ * Make a BIQ API GET request and promise to return the parsed 
+ * API response payload with status OK or reject with a bundled APIError
+ * @param {String} URL The BIQ API URL
+ * @param {String} k The BIQ API public affiliate key
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The parsed API response or rejected APIError
+ */
+export const apiGet = (URL, k, d) => {
+    return new Promise((rslv, rej) => {
+        // make the BIQ API call & add the public key
+        return axios.get(`${URL}&key=${k}`)
+        // parse the api response for status OK
+        .then(r => rslv(apiResponseParse(URL, k, r, d)))
+        .catch(e => {
+        // could be an axios error or response parsed error
+            if(!!d) {
+                console.log('BIQ API Error', { ...e });
+                console.error(e);
+            }
+            // get the error message
+            const m = e.message || 'Unknown';
+            // reject the API Error bundled failure for handling
+            return rej(new APIError(URL, k, e, m));
+        });
+    });
+};
+
+/**
+ * Make a BIQ API POST request and promise to return the parsed 
+ * API response payload with status OK or reject with a bundled APIError
+ * @param {String} URL The BIQ API URL
+ * @param {String} k The BIQ API public affiliate key
+ * @param {FormData} f The form data object
+ * @param {Object} rqc The request config
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The parsed API response or rejected APIError
+ */
+ export const apiPost = (URL, k, f, rqc, d) => {
+    f.append('key', k);
+    return new Promise((rslv, rej) => {
+        // make the BIQ API call & add the public key
+        return axios.post(URL, f, rqc)
+        // parse the api response for status OK
+        .then(r => rslv(apiResponseParse(URL, k, r, d)))
+        .catch(e => {
+        // could be an axios error or response parsed error
+            if(!!d) {
+                console.log('BIQ API Error', { ...e });
+                console.error(e);
+            }
+            // get the error message
+            const m = e.message || 'Unknown';
+            // reject the API Error bundled failure for handling
+            return rej(new APIError(URL, k, e, m));
+        });
+    });
+};
+
+/**
+ * Parse the API response payload for status OK
+ * @param {String} URL The BIQ API URL that was used
+ * @param {String} k The BIQ API public affiliate key that was used
+ * @param {Object} r The response payload
+ * @param {Boolean} d A debugging flag
+ * @returns {Object} The response payload data
+ * @throws {ErrorEvent} If the status is not OK
+ */
 export const apiResponseParse = (URL, k, r, d) => {
-    if(d) {
+    if(!!d) {
         console.log(`BIQ API response for - ${URL}`, r);
     }
     if(r.data.status != 'OK') {
@@ -31,25 +116,28 @@ export const apiResponseParse = (URL, k, r, d) => {
         });
     }
     // return the useful response data payload
-    return r.data;
+    return { ...r.data };
 };
 
 /**
- * Variable name replacement to help reduce production size
- * 
- * - URL = BIQ API URL
- * - k = BIQ API public affiliate key
- * - e = Error
- * - m = optional message (comes from error by default)
+ * return a structured caught error for rejection
+ * @param {String} URL BIQ API URL
+ * @param {String} k BIQ API public affiliate key
+ * @param {Error} e The Error
+ * @param {String} m optional message (comes from error by default)
+ * @returns {Object}
  */
-// return a structured caught error for rejection
 export const hmmm = (URL, k, e, m) => {
+    const msg = m || e.message;
+    const err = new APIError(URL, k, e, m);
     // return a base error object
     return {
+        message : e.message,
+        err,
         data : {
             URL,
             key : k,
-            message : m || e.message,
+            message : msg,
             error : e
         }
     };
@@ -62,7 +150,9 @@ export const API = {
     URI : {
         AUTH : AUTH_URI
     },
+    apiGet,
     apiResponseParse,
+    rejected,
     hmmm
 };
 // export the default object container

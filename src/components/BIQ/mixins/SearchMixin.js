@@ -50,6 +50,16 @@ const emitEvents = {
 const computed = {
     hasReturn : function() {
         return (this.fields.journey_type.selected === JOURNEY_TYPE_OPTION_RETURN);
+    },
+
+    datePickerIconAsset : function() {
+        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-date.png';
+        //return '/assets/images/form-date.png';
+    },
+
+    timePickerIconAsset : function() {
+        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-time.png';
+        //return '/assets/images/form-time.png';
     }
 };
 // define the BIQ Search component Mixin methods

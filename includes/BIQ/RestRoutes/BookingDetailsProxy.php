@@ -80,13 +80,13 @@ class BookingDetailsProxy extends Route
         // make the API call but no need to verify the SSL of the origin
         $api_call = wp_remote_get($api_url, ["sslverify" => false] );
         if(is_wp_error($api_call)) {
-            $processed_response = wp_remote_retrieve_response_message($api_call);
-        } else {
-            // get the API response body (it's plain text JSON)
-            $api_response = wp_remote_retrieve_body($api_call);
-            // convert the response to assoc
-            $processed_response = json_decode($api_response);
+        // well, that went wrong
+            return rest_ensure_response($this->whatWentWrong($api_call));
         }
+        // get the API response body (it's plain text JSON)
+        $api_response = wp_remote_retrieve_body($api_call);
+        // convert the response to assoc
+        $processed_response = json_decode($api_response);
         // make sure there is a response
         return rest_ensure_response($processed_response);
     }
@@ -114,6 +114,25 @@ class BookingDetailsProxy extends Route
         );
         // $api_url = https://api.taxicode.com/booking/details/?key=XXXXXX&secret=XXXXXX&id=
         return $api_url;
+    }
+
+    /**
+     * Determine which part went wrong & so which part has the error response
+     *
+     * @param WP_REST_Response|WP_Error $request Response object on success, or WP_Error object on failure.
+     * @return String|WP_Error Response body string on success, or WP_Error object on failure.
+     */
+    protected function whatWentWrong($response)
+    {
+        // get the remote response error message
+        $remote_response = wp_remote_retrieve_response_message($response);
+        if(!$remote_response) {
+        // there was an error getting to the remote
+            // return the request error response
+            return $response;
+        }
+        // return the remote response error
+        return $remote_response;
     }
     
 }

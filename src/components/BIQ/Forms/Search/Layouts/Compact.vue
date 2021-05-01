@@ -66,7 +66,11 @@
                 id="tcplugin-date" 
                 class="biq-journey-date flex-sm-fill"
                 locale="en" 
-            ></b-form-datepicker>
+            >
+                <template slot="button-content">
+                    <img :src="datePickerIconAsset" />
+                </template>
+            </b-form-datepicker>
 
             <b-form-timepicker 
                 v-model="time" 
@@ -75,7 +79,11 @@
                 id="tcplugin-time" 
                 class="biq-journey-time flex-sm-fill"
                 locale="en"
-            ></b-form-timepicker>
+            >
+                <template slot="button-content">
+                    <img :src="timePickerIconAsset" />
+                </template>
+            </b-form-timepicker>
         </div>
 
         <div 
@@ -107,7 +115,12 @@
                 id="tcplugin-return-date" 
                 locale="en" 
                 class="biq-journey-return-date flex-sm-fill"
-            ></b-form-datepicker>
+            >
+                <template slot="button-content">
+                    <img :src="datePickerIconAsset" />
+                </template>
+            </b-form-datepicker>
+            
             <b-form-timepicker 
                 v-model="return_time" 
                 key="return_time"
@@ -116,7 +129,11 @@
                 id="tcplugin-return-time" 
                 locale="en"
                 class="biq-journey-return-time flex-sm-fill"
-            ></b-form-timepicker>
+            >
+                <template slot="button-content">
+                    <img :src="timePickerIconAsset" />
+                </template>
+            </b-form-timepicker>
         </div>
 
         <div 
