@@ -1,5 +1,4 @@
 import BasePaymentHandler from '@BIQ/PaymentHandlers/BasePaymentHandler';
-import axios from 'axios';
 // import the BIQ API transaction client secret request
 import { getClientSecretIntent } from '@BIQ/API/Checkout';
 

@@ -1,7 +1,5 @@
 // import the BIQ API response handlers
-import { apiResponseParse, hmmm } from '@BIQ/API';
-// import the plugin to handle the Xhr AJAX API requests
-import axios from 'axios';
+import { apiGet, rejected } from '@BIQ/API';
 
 // export the API Quote URIs
 export const PLACES_URI = 'places/?term=';
@@ -9,21 +7,18 @@ export const QUOTE_URI = 'booking/quote/';
 export const JOURNEY_URI = 'booking/journey/?id=';
 
 /**
- * Variable name replacement to help reduce production size
- * 
- * - URL = BIQ API places lookup URL base
- * - k = BIQ API public affiliate key
- * - t = place search term
- * - sort = sort map function callback
- * - d = debugging flag
+ * Promise to do the place lookup
+ * @param {String} URL The BIQ Places Lookup API URL
+ * @param {String} k The BIQ API public affiliate key
+ * @param {String} t The places search term
+ * @param {Function} sort A sort map function callback
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The sorted list of autocomplete places or rejected APIError
  */
-// promise to do the place lookup
 export const placesLookup = (URL, k, t, sort, d) => {
     return new Promise((rslv, rej) => {
-        // do the place lookup
-        axios.get(`${URL}${t}&key=${k}`)
-        // parse the api response for status OK
-        .then(r => apiResponseParse(URL, k, r, d))
+        // do the places lookup
+        apiGet(`${URL}${t}`, k, d)
         // extract the places results from the response data
         .then (data => data.results)
         // build the places look up options list
@@ -45,26 +40,22 @@ export const placesLookup = (URL, k, t, sort, d) => {
             }
             const google = r.GOOGLE.map(l => sort(l.string, (l.poi) ? 'poi' : 'general'));
             // resolve the places lookup location options list in order of precidence
-            rslv(airports.concat(stations, locations, google));
+            return rslv(airports.concat(stations, locations, google));
         })
         .catch(e => {
-            // get the error message
-            const m = e.message || 'Unknown';
-            // reject the failure for handling
-            rej(hmmm(URL, k, e, `BIQ Places lookup API Error - ${m}`));
+            return rejected(rej, e, 'BIQ Places Lookup API Error', d);
         });
     });
 };
 
 /**
- * Variable name replacement to help reduce production size
- * 
- * - URL = BIQ API quotes URL base
- * - k = BIQ API public affiliate key
- * - j = the journey search details
- * - d = debugging flag
+ * Promise to do the quotes search
+ * @param {String} URL The BIQ API quotes URL 
+ * @param {String} k The BIQ API public affiliate key
+ * @param {Object} j The journey search details
+ * @param {Boolean} d A debugging flag
+ * @returns {Promise} The journey details and quotes or rejected APIError
  */
-// promise to do the quotes search
 export const searchQuotes = (URL, k, j, d) => {
     // start constructing the search details
     let URI = `pickup=${j.pickup}&destination=${j.destination}&date=${j.date} ${j.time}&people=${j.people}`;
@@ -80,9 +71,7 @@ export const searchQuotes = (URL, k, j, d) => {
     }
     return new Promise((rslv, rej) => {
         // get the quotes for the specified journey details
-        axios.get(`${URL}?key=${k}&${URI}`)
-        // parse the api response for status OK
-        .then(r => apiResponseParse(URL, k, r, d))
+        apiGet(`${URL}?${URI}`, k, d)
         // extract the journey quotes details from the response data
         .then (data => {
             // create the response data for the API Quote journey details and the API Quote results
@@ -98,13 +87,10 @@ export const searchQuotes = (URL, k, j, d) => {
                 r.warnings = data.warnings;
             }
             // resolve with the journey & the quotes
-            rslv(r);
+            return rslv(r);
         })
         .catch(e => {
-            // get the error message
-            const m = e.message || 'Unknown';
-            // reject the failure for handling
-            rej(hmmm(URL, k, e, `BIQ Quotes Search API Error - ${m}`));
+            return rejected(rej, e, 'BIQ Quotes Search API Error', d);
         });
     });
 };

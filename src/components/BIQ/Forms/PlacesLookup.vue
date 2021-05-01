@@ -185,13 +185,19 @@
                         ? this.errorClass
                         : this.validClass;
                 return `${this.id} ${errorState}`;
+            },
+
+            minLength : function() {
+                // allow less than the minimum required during dev to 
+                // allow correct error handling checks
+                return (this.debugging) ? 1 : 3;
             }
         },
 
         methods : {
             locationSearch : function(term) {
                 // make sure there is a point in even attempting the lookup
-                if(term === null || typeof(term) !== 'string' || term.length < 1) {
+                if(term === null || typeof(term) !== 'string' || term.length < this.minLength) {
                     return;
                 }
                 if(this.debugging) {
@@ -211,9 +217,6 @@
                 .catch(e => {
                     // no locations available
                     self.locations = [];
-                    if(self.debugging) {
-                        console.error(e.data.message, e.data);
-                    }
                     // trigger the error event
                     self.$emit(emitEvents.biqPlacesLookupError.name, e);
                 });

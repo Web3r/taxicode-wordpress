@@ -1,5 +1,5 @@
 // import the method to sort the quotes according to order types
-import { sort } from '@/common/BIQ/QuotesSorter';
+import { sort } from '@/common/BIQ/Quotes/Sorter';
 
 const debugging = true;
 
@@ -15,7 +15,7 @@ export const formatQuotes = (q, t, so) => {
     const d = [];
     if(debugging) {
         console.group("Formatting BIQ Quotes");
-        console.log('Quotes', {...q});
+        console.log('Quotes', { ...q });
         console.log('Type', t);
         console.log('Sort Order', so);
     }
@@ -51,17 +51,17 @@ export const formatQuotes = (q, t, so) => {
 export const reduceToTypeAndClass = (q, so) => {
     if(debugging) {
         console.group("Reducing BIQ Quotes to type & class only");
-        console.log('Quotes', {...q});
+        console.log('Quotes', { ...q });
         console.log('Sort Order', so);
     }
     // sorting taking from app, but needs further reconstructing for web UI
     const sq = formatQuotesReduced(q, so);
     if(debugging) {
-        console.log({...sq});
+        console.log({ ...sq });
     }
     const s = sq.sorted;
     // define the sorted quotes display list
-    const sd = {};
+    const sd = { };
     if(s.hasOwnProperty('recommended') && s.recommended.length) {
         sd['cheapest'] = s.recommended[0];
     }
@@ -84,8 +84,8 @@ export const reduceToTypeAndClass = (q, so) => {
 // define the function to format the quote data for display
 export const formatQuotesReduced = (q, so) => {
     // initiate quotes keys
-    let raw = {};
-    let sorted = {};
+    let raw = { };
+    let sorted = { };
 
     for(let key in q) {
         // get the current object based on key

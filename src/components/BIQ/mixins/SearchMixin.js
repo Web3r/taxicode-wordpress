@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex';
 // import the mixin that sets values & validates field values and the form events
 import { ValidatesMixin, formEvents } from 'mixins/ValidatesMixin';
 // import the journey quote search form fields
-import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/QuotesSearch';
+import { JOURNEY_TYPE_OPTION_RETURN, fF } from '@/common/BIQ/Quotes/Search';
 // import the API places location auto-complete lookup input field
 import PlacesLookup from 'BIQ/Forms/PlacesLookup.vue';
 
@@ -50,6 +50,16 @@ const emitEvents = {
 const computed = {
     hasReturn : function() {
         return (this.fields.journey_type.selected === JOURNEY_TYPE_OPTION_RETURN);
+    },
+
+    datePickerIconAsset : function() {
+        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-date.png';
+        //return '/assets/images/form-date.png';
+    },
+
+    timePickerIconAsset : function() {
+        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-time.png';
+        //return '/assets/images/form-time.png';
     }
 };
 // define the BIQ Search component Mixin methods

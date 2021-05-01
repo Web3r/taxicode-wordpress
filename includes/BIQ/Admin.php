@@ -40,7 +40,8 @@ class Admin
      */
     public function admin_menu()
     {
-        $hook = add_menu_page(
+        // the main menu item
+        $main = add_menu_page(
             __(static::MENU_DOMAIN_TEXT, "textdomain"), 
             __(static::MENU_DOMAIN_TEXT, "textdomain"), 
             PluginSettings::ADMIN_CAPABILITY, 
@@ -49,7 +50,9 @@ class Admin
             static::MENU_ICON
         );
         // add the action callback to run when the menu item slug page is being loaded
-        add_action("load-{$hook}", [$this, "init_hooks"]);
+        add_action("load-{$main}", [$this, "init_hooks"]);
+        // $this->biq_settings_menu();
+        // $this->map_settings_menu();
     }
 
     /**
@@ -65,7 +68,6 @@ class Admin
      */
     public function enqueue_scripts()
     {
-        // @todo remove legacy taxicode name reference
         wp_enqueue_style("biq-admin");
         wp_enqueue_script("biq-admin");
     }
@@ -75,7 +77,6 @@ class Admin
      */
     public function render()
     {
-        // @todo remove legacy taxicode name reference
         $content = '
 <script>
     const biqAppURL = \'' . BIQ_REST_URL . '\';
@@ -84,5 +85,41 @@ class Admin
 </script>
 <div class="wrap"><div id="biq-admin-vue-app"></div></div>';
         echo $content;
+    }
+
+    /**
+     * Register the BIQ settings sub menu item
+     */
+    protected function biq_settings_menu()
+    {
+        // the main plugin settings sub page
+        $biq = add_submenu_page( 
+            static::MENU_SLUG, 
+            'Settings', 
+            'BIQ Settings', 
+            PluginSettings::ADMIN_CAPABILITY, 
+            static::MENU_SLUG . '-biq-settings', 
+            [$this, "render"]
+        );
+        // add the action callback to run when the menu item slug page is being loaded
+        add_action("load-{$biq}", [$this, "init_hooks"]);
+    }
+
+    /**
+     * Register the BIQ settings sub menu item
+     */
+    protected function map_settings_menu()
+    {
+        // the optional maps section settings sub page
+        $map = add_submenu_page( 
+            static::MENU_SLUG, 
+            'Map Settings', 
+            'BIQ Map Settings', 
+            PluginSettings::ADMIN_CAPABILITY, 
+            static::MENU_SLUG . '-map-settings', 
+            [$this, "render"]
+        );
+        // add the action callback to run when the menu item slug page is being loaded
+        add_action("load-{$map}", [$this, "init_hooks"]);
     }
 }

@@ -20,7 +20,7 @@
     // import the mixin that sets values & validates field values and the form events
     import { formEvents } from 'mixins/ValidatesMixin';
     // import the journey quotes searched events
-    import { quotesSearchedEvents } from '@/common/BIQ/QuotesSearched';
+    import { quotesSearchedEvents } from '@/common/BIQ/Quotes/Searched';
 
     // define the list of available search form layout components that can be lazy load used
     const layouts = {
@@ -128,9 +128,6 @@
                 }
             })
             .catch(e => {
-                if(self.debugging) {
-                    console.error(e.data.message, e.data);
-                }
                 // trigger the error event
                 self.$emit(emitEvents.biqQuotesError.name, e);
                 if(self.debugging) {

@@ -49,7 +49,7 @@
     // import the state getters mapper
     import { mapGetters } from 'vuex';
     // import the journey quotes searched booking events
-    import { quoteBookingEvents } from '@/common/BIQ/QuotesSearched';
+    import { quoteBookingEvents } from '@/common/BIQ/Quotes/Searched';
 
     // define the component properties
     const props = {
