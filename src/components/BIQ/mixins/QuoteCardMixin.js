@@ -2,6 +2,8 @@
 import { quoteBookingEvents } from '@/common/BIQ/Quotes/Searched';
 // import the Book Now Call To Action button
 import BookNowC2A from 'BIQ/QuoteCards/BookNowC2A.vue';
+// import the date & time string functions for display
+import { journeyDisplayPrice } from '@BIQ/Journey';
 
 // define the BIQ Quote Card component Mixin properties
 export const quoteCardProps = {
@@ -37,7 +39,7 @@ export const quoteCardEvents = {
 // define the BIQ Quote Card component computed property Mixin methods
 const computed = {
     displayPrice : function() {
-        return '&pound;' + new Number(this.quote_price).toFixed(2);
+        return journeyDisplayPrice(this.quote_price);
     }
 };
 // define the BIQ Quote Card component Mixin methods

@@ -200,13 +200,7 @@ class Plugin
      */
     public function activate()
     {
-        if(!BIQPluginUpdater::treason(static::VERSION, null, "0.0.0")) {
-        // no version change, so nothing to do
-            return;
-        }
-        // It's treason then
-        // execute order 66, well, install, update the plugin settings etc.
-        return BIQPluginUpdater::order66(static::VERSION);
+        return BIQPluginUpdater::startedTheCloneWarHas(static::VERSION, null, "0.0.0");
     }
 
     /**
@@ -214,7 +208,7 @@ class Plugin
      */
     public function deactivate()
     {
-        BIQPluginUpdater::hitTheNose();
+        return BIQPluginUpdater::hitTheNose();
     }
 
     /**

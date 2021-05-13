@@ -9,10 +9,7 @@
             </biq-passenger-details-form-section>
 
             <div id="biq-payment-details-form-section">
-                <div 
-                    id="biq-payment-form-heading"
-                    class="d-flex"
-                >
+                <div id="biq-payment-form-heading">
                     <h4>{{payment_heading}}</h4>
                 </div>
 

@@ -1,7 +1,7 @@
 // import the dev mode flag from the common app & plugins setup 
 import { devMode } from './app_setup_common';
 // import the app CSS (webpack will chunk this  & auto load / include separately)
-import 'frontend/static-assets/css/customized/frontend.css';
+import 'frontend/static-assets/less/frontend/main.less';
 // start importing & setting up the vue app
 import Vue from 'vue';
 
@@ -25,8 +25,9 @@ new Vue({
     render : h => h(BIQApp, {
         props : {
             appURL : biqAppURL,
-            appDebugEnabled : devMode || biqAppDebugEnabled,
-            biqAppConfig : conf
+            appAssetURL : biqAppAssetsURL,
+            biqAppConfig : conf,
+            appDebugEnabled : devMode || biqAppDebugEnabled
         }
     }),
     el : '#biq-vue-app',

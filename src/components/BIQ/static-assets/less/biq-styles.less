@@ -1,0 +1,37 @@
+@import url('./style.less');
+@import url('./search-form.less');
+
+/*
+ * Beginning of the BIQ search form common theme settings 
+ */ 
+#biq-search-form {
+    width : @width-all;
+    margin : 50px auto 50px auto;
+    border-radius : @border-curve;
+
+    .row-col {
+        gap : @col-gap;
+    }
+
+    .search-form-bg();
+    
+    select.biq-journey {
+        .search-form-journey();
+    }
+    input[type="text"].biq-pickup {
+        .search-form-pickup();
+    }
+    input[type="text"].biq-via {
+        .search-form-via();
+    }
+    input[type="text"].biq-destination {
+        .search-form-destination();
+    }
+    input[type="number"].biq-people {
+        .search-form-passengers();
+    }
+
+    button.btn-primary {
+        .large-button()
+    }
+}

@@ -1,13 +1,14 @@
 <template>
     <div id="biq-search-lite-vue-app">
         <the-biq-search-form v-if="initialised" 
+            :layout="search_form_layout"
             :biq-public-key="appSettings.biq_pk"
             :biq-places-lookup="placesLookup"
             :biq-quotes-from="quotesFrom"
+            :use-labels="use_search_labels"
             :search-on-load="search_on_load"
             :debugging="appDebugEnabled"
             @submit="onSearchQuotes"
-            layout="compact"
             :action="biqSearchTarget"
             method="GET"
         ></the-biq-search-form>
@@ -139,6 +140,7 @@
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
+                    mapbox_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
                     stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,
@@ -149,6 +151,8 @@
                 },
                 // component specific data
                 app_title : APP_TITLE,
+                search_form_layout : 'compact-row',
+                use_search_labels : false,
                 search_on_load : false
             };
         },

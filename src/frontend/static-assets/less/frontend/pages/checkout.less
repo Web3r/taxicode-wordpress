@@ -1,0 +1,89 @@
+/** import the theme constucts */
+@import url('../../common/theme-vars.less');
+
+/* Main app container div */
+#biq-vue-app {
+    width : @width-all;
+
+    /* Checkout page container div */
+    #biq-checkout-page {
+        width : 75%;
+        margin : 0 auto;
+
+        .form-header() {
+            display : flex;
+
+            .card-header();
+
+            h4 {
+                margin-bottom : 0px !important;
+            }                        
+        }
+
+        #biq-checkout-form-container {
+            width : @width-all;
+
+            #biq-checkout-form {
+                .row-col {
+                    gap : @col-gap;
+                }
+                            
+                #biq-passenger-details-form-section {
+                    width : @width-all;
+
+                    #biq-passenger-details-form-heading {
+                        .form-header();
+                    }
+
+                    #biq-passenger-name,
+                    #biq-passenger-email,
+                    #biq-passenger-telephone,
+                    #biq-passenger-flight-number {
+                        flex : 1 1 auto;
+                    }
+                }
+
+                #biq-payment-details-form-section {
+                    width : @width-all;
+    
+                    button.btn-primary {
+                        .large-button()
+                    }
+
+                    #biq-payment-form-heading {
+                        .form-header();
+                     }
+
+                    #biq-paypal-plugin {
+                        width : @width-all;
+                    }
+
+                    #biq-cardholder-details {
+                        width : @width-all;
+                    }
+
+                    #biq-stripe-card-details {
+                        width : @width-all;
+    
+                        .stripe-card-container {
+                            padding : 8px !important;
+                            max-width : 290px;
+                            min-width : 250px;
+                        }
+                    }
+    
+                }
+            }
+
+            #biq-payment-error {
+                width : @width-all;
+            }
+        }
+
+        #biq-checkout-booking-details {
+            .card-header {
+                .card-header();
+            }
+        }
+    }
+}

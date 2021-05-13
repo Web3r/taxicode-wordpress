@@ -81,19 +81,22 @@ class AssetRegister
     protected function get_scripts()
     {
         $prefix = defined("SCRIPT_DEBUG") && SCRIPT_DEBUG ? ".min" : '';
-        // @todo remove legacy taxicode name reference
         $common_deps = [
-            "taxicode-vendor", 
-            "taxicode-runtime"
+            "biq-vendor", 
+            "biq-runtime"
         ];
         $asset_location = BIQ_PLUGIN_LOCATION . "/assets/js/";
         $asset_url = BIQ_PLUGIN_URL . "/assets/js/";
-        // @todo remove legacy taxicode name reference
         $scripts = [
             // webpack initial runtime (kickstart the app & lazy imports etc.)
-            "taxicode-runtime" => [
+            "biq-runtime" => [
                 "src"       => "{$asset_url}runtime.js",
                 "version"   => filemtime("{$asset_location}runtime.js"),
+                "in_footer" => true
+            ],
+            // when webpack has split the vendors vue* chunk from the vendors chunck
+            "biq-stripe" => [
+                "src"       => "https://js.stripe.com/v3/",
                 "in_footer" => true
             ],
             // when webpack has split the vendors vue* chunk from the vendors chunck
@@ -103,13 +106,13 @@ class AssetRegister
                 "in_footer" => true
             ],
             // the webpack split chunck for the app vendors code
-            "taxicode-vendor" => [
+            "biq-vendor" => [
                 "src"       => "{$asset_url}vendors.js",
                 "version"   => filemtime("{$asset_location}vendors.js"),
                 "in_footer" => true
             ],
             // the webpack split chunck for the main BIQ app code
-            "taxicode-frontend" => [
+            "biq-frontend" => [
                 "src"       => "{$asset_url}frontend.js",
                 "deps"      => $common_deps,
                 "version"   => filemtime("{$asset_location}frontend.js"),
@@ -141,18 +144,21 @@ class AssetRegister
     protected function get_styles()
     {
         $asset_location = BIQ_PLUGIN_URL . "/assets/css/";
-        // @todo remove legacy taxicode name reference
         $styles = [
-            "taxicode-style" => [
+            "biq-style" => [
                 "src" =>  "{$asset_location}style.css"
             ],
-            "taxicode-frontend" => [
+            "biq-frontend" => [
                 "src" =>  "{$asset_location}frontend.css"
             ],
             "biq-search-lite" => [
                 "src" =>  "{$asset_location}search_lite.css"
             ],
-            "taxicode-vendors" => [
+            "biq-mapbox" => [
+                "src" =>  "https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css"
+                //"src" =>  "https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css"
+            ],
+            "biq-vendors" => [
                 "src" =>  "{$asset_location}vendors.css"
             ],
             "biq-admin" => [

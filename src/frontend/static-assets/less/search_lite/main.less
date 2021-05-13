@@ -1,0 +1,34 @@
+/** import the theme constucts */
+@import url('../common/theme-vars.less');
+
+/* Main app container div */
+#biq-search-lite-vue-app {
+    width : @app-width;
+
+    /** import the themed search form */
+    @import url('../common/biq_search_form.less');
+
+    /** add some tweaks to the themed search form */
+    #biq-search-form.biq-layout-compact-row {
+        flex-flow : row;
+
+        input[type="text"] {
+            border-top : none;
+            border-bottom : none;
+        }
+        select,
+        input[type="number"] {
+            border : none;
+        }
+
+        .biq-journey,
+        .biq-pickup,
+        .biq-via,
+        .biq-destination,
+        .biq-journey-date,
+        .biq-journey-time,
+        .biq-people {
+            width : auto;
+        }
+    }
+}

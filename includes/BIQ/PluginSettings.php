@@ -24,6 +24,8 @@ class PluginSettings
         // @todo remove legacy taxicode name reference
         "taxicode_public"           => '',
         "biq_api_host"              => "",
+        "mapbox_public"             => '',
+        "mapbox_style"              => 'mapbox://styles/mapbox/streets-v11',
         "paypal_public"             => '',
         "stripe_public"             => '',
         "stripe_cardform_style"     => "",
@@ -48,6 +50,8 @@ class PluginSettings
     protected static $_exposable_settings_map = [
         // @todo remove legacy taxicode name reference
         "taxicode_public"       => "taxicode_public",
+        "mapbox_public"         => "mapbox_public",
+        "mapbox_style"          => "mapbox_style",
         "biq_api_host"          => "biq_api_host",
 //        "paypal_public"         => "paypal_public",
         "stripe_public"         => "stripe_public",
@@ -57,6 +61,61 @@ class PluginSettings
         "recommend_upgrade"     => "recommend_upgrade",
         "complete_page_text"    => "complete_page_text"
     ];
+
+    /**
+     * Get the plugin updater install / update actions conf.
+     * 
+     * @param Callable $test_cb A callback to test if a previous version of settings can be converted
+     * @return array Collection parameters.
+     */
+    public static function get_update_conf(Callable $test_cb)
+    {
+        $remove = [
+            // the older version plugin options are obsolete & should be removed for safety
+            "tcplugin_stripe_private",
+            "taxicode_installed",
+            "taxicode_version",
+            "biq_version",
+            "biq_installed"
+        ];
+        // run the test callback to check if the update / conversion needs to happen
+        if(!call_user_func_array($test_cb, [ $remove ])) {
+        // no previous version settings (apparently)
+            // return the "no update from previous" flag
+            return [
+                "previous"  => false
+            ];
+        }
+        // there are previous version option setting values available to convert & cleanup
+        // set the update convert & cleanup actions conf
+        $conf = [
+            "previous"  => [
+                "prefix"    => "tcplugin_",
+                "remove"    => $remove,
+                "convert"   => [
+                // the old option names will be added to the remove stack after conversion
+                    "tcplugin_taxicode_public"      => "taxicode_public",
+                    "tcplugin_taxicode_private"     => "taxicode_private",
+                    "tcplugin_stripe_public"        => "stripe_public",
+                    "tcplugin_paypal_public"        => "paypal_public",
+                    "tcplugin_mapbox_api"           => "mapbox_public",
+                    "tcplugin_quote_type"           => "quote_type",
+                    "tcplugin_complete_page_text"   => "complete_page_text",
+                    "tcplugin_custom_css"           => "custom_css",
+                    "tcplugin_test_mode"            => "test_mode"
+                ],
+                "add"       => [
+                // the plugin options new to this version
+                    "biq_api_host",
+                    "stripe_cardform_style",
+                    "search_target_permalink",
+                    "recommend_upgrade",
+                    "mapbox_style"
+                ]
+            ]
+        ];
+        return $conf;
+    }
 
     /**
      * Retrieves the request params for the admin updatable settings items collection.
@@ -125,6 +184,22 @@ class PluginSettings
         }
         // get the prefixed plugin setting option from wordpress
         return get_option(sprintf("%s{$name}", BIQ_OPTIONS_NAME_PREFIX), $default);
+    }
+     
+    /**
+     * Get the default set value for the plugin setting
+     * 
+     * @param string $name The plugin option name without the prefix
+     * @return mixed
+     */
+    public static function get_option_default($name)
+    {
+        if(!in_array($name, array_keys(static::$_default_options))) {
+        // unknown setting / option name
+            return null;
+        }
+        // get the defined default value for the setting option
+        return static::$_default_options[$name];
     }
     
     /**

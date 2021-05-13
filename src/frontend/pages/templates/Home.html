@@ -1,0 +1,205 @@
+<div class="row justify-content-between">
+    <div class="col-lg-4 pr-3 pr-lg-0 d-none d-lg-block" >
+        <MglMap :center="mapCentre" :accessToken="accessToken" :mapStyle="mapStyle" @load="onMapLoaded" ref="mpbx" v-if="pickup_coords.length > 0">
+            <MglMarker :coordinates="pickup_coords" color="blue" />
+            <MglMarker :coordinates="destination_coords" color="blue" />
+            <MglGeojsonLayer
+                    :sourceId="geoJsonSource.data.id"
+                    :source="geoJsonSource"
+                    layerId="myLayer"
+                    :layer="geoJsonLayer"
+            />
+        </MglMap>
+    </div>
+    <div class="col-lg-8 pl-3 pl-lg-0">
+        <div class="form_1">
+            <form id="taxicode-quote" class="trav-quote-form">
+                <input name="tcplugin_include_post" type="hidden" value="1">
+                <div class="top_form">
+                    <b-form-select class="journey" title="One way or Return" v-model="journey_type" :options="journey_options"></b-form-select>
+                    <vue-typeahead-bootstrap
+                            v-model="pickup"
+                            class="pickup"
+                            :inputClass="errors.pickup? 'is-invalid' : ''"
+                            :data="pickuplocations"
+                            :serializer="item => item.string"
+                            @hit="selectedLocation = $event"
+                            placeholder="Pickup postcode or place name"
+                            ref="pickupfield"
+                            :max-matches="30"
+                    >
+                        <template slot="suggestion" slot-scope="{ data, htmlText }">
+                            <div class="d-flex align-items-center">
+                                <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
+                                <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
+                                <span v-else><font-awesome-icon icon="map-marker-alt" /></span>
+                                <span class="ml-4" v-html="htmlText"></span>
+                            </div>
+                        </template>
+                    </vue-typeahead-bootstrap>
+                    <vue-typeahead-bootstrap
+                            ref="viafield"
+                            class="via-input"
+                            v-model="via"
+                            :inputClass="errors.via? 'is-invalid' : ''"
+                            :data="vialocations"
+                            :serializer="item => item.string"
+                            @hit="selectedLocation = $event"
+                            placeholder="Via postcode or place name"
+                            :max-matches="30"
+                    >
+                        <template slot="suggestion" slot-scope="{ data, htmlText }">
+                            <div class="d-flex align-items-center">
+                                <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
+                                <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
+                                <span v-else><font-awesome-icon icon="map-marker-alt" /></span>
+                                <span class="ml-4" v-html="htmlText"></span>
+                            </div>
+                        </template>
+                    </vue-typeahead-bootstrap>
+                    <vue-typeahead-bootstrap
+                            class="destination"
+                            ref="destinationfield"
+                            v-model="destination"
+                            :inputClass="errors.destination? 'is-invalid' : ''"
+                            :data="destinationlocations"
+                            :serializer="item => item.string"
+                            @hit="selectedLocation = $event"
+                            placeholder="Destination postcode or place name"
+                            :max-matches="30"
+                    >
+                        <template slot="suggestion" slot-scope="{ data, htmlText }">
+                            <div class="d-flex align-items-center">
+                                <span v-if="data.type=='station'"><font-awesome-icon icon="train" /></span>
+                                <span v-else-if="data.type=='airport'"><font-awesome-icon icon="plane" /></span>
+                                <span v-else><font-awesome-icon icon="map-marker-alt" /></span>
+                                <span class="ml-4" v-html="htmlText"></span>
+                            </div>
+                        </template>
+                    </vue-typeahead-bootstrap>
+                </div>
+                <div class="top_form mt-0">
+                    <b-form-datepicker locale="en" class="date" :min="mindate" :state="errors.date"  v-model="date">
+                        <template slot="button-content">
+                            <img src="https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-date.png"/>
+                        </template>
+                    </b-form-datepicker>
+                    <b-form-timepicker class="time" locale="en" v-model="time" :state="errors.time">
+                        <template slot="button-content">
+                            <img src="https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-time.png"/>
+                        </template>
+                    </b-form-timepicker>
+                    <input type="number" class="form-control" :class=" errors.people ? 'is-invalid' : ''" placeholder="People" v-model="people">
+                    <input class="submit-btn" title="Get Quotes" type="submit" value="Get a Quote" @click="submitForm">
+                </div>
+            </form>
+        </div>
+        <div class="process_data">
+            <div class="row">
+                <div class="col-xl-9">
+                    <div class="line_data"></div>
+                    <ul class="list-inline data_line mb-0">
+                        <li class="list-inline-item">
+                            <img :src="asset_url+'/images/icon1.png'">
+                            <span>{{journey_type}}</span>
+                        </li>
+                        <li class="list-inline-item">
+                            <img :src="asset_url+'/images/icon2.png'">
+                            <span>{{pickup}}</span>
+                        </li>
+                        <li class="list-inline-item">
+                            <img :src="asset_url+'/images/icon3.png'">
+                            <span>{{destination}}</span>
+                        </li>
+                        <li class="list-inline-item">
+                            <img :src="asset_url+'/images/icon4.png'">
+                            <span>{{date | readable_date}} @ {{time}}</span>
+                        </li>
+                        <li class="list-inline-item">
+                            <img :src="asset_url+'/images/icon5.png'">
+                            <span>{{people}}</span>
+                        </li>
+                    </ul>
+                </div>
+                <!--<div class="col-xl-3">
+                    <a href="" class="edit_button">Edit Booking</a>
+                </div>-->
+                <div class="col-md-12 pr-3 pr-lg-0 d-block d-lg-none">
+                    <img src="image/map.jpg">
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="car_sec">
+            <div v-if="loading">
+                Loading...
+            </div>
+            <div v-if="noquotes">
+                Sorry, we could not find any quotes for the selected journey.  Please try a different journey.
+            </div>
+            <div class="row" v-if="quotesloaded">
+                <div class="col-md-6" v-for="(quote,type) in quotes">
+                    <div class="car_box">
+                        <h2 class="mb-0">{{type_map[type]}}</h2>
+                        <div class="car_detail px-4">
+                            <div class="car_img py-4 text-center">
+                                <img :src="quote.vehicle.image" alt="Vehicle type image" :ref="quote.quote_id">
+                            </div>
+                            <p class="mb-1">{{quote.company_name}}</p>
+                            <p><img :src="asset_url+'/images/star_icon.png'"> ({{quote.rating.ratings}})</p>
+
+
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="price_box text-center">
+                                        <div class="position-relative main_price">
+                                            <span>£</span>{{quote.price}}
+                                        </div>
+                                        <p>£{{(quote.price / distance).toFixed(2)}} per mile</p>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="price_box text-center">
+                                        <ul class="list-inline mb-0 small_box">
+                                            <li class="list-inline-item"><img :src="asset_url+'/images/price_icon1.png'"></li>
+                                            <li class="list-inline-item">{{quote.vehicle.passengers}}</li>
+                                        </ul>
+                                    </div>
+                                    <div class="price_box mt-2 text-center">
+                                        <ul class="list-inline mb-0 small_box">
+                                            <li class="list-inline-item"><img :src="asset_url+'/images/price_icon2.png'"></li>
+                                            <li class="list-inline-item">{{quote.vehicle.luggage_small}}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <router-link :data-price="quote.price" :ref="quote.quote_id" :to="{ name: 'Checkout', params: { quote_id: quote.quote_id, journey_id: journey_id} }" class="booknow mt-3" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                        </div>
+                    </div>
+                </div>
+
+                            <!--
+
+                            <div class="card" style="width: 18rem;">
+                                <img class="card-img-top" :src="quote.vehicle.image" alt="Vehicle type image" :ref="quote.quote_id">
+                                <div class="card-header">
+                                    {{type_map[type]}}
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">{{quote.vehicle.name}}</h6>
+                                    <div class="card-text d-flex justify-content-center align-items-center">
+                                        <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="users" /> {{quote.vehicle.passengers}}</div>
+                                        <div>&nbsp;</div>
+                                        <div class="badge badge-pill badge-secondary"><font-awesome-icon icon="suitcase" /> {{quote.vehicle.luggage_small}}</div>
+                                    </div>
+                                    <p class="card-text text-center display-4" id="selected_price" :ref="quote.quote_id">&pound;{{quote.price}}.00</p>
+                                    <router-link :data-price="quote.price" :ref="quote.quote_id" :to="{ name: 'Checkout', params: { quote_id: quote.quote_id, journey_id: journey_id} }" class="btn btn-primary btn-block" @click.native="setPriceBeforeTransition(id,$event)">Book Now</router-link>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>

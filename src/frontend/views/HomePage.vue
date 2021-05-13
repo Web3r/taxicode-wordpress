@@ -1,17 +1,47 @@
 <template>
-    <div id="biq-home-page">
-        <the-biq-search-form
-            :biq-public-key="appSettings.biq_pk"
-            :biq-places-lookup="placesLookup"
-            :biq-quotes-from="quotesFrom"
-            :search-on-load="searchOnLoad"
-            :debugging="debugging"
-            @submit="onQuotesSearchSubmit"
-            @biqQuotesSearched="onQuotesSearched"
-            @biqZeroQuotes="onZeroQuotes"
-            @biqQuotesError="onQuotesError"
-            layout="column"
-        ></the-biq-search-form>
+    <div id="biq-search-page">
+        <div id="biq-journey-search">
+            <div 
+                id="biq-journey-route-map-container"
+                class="col-lg-4 pr-3 d-lg-block"
+            >
+                <the-biq-journey-route-map
+                    ref="map"
+                    :mapbox-public-key="appSettings.mapbox_pk"
+                    :mapbox-style="appSettings.mapbox_style"
+                    :pickup="quotePickupPosition"
+                    :destination="quoteDestinationPosition"
+                    :debugging="debugging"
+                    @directionsError="console.log('map error', $event)"
+                >
+                </the-biq-journey-route-map>
+            </div>
+
+            <the-biq-search-form
+                :layout="search_form_layout"
+                :biq-public-key="appSettings.biq_pk"
+                :biq-places-lookup="placesLookup"
+                :biq-quotes-from="quotesFrom"
+                :use-labels="use_search_labels"
+                :search-on-load="searchOnLoad"
+                :debugging="debugging"
+                @submit="onQuotesSearchSubmit"
+                @biqQuotesSearched="onQuotesSearched"
+                @biqZeroQuotes="onZeroQuotes"
+                @biqQuotesError="onQuotesError"
+            ></the-biq-search-form>
+        </div>
+
+        <the-biq-journey-outline
+            :journey-type="searchDetails.journey_type"
+            :pickup="searchDetails.pickup"
+            :destination="searchDetails.destination"
+            :date="searchDetails.date"
+            :time="searchDetails.time"
+            :passengers="searchDetails.people"
+            id="biq-journey-outline"
+        >
+        </the-biq-journey-outline>
 
         <the-biq-search-results v-if="showResults" 
             :display-results-type="appSettings.quote_type"
@@ -56,6 +86,7 @@
         ...mapGetters([
         // BIQ Quote Search state
             'searchOnLoad',
+            'searchDetails',
             'hasSearchResults',
             'displayType',
         // BIQ Quoting state
@@ -63,8 +94,8 @@
             'quotesError', 
             'quotesLoaded', 
             'journeyID', 
-            'journeyDetails', 
             'journeyQuotes', 
+            'journeyDetails',
         // BIQ Book Now Checkout state
             'quoteID',
             'vehicleIndex'
@@ -84,6 +115,14 @@
 
         showRecommendedUpgrade : function() {
             return (this.appSettings.recommend_upgrade && this.show_upgrade);
+        },
+
+        quotePickupPosition : function() {
+            return this.journeyDetails.pickup.position;
+        },
+
+        quoteDestinationPosition : function() {
+            return this.journeyDetails.destination.position;
         }
     };
     // define the Home Page component methods 
@@ -280,13 +319,17 @@
         ],
 
         components : {
+            'the-biq-journey-route-map' : () => import(/* webpackChunkName: "BIQJourneyRouteMap", webpackPrefetch: true */ 'BIQ/JourneyRouteMap.vue'),
             'the-biq-search-form' : TheSearchForm,
+            'the-biq-journey-outline' : () => import(/* webpackChunkName: "BIQJourneyOutline", webpackPrefetch: true */ 'BIQ/JourneyOutline.vue'),
             'the-biq-search-results' : () => import(/* webpackChunkName: "BIQSearchResults", webpackPrefetch: true */ 'BIQ/TheSearchResults.vue'),
             'biq-quote-upgrade-offer-modal' : () => import(/* webpackChunkName: "BIQQuoteUpgradeOffer", webpackPrefetch: true */ 'BIQ/QuoteUpgradeOfferModal.vue')
         },
 
         data() {
             return {
+                search_form_layout : 'compact-column',
+                use_search_labels : false,
                 selected : {
                     journey : '',
                     quote : {

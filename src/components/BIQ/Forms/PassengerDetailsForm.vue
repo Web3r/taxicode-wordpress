@@ -2,7 +2,6 @@
     <div id="biq-passenger-details-form-section">
         <div v-if="$slots.heading || heading" 
             id="biq-passenger-details-form-heading"
-            class="d-flex"
         >
             <slot 
                 name="heading"
@@ -13,10 +12,7 @@
         </div>
 
         <div class="d-flex flex-wrap justify-content-between row-col">
-            <div 
-                id="biq-passenger-name" 
-                class="flex-fill"
-            >
+            <div id="biq-passenger-name">
                 <label 
                     :for="fields.name.id"
                 >{{fields.name.label}}</label>
@@ -38,10 +34,7 @@
                 >{{fields.name.help}}</small>
             </div>
 
-            <div 
-                id="biq-passenger-email" 
-                class="flex-fill"
-            >
+            <div id="biq-passenger-email">
                 <label 
                     :for="fields.email.id"
                 >{{fields.email.label}}</label>
@@ -65,10 +58,7 @@
         </div>
 
         <div class="d-flex flex-wrap justify-content-between row-col">
-            <div 
-                id="biq-passenger-telephone" 
-                class="flex-fill"
-            >
+            <div id="biq-passenger-telephone">
                 <label 
                     :for="fields.telephone.id"
                 >{{fields.telephone.label}}</label>
@@ -90,10 +80,7 @@
                 >{{fields.telephone.label}}</small>
             </div>
 
-            <div 
-                id="biq-passenger-flight-number" 
-                class="flex-fill"
-            >
+            <div id="biq-passenger-flight-number">
                 <label 
                     :for="fields.flight_number.id"
                 >{{fields.flight_number.label}}</label>

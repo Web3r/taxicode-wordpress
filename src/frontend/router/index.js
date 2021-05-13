@@ -4,6 +4,7 @@ import Router from 'vue-router';
 
 // make the component load async to reduce chunk size
 const HomePageComponent = () => import(/* webpackChunkName: "BIQSearch", webpackPrefetch: true */ 'frontend/views/HomePage.vue')
+const HomePage2 = () => import(/* webpackPrefetch: true */ 'frontend/pages/Home.vue')
 
 // allow vue to use the web router plugin & ensure single inclusion
 Vue.use(Router);
@@ -14,6 +15,11 @@ export default new Router({
             path : '/',
             name : 'HomePage',
             component : HomePageComponent
+        },
+        {
+            path : '/vx/',
+            name : 'HomePage2',
+            component : HomePage2
         },
         {
             path : '/:journey',

@@ -1,0 +1,45 @@
+/*
+ * Beginning of the BIQ search form theme settings 
+ * 
+ * - #biq-search-form is common to all search form layouts
+ * - biq-layout-compact is specific to the homepage search lite varient of the app
+ * - biq-layout-column applies to the main BIQ app
+ */ 
+
+/*
+ * Beginning of the BIQ search form common theme settings 
+ */ 
+#biq-search-form select.biq-journey {
+    background : #fff url(../../images/forms/quote/journey_type.png) no-repeat 8px center;
+}
+#biq-search-form input[type="text"].biq-pickup {
+    background : #fff url(../../images/forms/quote/pickup.png) no-repeat 8px center;
+}
+#biq-search-form input[type="text"].biq-destination {
+    background : #fff url(../../images/forms/quote/destination.png) no-repeat 8px center;
+}
+#biq-search-form input[type="text"].biq-via {
+    background : #fff url(../../images/forms/quote/via.png) no-repeat 8px center;
+}
+#biq-search-form input[type="number"].biq-people {
+    background : #fff url(../../images/forms/quote/passengers.png) no-repeat 8px center;
+}
+/*
+ * End of the BIQ search form common theme settings 
+ */ 
+
+#biq-search-form button.btn-primary,
+#biq-checkout-form button.btn-primary {
+    background : #e4733d;
+    color : #fff !important;
+}
+/*
+ * Beginning of the BIQ search journey outline theme settings 
+ */ 
+#biq-journey-outline .journey-outline ul.data-line:before {
+    background-color: #e4733d;
+}
+
+/*
+* End of the common / global search form styles
+*/ 

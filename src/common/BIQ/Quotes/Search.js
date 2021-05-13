@@ -1,6 +1,7 @@
 // define the journey type search options
 export const JOURNEY_TYPE_OPTION_SINGLE = 'One Way';
 export const JOURNEY_TYPE_OPTION_RETURN = 'Return';
+export const JOURNEY_TYPE_OPTION_HOURLY = 'Hourly';
 // define the available journey search options
 export const JOURNEY_TYPE_OPTIONS = [
     JOURNEY_TYPE_OPTION_SINGLE, 

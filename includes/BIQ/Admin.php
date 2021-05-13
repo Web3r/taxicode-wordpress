@@ -17,15 +17,13 @@ class Admin
     
     /**
      * @var string The Admin menu link slug to the admin page
-     * @todo remove legacy taxicode name reference
      */
-    const MENU_SLUG = "taxicode-app";
+    const MENU_SLUG = "biq-client-app";
     
     /**
      * @var string The Admin menu display language block text
-     * @todo remove legacy taxicode name reference
      */
-    const MENU_DOMAIN_TEXT = "Taxicode";
+    const MENU_DOMAIN_TEXT = "BIQ Client";
 
     /**
      * Add the BIQ Admin menu item
@@ -68,7 +66,11 @@ class Admin
      */
     public function enqueue_scripts()
     {
+        // include the mapbox styles
+        wp_enqueue_style('biq-mapbox');
+        // include the scoped app styles generated
         wp_enqueue_style("biq-admin");
+        // include the app script
         wp_enqueue_script("biq-admin");
     }
 
@@ -80,6 +82,7 @@ class Admin
         $content = '
 <script>
     const biqAppURL = \'' . BIQ_REST_URL . '\';
+    const biqAppAssetsURL = \'' . BIQ_PLUGIN_URL . '/assets/\';
     const biqAppDebugEnabled = ' . json_encode(BIQ_PLUGIN_DEBUG) . ';
     const admin_nonce = \'' . wp_create_nonce("wp_rest") . '\';
 </script>

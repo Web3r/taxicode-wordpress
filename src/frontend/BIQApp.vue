@@ -4,6 +4,7 @@
             :app-config="appConfig"
             :app-settings="appSettings" 
             :appRESTBase="appURL"
+            :appAssetURL="appAssetURL"
             :debugging="appDebugEnabled"
         ></router-view>
     </div>
@@ -121,6 +122,7 @@
                 settings : {
                     biq_api_host : this.biqAppConfig.biq.LIVE_API_HOST,
                     biq_pk : '',
+                    mapbox_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
                     stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,

@@ -21,7 +21,7 @@
                         </slot>
                     </div>
 
-                    <div class="modal-body d-flex flex-wrap">
+                    <div class="modal-body">
                         <slot 
                             name="body"
                             :upgrade="upgrade_props"
@@ -61,7 +61,7 @@
     // import the vehicle specific upgrade stuff
     import { emptyUpgradeProps } from '@BIQ/VehicleUpgrade';
     // import the CSS specific to the modal popup (webpack will chunk this  & auto load / include separately)
-    import 'frontend/static-assets/css/modal_popup.css';
+    import 'frontend/static-assets/less/common/modal_popup.less';
 
     // define the component properties
     const props = {

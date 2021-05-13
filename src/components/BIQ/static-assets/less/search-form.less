@@ -1,0 +1,42 @@
+/*
+ * BIQ Search Form input icons 
+ */ 
+@form-input-icon : no-repeat 8px center;
+ 
+@form-input-icon-journey : url('~BIQ-Images/forms/quote/journey_type.png') @form-input-icon;
+@form-input-icon-pickup : url('~BIQ-Images/forms/quote/pickup.png') @form-input-icon;
+@form-input-icon-destination : url('~BIQ-Images/forms/quote/destination.png') @form-input-icon;
+@form-input-icon-via : url('~BIQ-Images/forms/quote/via.png') @form-input-icon;
+@form-input-icon-passengers : url('~BIQ-Images/forms/quote/passengers.png') @form-input-icon;
+ 
+.search-form-bg() {
+    border : 3px solid @primary-colour;
+    background : @primary-colour;
+    color : lighten(@primary-colour, 35%) !important;
+}
+
+.search-form-input() {
+    -webkit-appearance : none;
+    padding : 8px 8px 8px 34px;
+}
+
+.search-form-journey() {
+    background : @primary-text-colour @form-input-icon-journey;
+    .search-form-input();
+}
+.search-form-pickup() {
+    background : @primary-text-colour @form-input-icon-pickup;
+    .search-form-input();
+}
+.search-form-via() {
+    background : @primary-text-colour @form-input-icon-via;
+    .search-form-input();
+}
+.search-form-destination() {
+    background : @primary-text-colour @form-input-icon-destination;
+    .search-form-input();
+}
+.search-form-passengers() {
+    background : @primary-text-colour @form-input-icon-passengers;
+    .search-form-input();
+}

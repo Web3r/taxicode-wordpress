@@ -1,0 +1,48 @@
+
+#biq-search-form {
+    width : 100%;
+}
+
+#biq-vue-app input[type="text"],
+#biq-vue-app input[type="number"],
+#biq-vue-app input[type="email"],
+#biq-vue-app select {
+    border-radius : 0.25rem;
+}
+
+#biq-search-form button.btn-primary,
+#biq-checkout-form button.btn-primary {
+  	line-height: 1;
+  	padding: 12px 0px 12px 0px;
+  	width: 100%;
+  	border: none;
+  	border-radius: 0.25rem;
+}
+
+#biq-search-form .row-col, 
+#biq-checkout-form .row-col {
+    gap : .5em;
+}
+
+/*
+ * Beginning of the BIQ search column form layout specific global settings 
+ */ 
+#biq-search-form.biq-layout-column {
+    gap : .2em;
+    border-radius : 0.25rem;
+}
+/*
+* End of the column search form layout global overrinding styles
+*/ 
+
+/*
+ * Beginning of the BIQ search compact form layout specific global settings 
+ */ 
+#biq-search-form.biq-layout-compact-row, 
+#biq-search-form.biq-layout-compact {
+    margin : 50px auto 50px auto;
+    border-radius : 0.25rem;
+}
+/*
+* End of the compact search form layout global overrinding styles
+*/ 

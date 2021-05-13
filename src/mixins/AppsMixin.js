@@ -10,6 +10,13 @@ export const appProps = {
         // @todo add a validator to ensure the URL ends with a /
     },
 
+    appAssetURL : {
+        type : String,
+        required : true,
+        default : '//',
+        // @todo add a validator to ensure the URL ends with a /
+    },
+
     appDebugEnabled : {
         type : Boolean,
         default : false

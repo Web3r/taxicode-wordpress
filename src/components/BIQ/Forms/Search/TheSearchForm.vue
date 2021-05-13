@@ -3,6 +3,7 @@
         :biq-public-key="biqPublicKey"
         :biq-places-lookup="biqPlacesLookup"
         :biq-quotes-from="biqQuotesFrom"
+        :use-labels="useLabels"
         :search-on-load="searchOnLoad"
         :debugging="debugging"
         @submit="onSubmit"
@@ -35,6 +36,18 @@
             name : 'compact',
             tag : 'the-biq-search-form-compact',
             component : () => import(/* webpackChunkName: "BIQTheSearchFormCompact" */ 'BIQ/Forms/Search/Layouts/Compact.vue')
+        },
+        'compact-row' : {
+        // compact single row fields & search button under
+            name : 'compact-row',
+            tag : 'the-biq-search-form-compact-row',
+            component : () => import(/* webpackChunkName: "BIQTheSearchFormCompactRow" */ 'BIQ/Forms/Search/Layouts/CompactRow.vue')
+        },
+        'compact-column' : {
+        // compact single column fields & search button under
+            name : 'compact-column',
+            tag : 'the-biq-search-form-compact-column',
+            component : () => import(/* webpackChunkName: "BIQTheSearchFormCompactColumn" */ 'BIQ/Forms/Search/Layouts/CompactColumn.vue')
         }
     };
     // build the object list of search form layout components that can be registered
@@ -66,12 +79,7 @@
     const computed = {
         useLayout : function() {
             // determine which form layout component is being used
-            switch(this.layout) {
-                case layouts.compact.name :
-                    return layouts.compact.tag;
-                case layouts.column.name :
-                    return layouts.column.tag;
-            }
+            return layouts[this.layout].tag;
         }
     };
     // define the component methods

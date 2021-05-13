@@ -52,6 +52,90 @@
         </tr>
         <tr>
             <th scope="row">
+                <label 
+                    for="mapbox_public"
+                >Mapbox Public API key</label>
+            </th>
+            <td>
+                <input 
+                    v-model="form.mapbox_public" 
+                    id="mapbox_public" 
+                    placeholder="The Mapbox Public API key" 
+                    :required="true"
+                    :class="validation_errors.mapbox_public" 
+                    type="text" 
+                    class="regular-text" 
+                    aria-describedby="mapbox_publicHelp" 
+                />
+
+                <button 
+                    @click="onMapTestClick" 
+                    class="button button-secondary"
+                >Test</button>
+
+                <popup-modal v-if="show_map_test_modal"
+                    header="Mapbox API integration test"
+                    footer="Cancel"
+                    @cancel="show_map_test_modal = false"
+                >
+                    <!-- you can use custom content here to overwrite default content -->
+                    <template #body>
+                        <the-biq-journey-route-map
+                            ref="map"
+                            :mapbox-public-key="form.mapbox_public"
+                            :mapbox-style="form.mapbox_style"
+                            :pickup="geo_coords.london"
+                            :destination="geo_coords.lhr"
+                            :debugging="debugging"
+                            @directionsError="console.log('map error', $event)"
+                        >
+                        </the-biq-journey-route-map>
+                    </template>
+
+                    <!-- you can use custom content here to overwrite default content -->
+                    <template #footer="{ text, cancel }">
+                        <button 
+                            class="button button-secondary" 
+                            @click="cancel"
+                        >{{text}}</button>
+                    </template>
+
+                </popup-modal>
+                
+                <br />
+                <small 
+                    id="mapbox_publicHelp" 
+                    class="form-text text-muted"
+                >The Mapbox Public API key to display journey routes</small>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label 
+                    for="mapbox_style"
+                >Mapbox Style</label>
+            </th>
+            <td>
+                <input 
+                    v-model="form.mapbox_style" 
+                    id="mapbox_" 
+                    placeholder="mapbox://style" 
+                    :required="true"
+                    :class="validation_errors.mapbox_style" 
+                    type="text" 
+                    class="regular-text" 
+                    aria-describedby="mapbox_styleHelp" 
+                />
+                <br />
+                
+                <small 
+                    id="mapbox_styleHelp" 
+                    class="form-text text-muted"
+                >The Mapbox style to display journey routes with.</small>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label>Booking Test Mode</label>
             </th>
             <td>
@@ -199,4 +283,5 @@
         @click="onReloadSettings" 
         class="button button-secondary"
     >Reload Settings</button>
+
 </div>

@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Taxicode BIQ API Client
+Plugin Name: Booking Instant Quotes Client
 Plugin URI: https://api.taxicode.com
-Description: A search and checkout client for the Taxicode Booking Instant Quotes API
+Description: A Booking Instant Quotes search and checkout client using the Taxicode API
 Version: 1.0.1
 Author: Evil Wizard
 Author URI: https://taxicode.com/
@@ -77,12 +77,11 @@ if(file_exists(BIQ_PLUGIN_LOCATION . "vendor/autoload.php")) {
 
 
 /**
- * Taxicode Extend and customised the BIQ plugin
+ * BIQClient Extend and customised the BIQ plugin
  *
- * @class Taxicode
- * @todo remove legacy taxicode name reference
+ * @class BIQClient
  */
-final class Taxicode extends BIQ\Plugin
+final class BIQClient extends BIQ\Plugin
 {
     /**
      * @var string The plugin version string
@@ -92,39 +91,9 @@ final class Taxicode extends BIQ\Plugin
     /**
      * @var string The registered REST namespace base for routes
      */
-    const REST_NAMESPACE = "taxicode/v1/";
-    
-    /**
-     * @var string The language text domain to register 
-     */
-    const TEXT_DOMAIN = "taxicode";
-    
-    /**
-     * @var string The prefix to all the plugin wp options saved settings
-     */
-    const OPTIONS_NAME_PREFIX = "tcplugin_";
-
-    /**
-     * what to do when the plugin is activated / updated
-     */
-    public function activate()
-    {
-        parent::activate();
-        if(BIQPluginUpdater::treason(static::VERSION, get_option("biq_version", "0.0.0"))) {
-        // no version change, so nothing to do
-            return;
-        }
-        // legacy plugin name in process of removal
-        // @todo remove legacy taxicode name reference
-        $installed = get_option('taxicode_installed');
-        if(!$installed) {
-            update_option('taxicode_installed', time());
-        }
-        update_option('taxicode_version', static::VERSION);
-    }
+    const REST_NAMESPACE = "biq-client/v1/";
 
 }
 
-// @todo remove legacy taxicode name reference
-$taxicode = Taxicode::getInstance()
-                    ->init($debugging);
+BIQClient::getInstance()
+        ->init($debugging);

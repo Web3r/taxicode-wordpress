@@ -1,3 +1,6 @@
+// import the mixin that sets values & validates field values
+import { appProps } from 'mixins/AppsMixin';
+
 // define the Pages component Mixin properties
 export const pagesProps = {
     appConfig : {
@@ -16,9 +19,16 @@ export const pagesProps = {
         }
     },
 
+    appRESTBase : {
+        ...appProps.appURL
+    },
+
+    appAssetURL : {
+        ...appProps.appAssetURL
+    },
+
     debugging : {
-        type : Boolean,
-        default : false
+        ...appProps.appDebugEnabled
     }
 };
 

@@ -32,6 +32,11 @@ export const searchProps = {
         default : 'biq'
     },
 
+    useLabels : {
+        type : Boolean,
+        default : true
+    },
+
     searchOnLoad : {
         type : Boolean,
         default : false
@@ -53,13 +58,11 @@ const computed = {
     },
 
     datePickerIconAsset : function() {
-        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-date.png';
-        //return '/assets/images/form-date.png';
+        return require('frontend/static-assets/images/forms/quote/date.png');
     },
 
     timePickerIconAsset : function() {
-        return 'https://www.travarooo.com/wp-content/uploads/2020/03/form-time.png';
-        //return '/assets/images/form-time.png';
+        return require('frontend/static-assets/images/date_time.png');
     }
 };
 // define the BIQ Search component Mixin methods

@@ -1,6 +1,9 @@
 <template>
     <div class="d-flex flex-wrap justify-content-between row-col">
-        <div id="tcplugin-cardholder-details" class="d-flex flex-wrap justify-content-between flex-fill row-col">
+        <div 
+            id="biq-cardholder-details" 
+            class="d-flex flex-wrap justify-content-between flex-fill row-col"
+        >
             <div class="flex-fill">
                 <label 
                     :for="fields.cardholder_name.id"

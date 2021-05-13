@@ -5,7 +5,8 @@
         :admin-nonce="admin_nonce"
         :app-config="appConfig"
         :app-settings="appSettings"
-        :appRESTBaseURL="appURL"
+        :appRESTBase="appURL"
+        :appAssetURL="appAssetURL"
         :debugging="appDebugEnabled"
         @appSettingsUpdated="appSettingsUpdated" 
     ></router-view>
@@ -98,6 +99,7 @@
                     // default exposable app settings
                     biq_api_host : biqConf.LIVE_API_HOST,
                     biq_pk : '',
+                    mapbox_pk : '',
                     paypal_pk : '',
                     stripe_pk : '',
                     stripe_cardform_style : DEFAULT_STRIPE_CARD_STYLE,

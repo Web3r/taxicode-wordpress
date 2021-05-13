@@ -49,6 +49,7 @@ class SearchLite
 </style>
 <script>
     const biqAppURL = \'' . BIQ_REST_URL . '\';
+    const biqAppAssetsURL = \'' . BIQ_PLUGIN_URL . '/assets/\';
     const biqAppDebugEnabled = ' . json_encode(BIQ_PLUGIN_DEBUG) . ';
     const biqSearchTarget = \'' . $search_target_permalink . '\';
 </script>
@@ -62,11 +63,10 @@ class SearchLite
      */
     protected function enqueue_assets()
     {
-        // @todo remove legacy taxicode name reference
         // include the vendor specific styles used
         //wp_enqueue_style("biq-vendors-vue");
         // include the vendor specific styles used
-        wp_enqueue_style("taxicode-vendors");
+        wp_enqueue_style("biq-vendors");
         // include the scoped app styles generated
         wp_enqueue_style("biq-search-lite");
         // include the app script

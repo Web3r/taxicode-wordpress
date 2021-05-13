@@ -52,7 +52,7 @@
     // import the state getters mapper
     import { mapGetters } from 'vuex';
     // import the date & time string functions for display
-    import { journeyDetailsLabels } from '@BIQ/Journey';
+    import { journeyDetailsLabels, journeyDisplayPrice } from '@BIQ/Journey';
 
     // define the component default text labels used (can be overridden with the 'labels' prop)
     const defaultLabels = {
@@ -97,12 +97,12 @@
         ]),
 
         displayPrice : function() {
-            return `&pound;${this.price.toFixed(2)}`;
+            return journeyDisplayPrice(this.price);
         }
     };
 
     export default {
-        name : "QuotedJourneyDetails",
+        name : 'QuotedJourneyDetails',
         props,
         computed,
 

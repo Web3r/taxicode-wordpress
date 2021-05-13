@@ -6,10 +6,12 @@ import Vue from 'vue';
 Vue.config.productionTip = false;
 // allow the use of dev tools before the vuex store is created
 Vue.config.devtools = devMode;
+// import the app CSS (webpack will chunk this  & auto load / include separately)
+import 'admin/static-assets/less/main.less';
 
 // fix the admin menu for the slug "taxicode-app"
 import menuFix from 'admin/utils/admin-menu-fix';
-menuFix('taxicode-app');
+menuFix('biq-client-app');
 
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -24,6 +26,7 @@ new Vue({
         props : {
             adminNonce : admin_nonce,
             appURL : biqAppURL,
+            appAssetURL : biqAppAssetsURL,
             appDebugEnabled : devMode || biqAppDebugEnabled
         }
     }),

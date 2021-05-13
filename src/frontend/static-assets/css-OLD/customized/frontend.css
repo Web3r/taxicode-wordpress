@@ -6,12 +6,12 @@
  * - biq-layout-column applies to the main BIQ app
  */ 
 
-
 /*
  * Beginning of the BIQ search column form layout specific global theme settings 
  */ 
 #biq-search-form.biq-layout-column {
-    gap : 1em;
+    border : 3px solid #e4733d;
+    background : #e4733d;
 }
 /*
 * End of the column search form layout global overrinding styles

@@ -1,0 +1,40 @@
+/*
+ * BIQ colour theme
+ */ 
+@primary-colour : #4020f7;
+@primary-text-colour : #fff;
+
+@width-all : 100%;
+
+@app-width : @width-all;
+
+@col-gap : .5em;
+@border-curve : 0.25rem;
+
+.primary-btn() {
+    border-radius : @border-curve;
+    background : @primary-colour !important;
+    color : lighten(@primary-colour, 35%) !important;
+}
+.secondary-btn() {
+    border-radius : @border-curve;
+    background : lighten(@primary-colour, 35%) !important;
+    color : @primary-colour !important;
+}
+.large-button() {
+    .primary-btn();
+    width : @width-all;
+    border : none !important;
+    line-height : 1.5 !important;
+    padding : 12px 0px 12px 0px;
+}
+        
+.card-header() {
+    width : @width-all;
+    background : @primary-colour;
+    color : lighten(@primary-colour, 35%) !important;
+    padding : .75rem 1.25rem;
+    font-size : 24px;
+    border-radius : 6px 6px 0px 0px !important;
+    margin-top : 24px !important;
+}

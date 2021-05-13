@@ -1,9 +1,9 @@
 <template>
     <div 
         :id="id" 
-        class="d-flex flex-wrap justify-content-between row-col"
+        class="d-flex flex-wrap justify-content-between flex-row row-col"
     >
-        <div class="flex-fill">
+        <div class="flex-column">
             <label 
                 :for="mount_on" 
                 class="control-label"
@@ -13,7 +13,7 @@
                 ref="card" 
                 :id="mount_on" 
                 :class="errorStateClass"
-                class="form-control stripe-card-container"
+                class="stripe-card-container form-control"
             ></div>
         </div>
 

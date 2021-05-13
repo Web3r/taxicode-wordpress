@@ -1,83 +1,93 @@
+/* Main app container div */
 #biq-vue-app {
-  /* Main app container div */
-  width: 100%;
+    width: 100%;
 }
 
+/* Home page (search) container div */
 #biq-home-page {
-  /* Home page (search) container div */
-  width: 100%;
+    width: 100%;
+}
+#biq-home-page-search {
+    margin : 50px auto 50px auto;
+    display: flex;
+}
+
+#biq-journey-route-map-container {
+    display: flex;
 }
 
 /*
  * Beginning of the BIQ search form common theme settings 
  */ 
 #biq-search-form select.biq-journey {
-	background : url(https://www.travarooo.com/wp-content/uploads/2020/03/journey-bg.png) no-repeat;
-  	-webkit-appearance : none;
-  	background-position : 8px center;
-    background-color : #fff;
+	background : #fff url(../images/forms/quote/journey_type.png) no-repeat 8px center;
+    -webkit-appearance : none;
     padding : 8px 8px 8px 34px;
 }
 #biq-search-form input[type="text"].biq-pickup {
-    background : url(https://www.travarooo.com/wp-content/uploads/2020/03/form-pickup.png) no-repeat;
+    background : #fff url(../images/forms/quote/pickup.png) no-repeat 8px center;
     -webkit-appearance : none;
-    background-position : 8px center;
-    background-color : #fff;
     padding : 8px 8px 8px 34px;
 }
 #biq-search-form input[type="text"].biq-destination {
-    background : url(https://www.travarooo.com/wp-content/uploads/2020/03/form-destination.png) no-repeat;
+    background : #fff url(../images/forms/quote/destination.png) no-repeat 8px center;
     -webkit-appearance : none;
-    background-position : 8px center;
-    background-color : #fff;
     padding : 8px 8px 8px 34px;
 }
 #biq-search-form input[type="text"].biq-via {
-    background : url(https://www.travarooo.com/wp-content/uploads/2020/03/form-via.png) no-repeat;
+    background : #fff url(../images/forms/quote/via.png) no-repeat 8px center;
     -webkit-appearance : none;
-    background-position : 8px center;
-    background-color :  #fff;
     padding : 8px 8px 8px 34px;
 }
 #biq-search-form input[type="number"].biq-people {
-    background : url(https://www.travarooo.com/wp-content/uploads/2020/07/form-people2.png) no-repeat;
+    background : #fff url(../images/forms/quote/passengers.png) no-repeat 8px center;
     -webkit-appearance : none;
-    background-position : 4px center;
-    background-color : #fff;
     padding : 8px 8px 8px 34px;
 }
 
 #biq-search-form button.btn-primary,
 #biq-checkout-form button.btn-primary {
-  	padding : 18px 24px 18px 24px;
-  	font-size : 18px !important;
-  	border-radius : 0.65rem;
+    padding : 18px 24px 18px 24px;
+    font-size : 18px !important;
+    border-radius : 0.65rem;
 }
 /*
  * End of the BIQ search form common theme settings 
  */ 
 
 /*
+ * Beginning of the BIQ search journey outline theme settings 
+ */ 
+#biq-journey-outline .journey-outline ul.data-line:before {
+    content: '';
+    height: 3px;
+    background-color: #4020f7;
+    position: absolute;
+    width: 77%;
+    z-index: -1;
+}
+
+/*
  * Beginning of the BIQ search results common theme settings 
  */ 
 #biq-search-results {
-  /* Home page (search result) container div */
-  width: 100%;
+    /* Home page (search result) container div */
+    width: 100%;
 }
 #results {
-  /* Home page (search quotes results) container div */
-  width: 100%;
+    /* Home page (search quotes results) container div */
+    width: 100%;
 }
 #biq-search-results #results .quote-card {
-  width: 18rem;
+    width: 18rem;
 }
 /*
  * End of the BIQ search form common theme settings 
  */ 
 
 #biq-checkout-page {
-  /* Checkout page (book now) container div */
-  width: 75%;
+    /* Checkout page (book now) container div */
+    width: 75%;
 }
 
 #biq-checkout-form #biq-passenger-details-form-heading,
@@ -100,6 +110,6 @@
 }
 
 #biq-payment-error {
-  /* Checkout page (payment error) container div */
-  width: 100%;
+    /* Checkout page (payment error) container div */
+    width: 100%;
 }

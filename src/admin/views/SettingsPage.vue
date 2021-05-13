@@ -9,6 +9,10 @@
     import Form from '@/common/Form';
     // import the flash message to display messages about updating the settings
     import FlashMessage from '@/components/FlashMessage.vue';
+    // import the basic modal popup
+    import BasicConfirmModal from '@/components/BasicConfirmModal.vue';
+    // import the geo coords
+    import { geoCoords } from '@BIQ/Journey';
     // import the setting form section components
     import SettingsAPIForm from 'BIQ/Forms/Admin/SettingsAPIForm.vue';
     import SettingsPaymentForm from 'BIQ/Forms/Admin/SettingsPaymentForm.vue';
@@ -34,6 +38,8 @@
 
         components : {
             'flash-message' : FlashMessage,
+            'popup-modal' : BasicConfirmModal,
+            'the-biq-journey-route-map' : () => import(/* webpackChunkName: "BIQJourneyRouteMap", webpackPrefetch: true */ 'BIQ/JourneyRouteMap.vue'),
             'biq-api-settings-form-section' : SettingsAPIForm,
             'biq-payment-settings-form-section' : SettingsPaymentForm
         },
@@ -42,13 +48,6 @@
             adminNonce : {
                 type : String,
                 default : ''
-            },
-
-            appRESTBaseURL : {
-                type : String,
-                required : true,
-                default : '//',
-                // @todo add a validator to ensure the URL ends with a /
             }
         },
 
@@ -57,6 +56,8 @@
                 page_title : 'Settings',
                 flash_message : false,
                 flash_message_timeout : 5000,
+                show_map_test_modal : false,
+                geo_coords : geoCoords,
                 form_sections : [
                     'apiSettingsForm',
                     'paymentSettingsForm'
@@ -67,10 +68,12 @@
                 },
                 form : new Form({
                     search_target_permalink : '/booking-instant-quotes/',
-                    test_mode : 0,
+                    mapbox_public : '',
+                    mapbox_style : 'mapbox://styles/mapbox/streets-v11',
+                    test_mode : 1,
                     quote_type : 'all',
                     recommend_upgrade : 0,
-                    complete_page_text : '',
+                    complete_page_text : 'Thank you for booking with us.',
                     custom_css : '',
                     preserve_on_submit : true
                 }),
@@ -119,6 +122,8 @@
 
             propagateSettingsToFormData : function() {
                 this.form.search_target_permalink = this.appSettings.search_target_permalink;
+                this.form.mapbox_public = this.appSettings.mapbox_pk;
+                this.form.mapbox_style = this.appSettings.mapbox_style;
                 // convert to number for ease then to string for radio input value
                 this.form.test_mode = (this.appSettings.booking_test_mode) ? 1 : 0;
                 this.form.quote_type = this.appSettings.quote_type;
@@ -126,6 +131,10 @@
                 this.form.recommend_upgrade = (this.appSettings.recommend_upgrade) ? 1 : 0;
                 this.form.complete_page_text = this.appSettings.complete_page_text;
                 this.form.custom_css = this.appSettings.custom_css;
+            },
+
+            onMapTestClick : function(evt) {
+                this.show_map_test_modal = true;
             },
 
             onSaveSettings : function(event) {
@@ -145,7 +154,7 @@
                 // just grab a self reference
                 const self = this;
                 // set the URL to post the updated settings to update the backend values
-                const biq_save_app_settings_url = `${this.appRESTBaseURL}settings/`;
+                const biq_save_app_settings_url = `${this.appRESTBase}settings/`;
                 if(this.debugging) {
                     console.group(`Updating BIQ App Settings to '${biq_save_app_settings_url}'`);
                 }
@@ -223,6 +232,12 @@
                 });
                 if(this.form.search_target_permalink == '') {
                     validation_errors.search_target_permalink = 'Permalink to a page to display the search results & booking checkout is required.'
+                }
+                if(this.form.mapbox_public == '') {
+                    validation_errors.mapbox_public = 'Mapbox API is required to display the quote journey route.'
+                }
+                if(this.form.mapbox_style == '') {
+                    validation_errors.mapbox_style = 'Mapbox Style is required to display the quote journey route.'
                 }
                 // set any validation errors
                 this.validation_errors = validation_errors;

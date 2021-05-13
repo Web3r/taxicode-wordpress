@@ -4,8 +4,8 @@
         class="biq-layout-column d-flex flex-column"
     >
         <div class="d-flex flex-wrap">
-            <div class="col-6">
-                <label 
+            <div class="flex-column">
+                <label v-if="useLabels" 
                     :for="fields.journey_type.id" 
                     :id="`${fields.journey_type.id}-select`"
                 >{{fields.journey_type.label}}</label>
@@ -29,7 +29,7 @@
                 :required="fields.pickup.required"
                 :error-state="fields.pickup.error"
                 :id="fields.pickup.id"
-                :label="fields.pickup.label"
+                :label="useLabels ? fields.pickup.label : ''"
                 :placeholder="fields.pickup.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
@@ -45,7 +45,7 @@
                 :required="fields.destination.required"
                 :error-state="fields.destination.error"
                 :id="fields.destination.id"
-                :label="fields.destination.label"
+                :label="useLabels ? fields.destination.label : ''"
                 :placeholder="fields.destination.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
@@ -63,7 +63,7 @@
                 :required="fields.via.required"
                 :error-state="fields.via.error"
                 :id="fields.via.id"
-                :label="fields.via.label"
+                :label="useLabels ? fields.via.label : ''"
                 :placeholder="fields.via.placeholder"
                 :debugging="debugging"
                 @biqPlacesLookupError="onPlacesLookupError"
@@ -71,7 +71,7 @@
             ></biq-places-lookup>
 
             <div class="flex-fill">
-                <label 
+                <label v-if="useLabels" 
                     :id="`${fields.people.id}-input`" 
                     :for="fields.people.id"
                 >{{fields.people.label}}</label>
@@ -92,7 +92,7 @@
 
         <div class="d-flex flex-wrap justify-content-between row-col">
             <div class="flex-fill">
-                <label 
+                <label v-if="useLabels"  
                     for="tcplugin-date" 
                     id="date-input"
                 >Date</label>
@@ -112,7 +112,7 @@
             </div>
 
             <div class="flex-fill">
-                <label 
+                <label v-if="useLabels"  
                     for="tcplugin-time" 
                     id="time-input"
                 >Time</label>
@@ -136,7 +136,7 @@
             class="d-flex flex-wrap justify-content-between row-col"
         >
             <div class="flex-fill">
-                <label 
+                <label v-if="useLabels"  
                     for="tcplugin-return-date" 
                     id="return_date-input"
                 >Return Date</label>
@@ -156,7 +156,7 @@
             </div>
 
             <div class="flex-fill">
-                <label 
+                <label v-if="useLabels"  
                     for="tcplugin-return-time" 
                     id="return_time-input"
                 >Return Time</label>

@@ -34,6 +34,8 @@ export const biqSettings = (s, d) => {
     return {
         biq_pk : s.taxicode_public,
         biq_api_host : s.biq_api_host,
+        mapbox_pk : s.mapbox_public,
+        mapbox_style : s.mapbox_style,
         paypal_pk : s.paypal_public,
         stripe_pk : s.stripe_public,
         // this is a string from the REST & doesn't parse to JSON well :(

@@ -1,7 +1,7 @@
 // import the dev mode flag from the common app & plugins setup 
 import { devMode } from './app_setup_common';
 // import the CSS specific to the search lite app (webpack will chunk this  & auto load / include separately)
-import 'frontend/static-assets/css/customized/search_lite.css';
+import 'frontend/static-assets/less/search_lite/main.less';
 // start importing & setting up the vue app
 import Vue from 'vue';
 
@@ -18,9 +18,10 @@ new Vue({
     render : h => h(BIQAppSearchLite, {
         props : {
             appURL : biqAppURL,
-            appDebugEnabled : devMode || biqAppDebugEnabled,
+            appAssetURL : biqAppAssetsURL,
             biqAppConfig : conf,
-            biqSearchTarget
+            biqSearchTarget,
+            appDebugEnabled : devMode || biqAppDebugEnabled
         }
     }),
     el : '#biq-vue-app'

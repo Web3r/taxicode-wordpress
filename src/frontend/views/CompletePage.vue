@@ -35,8 +35,7 @@
     // import the component to asynchronous display of the booked journey details
     import BookingJourneyDetails from 'BIQ/BookingJourneyDetails.vue';
     // import the Complete specific CSS (webpack will chunk this with others & auto load / include separately)
-    import 'frontend/static-assets/css/complete.css';
-    import 'frontend/static-assets/css/customized/complete.css';
+    import 'frontend/static-assets/less/frontend/pages/complete.less';
     
     // define the component data structure & the default / initial values (inherits extra data from PagesMixin)
     const defaultData = {

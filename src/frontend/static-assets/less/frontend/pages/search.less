@@ -1,0 +1,35 @@
+/* Home page (search) container div */
+#biq-search-page {
+    width : @width-all;
+
+    /** import the home page search */
+    @import url('../journey_search.less');
+
+    #biq-journey-outline.journey-outline {
+        /** import the journey outline constucts */
+        @import url('~BIQ-Less/journey-outline.less');
+        ul.data-line:before {
+            .journey-data-line();
+        }
+    }
+
+    #biq-search-results {
+        /* Home page (search result) container div */
+        width : @width-all;
+        #results {
+            /* Home page (quotes results) container div */
+            width : @width-all;
+
+            .quote-card {
+                width : 18rem;
+
+                .card-body {
+                    .btn-primary {
+                        .primary-btn();
+                    }
+                }
+            }
+        }
+    }
+
+}

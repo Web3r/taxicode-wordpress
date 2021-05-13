@@ -13,9 +13,8 @@ class Frontend
 {
     /**
      * @var string The shortcode to invoke the rendering
-     * @todo remove legacy taxicode name reference
      */
-    const SHORTCODE = "taxicode-app";
+    const SHORTCODE = "biq-frontend-app";
 
     /**
      * Add the Shortcode to use to invoke the rendering
@@ -47,9 +46,9 @@ class Frontend
 <style>
 ' . PluginSettings::get_option("custom_css", '') . '
 </style>
-<script src="https://js.stripe.com/v3/"></script>
 <script>
     const biqAppURL = \'' . BIQ_REST_URL . '\';
+    const biqAppAssetsURL = \'' . BIQ_PLUGIN_URL . '/assets/\';
     const biqAppDebugEnabled = ' . json_encode(BIQ_PLUGIN_DEBUG) . ';
     const paypalClientToken = \'' . $paypalClientToken . '\';
 
@@ -69,15 +68,17 @@ class Frontend
      */
     protected function enqueue_assets()
     {
-        // @todo remove legacy taxicode name reference
         // include the vendor specific styles used
         //wp_enqueue_style("biq-vendors-vue");
         // include the vendor specific styles used
-        wp_enqueue_style("taxicode-vendors");
+        wp_enqueue_style("biq-vendors");
+        // include the mapbox styles
+        wp_enqueue_style('biq-mapbox');
         // include the scoped app styles generated
-        wp_enqueue_style("taxicode-frontend");
+        wp_enqueue_style("biq-frontend");
         // include the app script
-        wp_enqueue_script("taxicode-frontend");
+        wp_enqueue_script("biq-frontend");
+        // include the stripe dependency
+        wp_enqueue_script("biq-stripe");
     }
-    
 }
