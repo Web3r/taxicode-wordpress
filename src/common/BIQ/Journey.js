@@ -1,24 +1,8 @@
 // import the date time library
 import moment from 'moment';
+// import the geo coords locations services
+import { emptyLocation } from '@BIQ/LocationService';
 
-// define the lat/lng for certain places
-export const geoCoords = {
-    london : [ 51.509865, -0.118092 ],
-    lhr : [ 51.470020, -0.454295 ],
-    toCoords : (a) => {
-        return {
-            lat : a[0],
-            lng : a[1]
-        }
-    }
-};
-
-// define an empty journey location structured object
-export const emptyLocation = {
-    string : '',
-    postcode : '',
-    position : [ 0, 0 ]
-};
 // define the empty structure of the journey details to use
 export const emptyJourneyDetails = {
     pickup : emptyLocation,
@@ -79,8 +63,6 @@ export const journeyDisplayPrice = (p) => '&pound;' + new Number(p).toFixed(2);
 
 // create a default exportable object container
 const Journey = {
-    geoCoords,
-    emptyLocation,
     emptyJourneyDetails,
     journeyDetailsLabels,
     journeyDetails,

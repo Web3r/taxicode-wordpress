@@ -59,7 +59,7 @@
 
 <script>
     // import the CSS specific to the modal popup (webpack will chunk this  & auto load / include separately)
-    import 'frontend/static-assets/less/common/modal_popup.less';
+    import 'BIQ-Less/modal-popup.less';
 
     // define the component properties
     const props = {

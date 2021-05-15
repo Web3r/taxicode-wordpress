@@ -1,7 +1,7 @@
 <template>
     <div id="biq-search-page">
         <div id="biq-journey-search">
-            <div 
+            <div v-if="!map_error"
                 id="biq-journey-route-map-container"
                 class="col-lg-4 pr-3 d-lg-block"
             >
@@ -9,10 +9,13 @@
                     ref="map"
                     :mapbox-public-key="appSettings.mapbox_pk"
                     :mapbox-style="appSettings.mapbox_style"
-                    :pickup="quotePickupPosition"
-                    :destination="quoteDestinationPosition"
+                    :pickup="quotePickup"
+                    :destination="quoteDestination"
+                    :loading-journey="loadingQuotes"
+                    :journey-error="quotesError"
+                    :journey-loaded="quotesLoaded"
                     :debugging="debugging"
-                    @directionsError="console.log('map error', $event)"
+                    @directionsError="map_error = true"
                 >
                 </the-biq-journey-route-map>
             </div>
@@ -117,12 +120,12 @@
             return (this.appSettings.recommend_upgrade && this.show_upgrade);
         },
 
-        quotePickupPosition : function() {
-            return this.journeyDetails.pickup.position;
+        quotePickup : function() {
+            return this.journeyDetails.pickup;
         },
 
-        quoteDestinationPosition : function() {
-            return this.journeyDetails.destination.position;
+        quoteDestination : function() {
+            return this.journeyDetails.destination;
         }
     };
     // define the Home Page component methods 
@@ -337,7 +340,8 @@
                         vehicle : 0
                     }
                 },
-                show_upgrade : false
+                show_upgrade : false,
+                map_error : false
             };
         },
 

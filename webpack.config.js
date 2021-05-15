@@ -9,6 +9,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const devMode = process.env.NODE_ENV !== 'production';
+const travarooo = false;
 
 // Naming and path settings
 const entryPoints = {
@@ -35,7 +36,10 @@ const webRoot = '/wp-content';
 // set the public access (web) path by removing the base of the absolute export path
 // so the lazy component loading can work out where to load the compiled assets in browser
 const publicPath = webRoot + exportPath.split(webRoot)[1];
-const pluginPath = (devMode) ? publicPath : publicPath.replace('taxicode', 'biq-client');
+const pluginPath = (travarooo) ? publicPath.replace('taxicode', 'biq-client') : publicPath;
+
+console.log("paths ", { publicPath, pluginPath });
+console.log("plugin path replace ", publicPath.replace('taxicode', 'biq-client'));
 
 // create an array of plugins being used
 const plugins = [];

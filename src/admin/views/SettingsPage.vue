@@ -12,7 +12,7 @@
     // import the basic modal popup
     import BasicConfirmModal from '@/components/BasicConfirmModal.vue';
     // import the geo coords
-    import { geoCoords } from '@BIQ/Journey';
+    import { LAT_LNG_LONDON, LAT_LNG_LHR } from '@BIQ/LocationService';
     // import the setting form section components
     import SettingsAPIForm from 'BIQ/Forms/Admin/SettingsAPIForm.vue';
     import SettingsPaymentForm from 'BIQ/Forms/Admin/SettingsPaymentForm.vue';
@@ -57,7 +57,10 @@
                 flash_message : false,
                 flash_message_timeout : 5000,
                 show_map_test_modal : false,
-                geo_coords : geoCoords,
+                mapbox_test : {
+                    pickup : LAT_LNG_LONDON,
+                    desination : LAT_LNG_LHR
+                },
                 form_sections : [
                     'apiSettingsForm',
                     'paymentSettingsForm'

@@ -84,8 +84,8 @@
                             ref="map"
                             :mapbox-public-key="form.mapbox_public"
                             :mapbox-style="form.mapbox_style"
-                            :pickup="geo_coords.london"
-                            :destination="geo_coords.lhr"
+                            :pickup="mapbox_test.pickup"
+                            :destination="mapbox_test.destination"
                             :debugging="debugging"
                             @directionsError="console.log('map error', $event)"
                         >
@@ -101,7 +101,7 @@
                     </template>
 
                 </popup-modal>
-                
+
                 <br />
                 <small 
                     id="mapbox_publicHelp" 
