@@ -1,7 +1,27 @@
 // import the geo coords locations services
 import { toLocationObject, geoCoords, geoJSONCoords, LAT_LNG_LONDON, LAT_LNG_LHR } from '@BIQ/LocationService';
 
-// defin pickup location component property
+// define location component property
+export const locationProp = {
+    type : Object,
+    required : true,
+    // @todo add a validator to make sure location object structure
+    default : function() { 
+        return toLocationObject('', '', [ 0, 0 ]);
+    }
+};
+// define the location related computed property methods
+export const locationComputed = {
+    geoJSONLocation : function() {
+        return geoJSONCoords.toCoords(this.location.position);
+    },
+
+    coordsLocation : function() {
+        return geoCoords.toCoords(this.location.position);
+    }
+};
+
+// define pickup location component property
 export const pickupLocationProp = {
     type : Object,
     required : true,
@@ -21,7 +41,7 @@ export const pickupLocationComputed = {
     }
 };
 
-// defin destination location component property
+// define destination location component property
 export const destinationLocationProp = {
     type : Object,
     required : true,
@@ -83,7 +103,7 @@ export const journeyLocationsMethods = {
             hmm : geoJSONCoords.toGeoJSON(geoCoords.centerOnCoords(this.pickup.position, this.destination.position))
         };
         console.log('WTF', { ...wtf });
-    },
+    }
 };
 
 // define the BIQ Journey Locations Mixin for components to include & inherit from

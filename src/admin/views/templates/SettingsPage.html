@@ -87,9 +87,13 @@
                             :pickup="mapbox_test.pickup"
                             :destination="mapbox_test.destination"
                             :debugging="debugging"
-                            @directionsError="console.log('map error', $event)"
+                            @directionsError="onMapTestError"
                         >
                         </the-biq-journey-route-map>
+
+                        <div v-if="map_test_error">
+                            <h3>Error</h3>
+                        </div>
                     </template>
 
                     <!-- you can use custom content here to overwrite default content -->

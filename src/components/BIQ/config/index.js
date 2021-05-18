@@ -9,6 +9,10 @@ export const DEFAULT_STRIPE_CARD_STYLE = {
         "color" : "red"
     }
 };
+// mine
+// const mapbox_key = 'pk.eyJ1IjoiZXZpbC13aXphcmQiLCJhIjoiY2tvbDVtZjAwMHB2ZjJvcWYxcWQ3ZWJyOCJ9.ZsLvVwGS1t8sClVF_ShItA';
+// biq / tc
+// const mapbox_key = 'pk.eyJ1IjoidGF4aWNvZGUiLCJhIjoiY2p2d2FiMmVoMXpvNjQ4bHE2aGc2ejZibiJ9.7cygLzU4V1K1CH8S_elamQ';
 /**
  * Variable name replacement to help reduce production size
  * 

@@ -39,6 +39,9 @@ export const geoCoords = {
     centerOnCoords
 };
 
+// I googles what comes first, it's lat then lng ffs
+// the markers want the coordinates the other way round, so to avoid confustion the position 
+// object { lat : 0,  lng : 0 } keys are used. FU Mapbox || vue-mapbox FU
 // define an object for working with lng lat coordinates compatible with GeoJSON
 export const geoJSONCoords = {
     // helpers to convert the result [ lat, lng ] to [ lng, lat ]

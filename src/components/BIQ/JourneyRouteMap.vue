@@ -8,45 +8,37 @@
         :center="geoJSONCenter" 
         @load="onMapLoaded" 
     >
-        <map-marker v-if="!loadingJourney"
-            :coordinates="geoJSONPickup" 
-            color="blue" 
+        <location-map-marker v-if="!loadingJourney"
+            :location="pickup"
+            :show-popup="show_debug"
+            :debugging="debugging"
+            location-type-label="Pickup"
+            color="green"
+            popup-anchor="top"
         >
-            <map-popup v-if="show_debug"
-                anchor="bottom"
-            >
-                <div>
-                    <ul>
-                        <li>Pickup : {{pickup}}</li>
-                        <li>Pickup Coords : {{coordsPickup}}</li>
-                        <li>Pickup GeoJSON : {{geoJSONPickup}}</li>
-                        <li>Center : {{center}}</li>
-                        <li>Center GeoJSON : {{geoJSONCenter}}</li>
-                        <li>Center Coords : {{coordsCenter}}</li>
-                    </ul>
-                </div>
-            </map-popup>
-        </map-marker>
+        </location-map-marker>
 
-        <map-marker v-if="!loadingJourney"
-            :coordinates="geoJSONDestination" 
-            color="blue" 
+        <location-map-marker v-if="!loadingJourney"
+            :location="destination"
+            :show-popup="show_debug"
+            :debugging="debugging"
+            location-type-label="Destination"
+            color="blue"
+            popup-anchor="top"
         >
-            <map-popup v-if="show_debug"
-                anchor="top"
-            >
-                <div>
-                    <ul>
-                        <li>Destination : {{destination}}</li>
-                        <li>Destination Coords : {{coordsDestination}}</li>
-                        <li>Destination GeoJSON : {{geoJSONDestination}}</li>
-                        <li>Center : {{center}}</li>
-                        <li>Center GeoJSON : {{geoJSONCenter}}</li>
-                        <li>Center Coords : {{coordsCenter}}</li>
-                    </ul>
-                </div>
-            </map-popup>
-        </map-marker>
+        </location-map-marker>
+
+        <map-popup v-if="show_debug"
+            :coordinates="geoJSONCenter" 
+        >
+            <div>
+                <ul>
+                    <li>Center : {{center}}</li>
+                    <li>Center GeoJSON : {{geoJSONCenter}}</li>
+                    <li>Center Coords : {{coordsCenter}}</li>
+                </ul>
+            </div>
+        </map-popup>
 
         <map-geo-json-layer v-if="geo_json.conf.active"
             :layer-id="mapboxLayerId"
@@ -62,8 +54,10 @@
 <script>
     // import the mapbox components
     import Mapbox from "mapbox-gl";
-    import { MglMap, MglMarker, MglPopup, MglGeojsonLayer } from "vue-mapbox";
-    // import the mixin that controls the BIQ search without form layout worries
+    import { MglMap, MglPopup, MglGeojsonLayer } from "vue-mapbox";
+    // import the journey location map marker
+    import JourneyLocationMapMarker from 'BIQ/JourneyLocationMapMarker.vue';
+    // import the mixin that handles coordinate geoJSON wiredness without worries
     import biqJourneyLocationsMixin from 'BIQ/mixins/JourneyLocationsMixin';
     // import the mapbox api stuff
     import { getDirections, mapStyles } from '@BIQ/MapBox';
@@ -150,9 +144,6 @@
                 fitBounds,
                 zoomOut
             } = actions;
-            // I googles what comes first, it's lat then lng ffs
-            // the markers what the coordinates the other way round, so to avoid confustion the position 
-            // object keys are used. FU Mapbox || vue-mapbox FU
             // make the map fit the confines of the pickup & destination
             await fitBounds([ this.geoJSONPickup, this.geoJSONDestination ], { animate : true });
             // add a little padding to the map bounds so the locations are not right at the edge
@@ -165,11 +156,8 @@
             this.wtf();
             this.map = evt.map;
             try {
-                // lol, this one is expecting the location as [ lat, lng ] FU Mapbox || vue-mapbox FU
                 // get the route directions between pickup & destination
-                this.geo_json.coords = await getDirections(this.pickup.position, this.destination.position, this.mapboxPublicKey, this.debugging);
-                // snap the map to the new location
-                //await this.snapTo(evt.component.actions);
+                this.geo_json.coords = await getDirections(this.geoJSONPickup, this.geoJSONDestination, this.mapboxPublicKey, this.debugging);
                 this.wtf();
             } catch(e) {
             // could be an axios error or response parsed error
@@ -196,9 +184,9 @@
 
         components : {
             'route-map' : MglMap,
-            'map-marker' : MglMarker,
             'map-geo-json-layer' : MglGeojsonLayer,
-            'map-popup' : MglPopup
+            'map-popup' : MglPopup,
+            'location-map-marker' : JourneyLocationMapMarker
         },
 
         data() {
@@ -216,7 +204,7 @@
                         replace : true,
                         replace_source : true
                     },
-                    coords : [ this.pickup.position, this.destination.position ],
+                    coords : [ this.geoJSONPickup, this.geoJSONDestination ],
                     layer : {
                         type : 'line',
                         layout : {
@@ -226,7 +214,7 @@
                         paint : {
                             'line-color' : '#0876BA',
                             'line-width' : 4,
-                            'line-opacity' : 1
+                            'line-opacity' : 0.5
                         }
                     }
                 }
@@ -235,6 +223,13 @@
 
         created() {
             this.mapbox = Mapbox;
+            console.log('created');
+            this.wtf();
+        },
+
+        mounted() {
+            console.log('mounted');
+            this.wtf();
         },
 
         updated() {

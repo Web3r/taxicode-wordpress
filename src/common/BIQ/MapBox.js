@@ -1,7 +1,5 @@
 // import the plugin to handle the Xhr AJAX API requests
 import axios from 'axios';
-// import the geo coords
-import { geoJSONCoords } from '@BIQ/LocationService';
 
 // function to build the mapbox directions API URL to call
 export const apiDirectionsURL = (a, b, token) => {
@@ -11,7 +9,7 @@ export const apiDirectionsURL = (a, b, token) => {
 }
 // asynchronous function to call the mapbox API for directions route geometry
 export const getDirections = async (a, b, token, d) => {
-    const URL = apiDirectionsURL(geoJSONCoords.toCoords(a), geoJSONCoords.toCoords(b), token);
+    const URL = apiDirectionsURL(a, b, token);
     if(d) {
         console.log('Mapbox API URL', URL);
     }

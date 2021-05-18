@@ -12,7 +12,7 @@
     // import the basic modal popup
     import BasicConfirmModal from '@/components/BasicConfirmModal.vue';
     // import the geo coords
-    import { LAT_LNG_LONDON, LAT_LNG_LHR } from '@BIQ/LocationService';
+    import { toLocationObject, LAT_LNG_LONDON, LAT_LNG_LHR } from '@BIQ/LocationService';
     // import the setting form section components
     import SettingsAPIForm from 'BIQ/Forms/Admin/SettingsAPIForm.vue';
     import SettingsPaymentForm from 'BIQ/Forms/Admin/SettingsPaymentForm.vue';
@@ -57,9 +57,10 @@
                 flash_message : false,
                 flash_message_timeout : 5000,
                 show_map_test_modal : false,
+                map_test_error : false,
                 mapbox_test : {
-                    pickup : LAT_LNG_LONDON,
-                    desination : LAT_LNG_LHR
+                    pickup : toLocationObject('London', '', LAT_LNG_LONDON),
+                    desination : toLocationObject('London Heathrow', 'TW6 1AP', LAT_LNG_LHR)
                 },
                 form_sections : [
                     'apiSettingsForm',
@@ -137,7 +138,16 @@
             },
 
             onMapTestClick : function(evt) {
+                // reset any previous map test error flag
+                this.map_test_error = false;
+                // set the flag to show the map test popup
                 this.show_map_test_modal = true;
+            },
+
+            onMapTestError : function(evt) {
+                console.log('map error', evt);
+                // set the map test error flag
+                this.map_test_error = true;
             },
 
             onSaveSettings : function(event) {
