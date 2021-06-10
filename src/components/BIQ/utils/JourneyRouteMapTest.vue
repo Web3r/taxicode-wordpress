@@ -228,7 +228,7 @@
     };
 
     export default {
-        name : 'JourneyRouteMap',
+        name : 'JourneyRouteMapTest',
         props,
         computed,
         methods,

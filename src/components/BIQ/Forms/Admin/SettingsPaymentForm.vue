@@ -73,7 +73,7 @@
                         class="form-text text-muted"
                     >
                         See <a 
-                            href="https://stripe.com/docs/js/appendix/style" 
+                            :href="stripe_style_guide_docs_url" 
                             title="Stripe JS Card Element Style Object" 
                             target="_blank"
                         >Stripe JS Card Element Style Object</a> for details of valid options.
@@ -87,6 +87,8 @@
 <script>
     // import the mixin that sets values & validates field values
     import ValidatesMixin from 'mixins/ValidatesMixin';
+    // import the BIQ static config
+    import { STRIPE_STYLE_GUIDE_DOCS_URL } from 'BIQ/config';
 
     // define the component properties
     const props = {
@@ -153,7 +155,8 @@
 
         data() {
             return {
-                fields : fF('')
+                fields : fF(''),
+                stripe_style_guide_docs_url : STRIPE_STYLE_GUIDE_DOCS_URL
             };
         },
 

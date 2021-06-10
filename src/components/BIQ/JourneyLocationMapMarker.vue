@@ -6,13 +6,26 @@
         <map-popup v-if="showPopup"
             :anchor="popupAnchor"
         >
-            <div>
-                <ul>
-                    <li>{{locationTypeLabel}} : {{location}}</li>
-                    <li>{{locationTypeLabel}} Coords : {{coordsLocation}}</li>
-                    <li>{{locationTypeLabel}} GeoJSON : {{geoJSONLocation}}</li>
-                </ul>
-            </div>
+            <slot 
+                name="popup-content"
+                :location="location"
+                :location-type-label="locationTypeLabel"
+                :geo-location="geoJSONLocation"
+            >
+                <div>
+                    <ul class="card list-group list-group-flush">
+                        <li class="list-group-item d-flex">
+                            {{locationTypeLabel}} : {{location}}
+                        </li>
+                        <li class="list-group-item d-flex">
+                            {{locationTypeLabel}} Coords : {{coordsLocation}}
+                        </li>
+                        <li class="list-group-item d-flex">
+                            {{locationTypeLabel}} GeoJSON : {{geoJSONLocation}}
+                        </li>
+                    </ul>
+                </div>
+            </slot>
         </map-popup>
     </map-marker>
 </template>
@@ -57,7 +70,8 @@
         popupAnchor : {
             type : String,
             default : anchorPoints[0],
-            validator : anchor => anchorPoints.indexOf(anchor) > -1
+            // validate the anchor point is one of the acepted values
+            validator : a => anchorPoints.indexOf(a) > -1
         },
 
         debugging : {
@@ -65,27 +79,19 @@
             default : false
         }
     };
-    // define the list of events the component emits & can be listened for
-    const emitEvents = {
-    };
     // define the component computed property methods
     const computed = {
         ...locationComputed
-    };
-    // define the component methods
-    const methods = {
     };
 
     export default {
         name : 'JourneyLocationMapMarker',
         props,
         computed,
-        methods,
 
         components : {
             'map-marker' : MglMarker,
             'map-popup' : MglPopup
-        },
-
+        }
     };
 </script>

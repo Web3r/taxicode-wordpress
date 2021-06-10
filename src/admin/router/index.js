@@ -11,6 +11,12 @@ export default new Router({
             path : '/',
             name : 'SettingsPage',
             component : () => import(/* webpackChunkName: "BIQAdminSettings" */ 'admin/views/SettingsPage.vue')
+        },
+
+        {
+            path : '/tests/',
+            name : 'TestsPage',
+            component : () => import(/* webpackChunkName: "BIQAdminTests" */ 'admin/views/TestsPage.vue')
         }
     ]
 });

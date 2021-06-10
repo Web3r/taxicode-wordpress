@@ -1,5 +1,30 @@
 <template>
     <div id="biq-search-page">
+        <the-biq-search-form
+            :layout="search_form_layout"
+            :biq-public-key="appSettings.biq_pk"
+            :biq-places-lookup="placesLookup"
+            :biq-quotes-from="quotesFrom"
+            :use-labels="use_search_labels"
+            :search-on-load="searchOnLoad"
+            :debugging="debugging"
+            @submit="onQuotesSearchSubmit"
+            @biqQuotesSearched="onQuotesSearched"
+            @biqZeroQuotes="onZeroQuotes"
+            @biqQuotesError="onQuotesError"
+        ></the-biq-search-form>
+
+        <the-biq-journey-outline
+            :journey-type="searchDetails.journey_type"
+            :pickup="searchDetails.pickup"
+            :destination="searchDetails.destination"
+            :date="searchDetails.date"
+            :time="searchDetails.time"
+            :passengers="searchDetails.people"
+            id="biq-journey-outline"
+        >
+        </the-biq-journey-outline>
+
         <div id="biq-journey-search">
             <div v-if="!map_error"
                 id="biq-journey-route-map-container"
@@ -20,58 +45,33 @@
                 </the-biq-journey-route-map>
             </div>
 
-            <the-biq-search-form
-                :layout="search_form_layout"
-                :biq-public-key="appSettings.biq_pk"
-                :biq-places-lookup="placesLookup"
-                :biq-quotes-from="quotesFrom"
-                :use-labels="use_search_labels"
-                :search-on-load="searchOnLoad"
+            <the-biq-search-results v-if="showResults" 
+                :display-results-type="appSettings.quote_type"
                 :debugging="debugging"
-                @submit="onQuotesSearchSubmit"
-                @biqQuotesSearched="onQuotesSearched"
-                @biqZeroQuotes="onZeroQuotes"
-                @biqQuotesError="onQuotesError"
-            ></the-biq-search-form>
+                @biqQuoteBookNow="onBookNowClicked"
+            >
+                <template #loading-quotes>
+                    <div class="d-flex">
+                        <div class="spinner-border"></div>&nbsp;Generating&nbsp;Quotes...
+                    </div>
+                </template>
+            </the-biq-search-results>
+
+            <biq-quote-upgrade-offer-modal v-if="showRecommendedUpgrade" 
+                :journey="selected.journey"
+                :quote="selected.quote.id"
+                :vehicle="selected.quote.vehicle"
+                :debugging="debugging"
+                @unavailable="onUpgradeUnavailable"
+                @cancel="onUpgradeModalCancel"
+                @confirm="onUpgradeModalConfirm"
+            >
+                <!-- you can use custom content here to overwrite default content -->
+                <template #body="{ upgrade }">
+                    <p>{{upgrade.description}}</p>
+                </template>
+            </biq-quote-upgrade-offer-modal>
         </div>
-
-        <the-biq-journey-outline
-            :journey-type="searchDetails.journey_type"
-            :pickup="searchDetails.pickup"
-            :destination="searchDetails.destination"
-            :date="searchDetails.date"
-            :time="searchDetails.time"
-            :passengers="searchDetails.people"
-            id="biq-journey-outline"
-        >
-        </the-biq-journey-outline>
-
-        <the-biq-search-results v-if="showResults" 
-            :display-results-type="appSettings.quote_type"
-            :debugging="debugging"
-            @biqQuoteBookNow="onBookNowClicked"
-        >
-            <template #loading-quotes>
-                <div class="d-flex">
-                    <div class="spinner-border"></div>&nbsp;Generating&nbsp;Quotes...
-                </div>
-            </template>
-        </the-biq-search-results>
-
-        <biq-quote-upgrade-offer-modal v-if="showRecommendedUpgrade" 
-            :journey="selected.journey"
-            :quote="selected.quote.id"
-            :vehicle="selected.quote.vehicle"
-            :debugging="debugging"
-            @unavailable="onUpgradeUnavailable"
-            @cancel="onUpgradeModalCancel"
-            @confirm="onUpgradeModalConfirm"
-        >
-            <!-- you can use custom content here to overwrite default content -->
-            <template #body="{ upgrade }">
-                <p>{{upgrade.description}}</p>
-            </template>
-        </biq-quote-upgrade-offer-modal>
     </div>
 </template>
 

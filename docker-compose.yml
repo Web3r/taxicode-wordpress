@@ -7,9 +7,8 @@ services:
         image: ewc2020/tc-wordpress-base:latest
         volumes:
             - wordpress_files:/var/www/html
-#            - plugin_files:/var/www/html/wp-content/plugins/taxicode
-            - ./:/var/www/html/wp-content/plugins/taxicode
-#        command: cd /var/www/html/wp-content/plugins/taxicode && npm run build
+#            - plugin_files:/var/www/html/wp-content/plugins/biq-client
+            - ./:/var/www/html/wp-content/plugins/biq-client
         restart: always
         ports:
             - "8080:80"

@@ -5,9 +5,9 @@ LABEL com.taxicode.target-env="wordpress-plugin"
 LABEL com.taxicode.target-env.version="latest"
 
 RUN set -ex \
-    git clone --branch docker-testing https://github.com/Web3r/taxicode-wordpress.git /usr/src/wordpress/wp-content/plugins/taxicode \
-    cd /usr/src/wordpress/wp-content/plugins/taxicode \
+    git clone --branch docker-testing https://github.com/Web3r/taxicode-wordpress.git /usr/src/wordpress/wp-content/plugins/biq-client \
+    cd /usr/src/wordpress/wp-content/plugins/biq-client \
     npm install \
     npm audit fix
 
-VOLUME /var/www/html/wp-content/plugins/taxicode
+VOLUME /var/www/html/wp-content/plugins/biq-client
