@@ -92,11 +92,7 @@
                     <img :src="timePickerIconAsset" />
                 </template>
             </b-form-timepicker>
-        </div>
 
-        <div 
-            class="d-flex align-items-center"
-        >
             <label v-if="useLabels" 
                 :id="`${fields.people.id}-input`" 
                 :for="fields.people.id"
@@ -113,40 +109,39 @@
                 min="1"
                 max="99"
             />
-        </div>
 
-
-        <div v-if="hasReturn"
-            class="d-flex flex-wrap "
-        >
-            <b-form-datepicker 
-                v-model="return_date" 
-                key="return_date"
-                :date-format-options="date_picker_formats.short"
-                :state="journeyDateTimeErrorState('return_date')" 
-                :required="hasReturn"
-                id="tcplugin-return-date" 
-                locale="en" 
-                class="biq-journey-return-date flex-sm-fill"
+            <div v-if="hasReturn"
+                class="d-flex flex-wrap "
             >
-                <template slot="button-content">
-                    <img :src="datePickerIconAsset" />
-                </template>
-            </b-form-datepicker>
-            
-            <b-form-timepicker 
-                v-model="return_time" 
-                key="return_time"
-                :state="journeyDateTimeErrorState('return_time')" 
-                :required="hasReturn"
-                id="tcplugin-return-time" 
-                locale="en"
-                class="biq-journey-return-time flex-sm-fill"
-            >
-                <template slot="button-content">
-                    <img :src="timePickerIconAsset" />
-                </template>
-            </b-form-timepicker>
+                <b-form-datepicker 
+                    v-model="return_date" 
+                    key="return_date"
+                    :date-format-options="date_picker_formats.short"
+                    :state="journeyDateTimeErrorState('return_date')" 
+                    :required="hasReturn"
+                    id="tcplugin-return-date" 
+                    locale="en" 
+                    class="biq-journey-return-date flex-sm-fill"
+                >
+                    <template slot="button-content">
+                        <img :src="datePickerIconAsset" />
+                    </template>
+                </b-form-datepicker>
+                
+                <b-form-timepicker 
+                    v-model="return_time" 
+                    key="return_time"
+                    :state="journeyDateTimeErrorState('return_time')" 
+                    :required="hasReturn"
+                    id="tcplugin-return-time" 
+                    locale="en"
+                    class="biq-journey-return-time flex-sm-fill"
+                >
+                    <template slot="button-content">
+                        <img :src="timePickerIconAsset" />
+                    </template>
+                </b-form-timepicker>
+            </div>
         </div>
 
         <div 

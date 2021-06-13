@@ -151,7 +151,7 @@
                 },
                 // component specific data
                 app_title : APP_TITLE,
-                search_form_layout : 'compact-row',
+                search_form_layout : 'compact',
                 use_search_labels : false,
                 search_on_load : false
             };
