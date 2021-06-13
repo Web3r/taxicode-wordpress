@@ -1,9 +1,35 @@
 /* Home page (search) container div */
 #biq-search-page {
+    display : flex;
+    flex-flow : column;
+    gap : @col-gap;
+    margin : 50px auto 50px auto;
     width : @width-all;
 
-    /** import the home page search */
-    @import url('../journey_search.less');
+
+    /** import the themed search form */
+    @import url('../../common/biq_search_form.less');
+
+    /** tweak search form margin as it's next to something & the margin is on the container*/
+    #biq-search-form {
+        margin : auto;
+    }
+
+    /** add some tweaks to the themed search forms specific to the layouts */
+    #biq-search-form.biq-layout-compact-column {
+        flex-flow : column;
+        gap : @col-gap;
+        border-radius :  @border-curve;
+    }
+    #biq-search-form.biq-layout-compact-row, 
+    #biq-search-form.biq-layout-compact {
+        flex-flow : row;
+        border-radius : @border-curve;
+    }
+
+    #biq-journey-route-map-container {
+        display : flex;
+    }
 
     #biq-journey-outline.journey-outline {
         /** import the journey outline constucts */
@@ -13,23 +39,35 @@
         }
     }
 
-    #biq-search-results {
-        /* Home page (search result) container div */
-        width : @width-all;
-        #results {
-            /* Home page (quotes results) container div */
+    #biq-journey-search {
+        display : flex;
+        margin : 50px auto 50px auto;
+
+        #biq-journey-route-map-container {
+            /* Home page (journey route map) container div */
+            width : @width-all;
+            flex-grow: 1;
+        }
+
+        #biq-search-results {
+            /* Home page (search result) container div */
             width : @width-all;
 
-            .quote-card {
-                width : 18rem;
+            #results {
+                /* Home page (quotes results) container div */
+                width : @width-all;
+                flex-grow: 2;
 
-                .card-body {
-                    .btn-primary {
-                        .primary-btn();
+                .quote-card {
+                    width : 18rem;
+
+                    .card-body {
+                        .btn-primary {
+                            .primary-btn();
+                        }
                     }
                 }
             }
         }
     }
-
 }

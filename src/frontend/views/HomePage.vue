@@ -331,7 +331,7 @@
 
         data() {
             return {
-                search_form_layout : 'compact-column',
+                search_form_layout : 'compact-row',
                 use_search_labels : false,
                 selected : {
                     journey : '',
