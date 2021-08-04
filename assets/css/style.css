@@ -1,0 +1,2247 @@
+/*!
+Theme Name: Travaroo
+Theme URI: http://underscores.me/
+Author: x0101
+Author URI: http://x0101.co.uk
+Description: Custom theme for Travaroo by Mike Hammond
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: LICENSE
+Text Domain: travaroo
+Tags: custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+
+Travaroo is based on Underscores https://underscores.me/, (C) 2012-2017 Automattic, Inc.
+Underscores is distributed under the terms of the GNU GPL v2 or later.
+
+Normalizing styles have been helped along thanks to the fine work of
+Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
+*/
+/*--------------------------------------------------------------
+>>> TABLE OF CONTENTS:
+----------------------------------------------------------------
+# Normalize
+# Typography
+# Elements
+# Forms
+# Navigation
+	## Links
+	## Menus
+# Accessibility
+# Alignments
+# Clearings
+# Widgets
+# Content
+	## Posts and pages
+	## Comments
+# Infinite scroll
+# Media
+	## Captions
+# Custom styles
+
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Normalize
+--------------------------------------------------------------*/
+/* normalize.css v8.0.0 | MIT License | github.com/necolas/normalize.css */
+
+/* Document
+	 ========================================================================== */
+
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in iOS.
+ */
+
+html {
+	line-height: 1.15; /* 1 */
+	-webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/* Sections
+	 ========================================================================== */
+
+/**
+ * Remove the margin in all browsers.
+ */
+
+body {
+	margin: 0;
+}
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+
+
+
+/* Grouping content
+	 ========================================================================== */
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+
+hr {
+	box-sizing: content-box; /* 1 */
+	height: 0; /* 1 */
+	overflow: visible; /* 2 */
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+pre {
+	font-family: monospace, monospace; /* 1 */
+	font-size: 1em; /* 2 */
+}
+
+/* Text-level semantics
+	 ========================================================================== */
+
+/**
+ * Remove the gray background on active links in IE 10.
+ */
+
+a {
+	background-color: transparent;
+}
+
+/**
+ * 1. Remove the bottom border in Chrome 57-
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+
+abbr[title] {
+	border-bottom: none; /* 1 */
+	text-decoration: underline; /* 2 */
+	text-decoration: underline dotted; /* 2 */
+}
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+
+b,
+strong {
+	font-weight: 500!important;
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+code,
+kbd,
+samp {
+	font-family: monospace, monospace; /* 1 */
+	font-size: 1em; /* 2 */
+}
+
+/**
+ * Add the correct font size in all browsers.
+ */
+
+small {
+	font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+
+sub {
+	bottom: -0.25em;
+}
+
+sup {
+	top: -0.5em;
+}
+
+/* Embedded content
+	 ========================================================================== */
+
+/**
+ * Remove the border on images inside links in IE 10.
+ */
+
+img {
+	border-style: none;
+}
+
+/* Forms
+	 ========================================================================== */
+
+/**
+ * 1. Change the font styles in all browsers.
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+	font-family: inherit; /* 1 */
+	font-size: 100%; /* 1 */
+	line-height: 1.15; /* 1 */
+	margin: 0; /* 2 */
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+
+button,
+input { /* 1 */
+	overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+	text-transform: none;
+}
+
+/**
+ * Correct the inability to style clickable types in iOS and Safari.
+ */
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+	-webkit-appearance: button;
+}
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+	border-style: none;
+	padding: 0;
+}
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+	outline: 1px dotted ButtonText;
+}
+
+/**
+ * Correct the padding in Firefox.
+ */
+
+fieldset {
+	padding: 0.35em 0.75em 0.625em;
+}
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *		`fieldset` elements in all browsers.
+ */
+
+legend {
+	box-sizing: border-box; /* 1 */
+	color: inherit; /* 2 */
+	display: table; /* 1 */
+	max-width: 100%; /* 1 */
+	padding: 0; /* 3 */
+	white-space: normal; /* 1 */
+}
+
+/**
+ * Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+
+progress {
+	vertical-align: baseline;
+}
+
+/**
+ * Remove the default vertical scrollbar in IE 10+.
+ */
+
+textarea {
+	overflow: auto;
+}
+
+/**
+ * 1. Add the correct box sizing in IE 10.
+ * 2. Remove the padding in IE 10.
+ */
+
+[type="checkbox"],
+[type="radio"] {
+	box-sizing: border-box; /* 1 */
+	padding: 0; /* 2 */
+}
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+	height: auto;
+}
+
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+
+[type="search"] {
+	-webkit-appearance: textfield; /* 1 */
+	outline-offset: -2px; /* 2 */
+}
+
+/**
+ * Remove the inner padding in Chrome and Safari on macOS.
+ */
+
+[type="search"]::-webkit-search-decoration {
+	-webkit-appearance: none;
+}
+
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+
+::-webkit-file-upload-button {
+	-webkit-appearance: button; /* 1 */
+	font: inherit; /* 2 */
+}
+
+/* Interactive
+	 ========================================================================== */
+
+/*
+ * Add the correct display in Edge, IE 10+, and Firefox.
+ */
+
+details {
+	display: block;
+}
+
+/*
+ * Add the correct display in all browsers.
+ */
+
+summary {
+	display: list-item;
+}
+
+/* Misc
+	 ========================================================================== */
+
+/**
+ * Add the correct display in IE 10+.
+ */
+
+template {
+	display: none;
+}
+
+/**
+ * Add the correct display in IE 10.
+ */
+
+[hidden] {
+	display: none;
+}
+
+/*--------------------------------------------------------------
+# Typography
+--------------------------------------------------------------*/
+body,
+button,
+input,
+select,
+optgroup,
+textarea {
+	color: #333;
+	font-family: 'Work Sans', sans-serif;
+	font-size: 16px;
+	font-size: 1rem;
+	line-height: 1.5;
+  	font-weight:400;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	clear: both;
+  	font-weight:500;
+}
+
+h1 {
+	font-size:4.6em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h2 {
+	font-size:3.6em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h3 {
+	font-size:2.6em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h4 {
+	font-size:1.6em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h5 {
+	font-size:1.2em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+
+p {
+	margin-bottom: 1.5em;
+}
+
+dfn, cite, em, i {
+	font-style: italic;
+}
+
+blockquote {
+	margin: 0 1.5em;
+}
+
+address {
+	margin: 0 0 1.5em;
+}
+
+pre {
+	background: #eee;
+	font-family: "Courier 10 Pitch", Courier, monospace;
+	font-size: 15px;
+	font-size: 0.9375rem;
+	line-height: 1.6;
+	margin-bottom: 1.6em;
+	max-width: 100%;
+	overflow: auto;
+	padding: 1.6em;
+}
+
+code, kbd, tt, var {
+	font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+	font-size: 15px;
+	font-size: 0.9375rem;
+}
+
+abbr, acronym {
+	border-bottom: 1px dotted #666;
+	cursor: help;
+}
+
+mark, ins {
+	background: #fff9c0;
+	text-decoration: none;
+}
+
+big {
+	font-size: 125%;
+}
+
+/*--------------------------------------------------------------
+# Elements
+--------------------------------------------------------------*/
+html {
+	box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+	/* Inherit box-sizing to make it easier to change the property for components that leverage other behavior; see https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
+	box-sizing: inherit;
+}
+
+body {
+	background: #fff;
+	/* Fallback for when there is no custom background color defined. */
+}
+
+hr {
+	background-color: #ccc;
+	border: 0;
+	height: 1px;
+	margin-bottom: 1.5em;
+}
+
+ul, ol {
+	margin: 0 0 1.5em 0em;
+}
+
+ul {
+	list-style: disc;
+}
+
+ol {
+	list-style: decimal;
+}
+
+li > ul,
+li > ol {
+	margin-bottom: 0;
+	margin-left: 1.5em;
+}
+
+dt {
+	font-weight: bold;
+}
+
+dd {
+	margin: 0 1.5em 1.5em;
+}
+
+img {
+	height: auto;
+	/* Make sure images are scaled correctly. */
+	max-width: 100%;
+	/* Adhere to container width. */
+}
+
+figure {
+	margin: 1em 0;
+	/* Extra wide images within figure tags don't overflow the content area. */
+}
+
+table {
+	margin: 0 0 1.5em;
+	width: 100%;
+}
+
+/*--------------------------------------------------------------
+# Forms
+--------------------------------------------------------------*/
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+	border: 1px solid;
+	border-color: #ccc #ccc #bbb;
+	border-radius: 3px;
+	background: #e6e6e6;
+	color: rgba(0, 0, 0, 0.8);
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1;
+	padding: .6em 1em .4em;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+	border-color: #ccc #bbb #aaa;
+}
+
+button:active, button:focus,
+input[type="button"]:active,
+input[type="button"]:focus,
+input[type="reset"]:active,
+input[type="reset"]:focus,
+input[type="submit"]:active,
+input[type="submit"]:focus {
+	border-color: transparent!important;
+  	border:none!important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="range"],
+input[type="date"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="color"],
+textarea {
+	color: #666;
+	border: 1px solid #ccc;
+	border-radius: 0px;
+	padding: 6px;
+  	width:100%;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="range"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="week"]:focus,
+input[type="time"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="color"]:focus,
+textarea:focus {
+	color: #111;
+}
+
+*, input, select, textarea, option, button {
+        outline: none!important;
+}
+
+select {
+	border: 1px solid #ccc;
+}
+
+textarea {
+	width: 100%;
+}
+
+input.submit-button {
+    color: #ffffff;
+    font-size: 16px;
+    text-align: center;
+    font-style: normal;
+    font-weight: normal;
+    padding-top: 16px;
+    padding-right: 25px;
+    padding-bottom: 16px;
+    padding-left: 25px;
+    line-height: 1em;
+    box-sizing: border-box;
+    display: block;
+    background-color: #e4733d;
+  	border:none;
+  	border-radius:8px;
+}
+
+/*--------------------------------------------------------------
+# Navigation
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+## Links
+--------------------------------------------------------------*/
+a {
+	color: royalblue;
+}
+
+a:visited {
+	color: purple;
+}
+
+a:hover, a:focus, a:active {
+	color: midnightblue;
+}
+
+a:focus {
+	outline: thin dotted;
+}
+
+a:hover, a:active {
+	outline: 0;
+}
+
+/*--------------------------------------------------------------
+## Menus
+--------------------------------------------------------------*/
+.main-navigation {
+	display: block;
+	float: left;
+	/*width: 70%;*/
+  	position: relative;
+	top:22px;
+}
+
+.main-navigation ul {
+	display: none;
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+}
+
+.main-navigation ul ul {
+	box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+	float: left;
+	position: absolute;
+	top: 100%;
+	left: -999em;
+	z-index: 99999;
+}
+
+.main-navigation ul ul ul {
+	left: -999em;
+	top: 0;
+}
+
+.main-navigation ul ul li:hover > ul,
+.main-navigation ul ul li.focus > ul {
+	left: 100%;
+}
+
+.main-navigation ul ul a {
+	width: 200px;
+}
+
+.main-navigation ul li:hover > ul,
+.main-navigation ul li.focus > ul {
+	left: auto;
+}
+
+.main-navigation li {
+	float: left;
+	position: relative;
+}
+
+.main-navigation a {
+	display: block;
+	text-decoration: none;
+  	color:#fff;
+  	font-size:18px;
+  	font-weight:500;
+  	padding:0px 30px 0px 30px;
+}
+.main-navigation a:hover {
+	color:#e4733d;
+}
+.main-navigation li::after {
+	content: "|";
+	float: right;
+	color: #fff;
+  margin-top:-28px;
+}
+.main-navigation li:last-child::after {
+	display: none;
+}
+
+/* Small menu. */
+.menu-toggle,
+.main-navigation.toggled ul {
+	display: block;
+}
+
+@media screen and (min-width: 37.5em) {
+	.menu-toggle {
+		display: none;
+	}
+	.main-navigation ul {
+		display: block;
+	}
+}
+
+.site-main .comment-navigation, .site-main
+.posts-navigation, .site-main
+.post-navigation {
+	margin: 0 0 1.5em;
+	overflow: hidden;
+}
+
+.comment-navigation .nav-previous,
+.posts-navigation .nav-previous,
+.post-navigation .nav-previous {
+	float: left;
+	width: 50%;
+}
+
+.comment-navigation .nav-next,
+.posts-navigation .nav-next,
+.post-navigation .nav-next {
+	float: right;
+	text-align: right;
+	width: 50%;
+}
+
+/*--------------------------------------------------------------
+# Accessibility
+--------------------------------------------------------------*/
+/* Text meant only for screen readers. */
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important; /* Many screen reader and browser combinations announce broken words as they would appear visually. */
+}
+
+.screen-reader-text:focus {
+	background-color: #f1f1f1;
+	border-radius: 3px;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+	clip: auto !important;
+	clip-path: none;
+	color: #21759b;
+	display: block;
+	font-size: 14px;
+	font-size: 0.875rem;
+	font-weight: bold;
+	height: auto;
+	left: 5px;
+	line-height: normal;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	top: 5px;
+	width: auto;
+	z-index: 100000;
+	/* Above WP toolbar. */
+}
+
+/* Do not show the outline on the skip link target. */
+#content[tabindex="-1"]:focus {
+	outline: 0;
+}
+
+/*--------------------------------------------------------------
+# Alignments
+--------------------------------------------------------------*/
+.alignleft {
+	display: inline;
+	float: left;
+	margin-right: 1.5em;
+}
+
+.alignright {
+	display: inline;
+	float: right;
+	margin-left: 1.5em;
+}
+
+.aligncenter {
+	clear: both;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*--------------------------------------------------------------
+# Clearings
+--------------------------------------------------------------*/
+.clear:before,
+.clear:after,
+.entry-content:before,
+.entry-content:after,
+.comment-content:before,
+.comment-content:after,
+.site-header:before,
+.site-header:after,
+.site-content:before,
+.site-content:after,
+.site-footer:before,
+.site-footer:after {
+	content: "";
+	display: table;
+	table-layout: fixed;
+}
+
+.clear:after,
+.entry-content:after,
+.comment-content:after,
+.site-header:after,
+.site-content:after,
+.site-footer:after {
+	clear: both;
+}
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/*--------------------------------------------------------------
+# Widgets
+--------------------------------------------------------------*/
+.widget {
+	margin: 0 0 1.5em;
+	/* Make sure select elements fit in widgets. */
+}
+
+.widget select {
+	max-width: 100%;
+}
+
+/*--------------------------------------------------------------
+# Content
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+## Posts and pages
+--------------------------------------------------------------*/
+.sticky {
+	display: block;
+}
+
+.post,
+.page {
+	margin: 0 0 0;
+}
+
+.updated:not(.published) {
+	display: none;
+}
+
+.page-content,
+.entry-content,
+.entry-summary {
+	margin: 0 0 0;
+}
+
+.page-links {
+	clear: both;
+	margin: 0 0 1.5em;
+}
+
+/*--------------------------------------------------------------
+## Comments
+--------------------------------------------------------------*/
+.comment-content a {
+	word-wrap: break-word;
+}
+
+.bypostauthor {
+	display: block;
+}
+
+/*--------------------------------------------------------------
+# Infinite scroll
+--------------------------------------------------------------*/
+/* Globally hidden elements when Infinite Scroll is supported and in use. */
+.infinite-scroll .posts-navigation,
+.infinite-scroll.neverending .site-footer {
+	/* Theme Footer (when set to scrolling) */
+	display: none;
+}
+
+/* When Infinite Scroll has reached its end we need to re-display elements that were hidden (via .neverending) before. */
+.infinity-end.neverending .site-footer {
+	display: block;
+}
+
+/*--------------------------------------------------------------
+# Media
+--------------------------------------------------------------*/
+.page-content .wp-smiley,
+.entry-content .wp-smiley,
+.comment-content .wp-smiley {
+	border: none;
+	margin-bottom: 0;
+	margin-top: 0;
+	padding: 0;
+}
+
+/* Make sure embeds and iframes fit their containers. */
+embed,
+iframe,
+object {
+	max-width: 100%;
+}
+
+/* Make sure logo link wraps around logo image. */
+.custom-logo-link {
+	display: inline-block;
+}
+
+/*--------------------------------------------------------------
+## Captions
+--------------------------------------------------------------*/
+.wp-caption {
+	margin-bottom: 1.5em;
+	max-width: 100%;
+}
+
+.wp-caption img[class*="wp-image-"] {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.wp-caption .wp-caption-text {
+	margin: 0.8075em 0;
+}
+
+.wp-caption-text {
+	text-align: center;
+}
+
+/*--------------------------------------------------------------
+## Custom styles
+--------------------------------------------------------------*/
+
+/* Global */
+
+.entry-content {
+	max-width:1100px;
+  	padding:0px 20px 0px 20px;
+  	margin:0 auto;
+}
+
+
+
+/* Header */
+
+.site-header {
+	position:absolute;
+  	top:0px;
+  	z-index:99;
+  	background:transparent;
+  	width:100%;
+}
+.site-branding {
+	padding:40px 40px 0px 45px;
+}
+.custom-logo-link {
+	float:left;
+  	margin-right:40px;
+  	max-width:350px;
+}
+.header-1 {
+	position:relative;
+  	float:right;
+    color:#fff;
+  	font-size:24px;
+  	font-weight:500;
+  	margin-top:-8px;
+}
+.header-1:before {
+	position:absolute;
+  	content:"";
+  	width:14px;
+  	height:25px;
+  	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/small-phone-icon.png)no-repeat;
+  	top:0px;
+	left: 0px;
+	margin-top: 34px;
+	margin-left: -26px;
+}
+.top-button {
+	margin-top:-6px;
+}
+
+
+
+/* Footer */
+
+.site-footer {
+	min-height:400px;
+  	background:#385d78;
+  	height:auto;
+  	position:relative;
+  	padding-top:10px;
+}
+.site-info {
+	max-width:1100px;
+  	margin:0 auto;
+  	border-top:3px solid #4c6e86;
+  	padding-top:50px;
+}
+.footer-1, .footer-2, .footer-3 {
+	position:relative;
+  	float:left;
+  	width:33.3%;
+  	padding:16px 16px 16px 16px;
+  	color:#fff;
+}
+.footer-copyright {
+	position:absolute;
+  	bottom:0px;
+  	left:0px;
+  	right:0px;
+  	text-align:center;
+  	font-size:14px;
+  	color:#fff;
+}
+.footer-copyright a {
+	color:#fff;
+  text-decoration:none;
+}
+.footer-copyright a:hover {
+	color:#ccc;
+}
+.site-info h4 {
+	margin:12px 0px 0px 0px;
+  	line-height:1;
+  	font-size:16px!important;
+}
+.site-info p {
+	font-size:14px;
+  	color:#9ba9b5;
+  	margin-top:0px;
+}
+.footer-booking h2 {
+	font-size:45px;
+  	line-height:1;
+  	color:#fff;
+  	float:left;
+  	margin:0px;
+}
+.book-button {
+  	margin-right:18px;
+}
+.booking-buttons {
+	float:right;
+  	display:inline-block;
+  	text-align:right;
+  	margin-top: -12px;
+}
+
+@media only screen and (max-width:600px) {
+	.footer-1, .footer-2, .footer-3 {
+  	width:100%;
+    padding:0px 16px 0px 16px;
+}
+  .site-info h4 {
+	margin:0px 0px 0px 0px;
+}
+  .site-footer {
+  	padding-bottom:60px;
+}
+  .footer-1 {
+  	margin-bottom:36px;
+  }
+}
+
+
+/* Page styles */
+
+/* Homepage */
+
+.hero-image {
+	position:relative;
+  	overflow:hidden;
+}
+
+.hero-image:after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: rgba(0,0,0,0.4);
+}
+.hero-text {
+	position:relative;
+  	z-index:999;
+  	color:#fff;
+  	padding:0px 30px 0px 30px;
+}
+.appstore-links {
+	position:absolute;
+  	right:0px;
+  	bottom:80px;
+  	width:205px;
+  	z-index:999;
+}
+.top-phone-panel {
+	position:relative;
+  	margin:0 auto;
+  	border:4px solid #e4733d;
+  	border-radius:8px;
+  	padding:8px 8px 0px 0px;
+  	max-width:320px;
+  	text-align:center;
+  	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/phone-icon.png)no-repeat;
+  	background-position:6px bottom;
+}
+.phone-panel-book {
+	color:#e4733d;
+  	font-weight:500;
+  	margin:0;
+  	padding-left:28px;
+  	line-height:1;
+}
+.phone-panel-number a {
+	color:#fff;
+  	font-size:32px;
+  	font-weight:500;
+  	margin:0;
+  	padding-left:28px;
+  	text-decoration:none;
+}
+.top-button {
+	margin-top:0px;
+}
+
+
+/* Homepage Autocomplete CSS added by Alasdair */
+
+.tc-autocomplete-suggestions {
+	position: absolute;
+	z-index: 9999;
+
+	height: auto;
+	min-width: 400px;
+
+	margin: 0px;
+	padding: 0px;
+
+	max-height: 400px;
+	overflow-y: auto;
+
+	background: #FFF;
+	color: #000;
+	box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+	list-style: none;
+}
+
+.tc-autocomplete-suggestions li {
+	border-top: 1px solid #CCC;
+	padding: 5px 10px;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+.tc-autocomplete-suggestions li.tc-autocomplete-title, .tc-autocomplete-suggestions:hover li.tc-autocomplete-title {
+	padding: 3px 10px;
+	background: #CCC;
+	font-weight: bold;
+	color: #000 !important;
+	cursor: default;
+}
+
+.tc-autocomplete-suggestions li.tc-autocomplete-title .tc-google-logo {
+	margin: 4px -8px 0px 0px;
+	float: right;
+	width: 104px;
+	width: 104px;
+	height: 16px;
+}
+
+.tc-autocomplete-suggestions li:nth-child(1) {
+	border-top: none;
+}
+
+.tc-autocomplete-suggestions li:hover, .tc-autocomplete-suggestions li.selected {
+	background: #F0F0F0;
+	color: #C93636 !important;
+}
+
+.tc-autocomplete-suggestions li .comma1,
+.tc-autocomplete-suggestions li .comma2 {
+	font-size: 0px !important;
+}
+
+.tc-autocomplete-suggestions li .text-block1 {
+	font-size: 13px;
+	font-weight: bold;
+	color: #000;
+}
+
+.tc-autocomplete-suggestions li .text-block2 {
+	font-size: 13px;
+	color: #000;
+}
+
+.tc-autocomplete-suggestions li span, .tc-autocomplete-suggestions li .comma {
+	font-size: 11px;
+}
+
+/* END homepage autocomplete CSS */
+
+
+
+/* Testimonials */
+
+.main-top .testimonial-content p, .footer-testimonials .testimonial-content p {
+	font-size:13px;
+  	line-height:1.9;
+}
+.main-top h3.wpmtst-testimonial-heading {
+	display:none;
+}
+.main-top .testimonial-name, .footer-testimonials .testimonial-name {
+	font-size:15px;
+  	line-height:1.4;
+  	font-weight:500;
+}
+.main-top .testimonial-company, .footer-testimonials .testimonial-company {
+	font-size:12px;
+  	line-height:1.4;
+  	font-style:italic;
+}
+.main-top .testimonial-inner {
+  	padding:12px;
+}
+.footer-testimonials .testimonial-inner {
+	background-color:#fff;
+  	padding:20px;
+  	border-radius:12px;
+}
+
+
+
+
+
+/* Quote Form */
+
+.trav-quote-form {
+	
+}
+.top_form
+{
+	border: 3px solid #e4733d;
+  	border-radius:8px;
+  	margin:50px auto 50px auto;
+  	width:100%;
+  background: #f1f1f1;
+}
+
+::-webkit-input-placeholder { /* Edge */
+  color: #333;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #333;
+}
+
+::placeholder {
+  color: #333;
+  opacity: 1;
+}
+
+.trav-quote-form input[type="text"] {
+      width: 28%;
+  	padding:16px 8px 16px 8px;
+  	border-top:none;
+  	border-bottom:none;
+}
+.trav-quote-form select {
+	width: 25%;
+  	border:none;
+  	padding:16px 8px 16px 34px;
+  	border:none;
+  	border-radius:5px 0px 0px 5px;
+}
+.get_quate_sec
+{
+	background-color: #fcfcfc;
+}
+.trav-quote-form input[type="number"] {
+	width:9%;
+  	padding:16px 8px 16px 46px;
+  	border-top:none;
+  	border-bottom:none;
+}
+.entry-content-new
+{
+	max-width:1500px;
+    padding: 0px 20px 0px 20px;
+ 	font-weight: 500;
+    margin: 0 auto;
+}
+.entry-content-new button, input, select, optgroup, textarea
+{
+font-weight: 500;
+}
+.form_1
+{
+	padding-left: 40px;
+}
+.line_data
+{
+	    height: 3px;
+    background-color: #e4733d;
+    position: absolute;
+    top: 13px;
+    width: 86%;
+    left: 59px;
+}
+.car_box
+{
+	background-color: #fff;
+	border-radius: 8px;
+	font-size: 23px;
+	color: #31383c;
+	    padding-bottom: 30px;
+	text-align: center;
+	margin-bottom: 30px;
+}
+.car_box h2
+{
+	    background-color: #e4733d;
+    color: #fff;
+        letter-spacing: 3px;
+    text-align: center;
+    font-size: 23px;
+    padding: 10px;
+    border-top-left-radius: 8px;
+     border-top-right-radius: 8px;
+}
+
+.process_data
+{
+	background-color: #fff;
+	padding-left: 40px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+.car_sec
+{
+	padding-left: 40px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+.edit_button
+{
+	background: #385d78;
+    color: #fff!important;
+    padding: 19px 35px 19px 35px;
+    border: none;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+    text-align: center;
+   
+}
+.edit_button:hover
+{
+	text-decoration: none;
+	background-color: #e4733d;
+}
+.data_line li span
+{
+	display: block;
+	font-size: 15px;
+}
+.data_line .list-inline-item:not(:last-child) {
+     margin-right: 55px;
+}
+.data_line li
+{
+	text-align: center;
+}
+.data_line li img
+{
+	z-index: 9;
+	position: relative;
+}
+.trav-quote-form .submit-btn {
+	background: #e4733d;
+    color: #fff;
+    padding: 19px 35px 19px 35px;
+    border: none;
+    font-size: 18px;
+    border-radius: 0px 8px 8px 0px;
+    cursor: pointer;
+    width: auto;
+    display: inline-block;
+    right: 0;
+    position: absolute;
+    right: 15px;
+}
+.trav-quote-form input.pickup {
+	background:url(../image/form-pickup.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#f1f1f1;
+  	padding:16px 8px 16px 34px;
+}
+.trav-quote-form input.destination {
+	background:url(../image/form-destination.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#f1f1f1;
+  	padding:16px 8px 16px 34px;
+  	    border-left: 0;
+    border-right: 0;
+}
+.trav-quote-form input.date, .trav-quote-form input.return-date {
+	background:url(../image/form-date.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#f1f1f1;
+  	padding:16px 8px 16px 34px;
+  	    border-right: 0;
+}
+.ui-button .ui-icon-triangle-1-s
+{
+	    background: url(../image/minus.png)!important;
+}
+.ui-button .ui-icon-triangle-1-n
+{
+	    background: url(../image/plus.png)!important;
+}
+.trav-quote-form input.return-date {
+	border-radius: 6px 0px 0px 6px;
+}
+.ui-spinner-up
+{
+    position: absolute!important;
+   left: 43%;
+    top: 26%!important;
+}
+
+.ui-spinner-down
+{
+      position: absolute!important;
+    right: 13%!important;
+    top: 26%!important;
+}
+
+
+.trav-quote-form input.time, .trav-quote-form input.return-time {
+	
+   background-color: #f1f1f1;
+    padding: 16px 8px 16px 34px;
+    width: 16%;
+    border-left: 0;
+    border-right: 0;
+}
+.ui-widget.ui-widget-content {
+      border: 0!important;
+
+}
+.ui-spinner a.ui-spinner-button
+{
+	
+    background-color: transparent;
+  
+    border: 0;
+}
+.price_box
+{
+	border-radius: 8px;
+	background-color: #385d78;
+	padding: 10px;
+	color: #fff;
+	font-size: 15px;
+}
+.trav-quote-form input.via-input {
+	background:url(../image/form-via.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#f1f1f1;
+  	padding:16px 0px 16px 34px;
+  	width: 16.5%;
+  	    border-left: 0;
+}
+.booknow:hover
+{
+	background-color: #385d78;
+	text-decoration: none;
+}
+.booknow
+{
+	background: #e4733d;
+    color: #fff!important;
+    padding: 15px 35px 15px 35px;
+    border: none;
+    font-size:29px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+.small_box
+{
+	font-size: 28px;
+}
+.small_box li
+{
+	    line-height: 26px;
+}
+.small_box li img
+{
+	vertical-align: top;
+}
+.main_price
+{
+	font-size: 70px;
+	color: #fff;
+	line-height: 65px;
+}
+.main_price span
+{
+	position: relative;
+    font-size: 42px;
+    left: -4px;
+    top: -19px;
+}
+.ui-icon {
+    width: 15px!important;
+    height: 15px!important;
+}
+.trav-quote-form input.pass-number {
+	background: url(../image/form-people2.png)no-repeat;
+ background-position: 19px center;
+    background-color: #f1f1f1;
+    padding: 0.9em 0 0.7em 7.9em;
+    width: 100%;
+    border-left: 0;
+    border-right: 0;
+}
+.ui-widget.ui-widget-content {
+    border: 0;
+}
+.ui-spinner-input {
+    border: none!important;
+    background: none;
+    padding: 1em 0 0.9em 1.7em;
+    margin: 0em 2em 0em 0.4em;
+    vertical-align: middle;
+}
+.ui-spinner.ui-corner-all {
+    border-left:2px solid #ccc!important;
+	border-bottom: none !important;
+    border-top: none !important;
+  	border-radius: 0px 6px 6px 0px !important;
+}
+.ui-spinner {
+       width: 24%!important;
+    margin-left: -5px;
+    margin-top: -3px;
+}
+.ui-widget.ui-widget-content {
+    border: 1px solid #c5c5c5;
+    background-color: #f1f1f1;
+}
+
+/*.trav-quote-form select.journey {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/journey-bg.png) no-repeat 8px #fff;
+  	-webkit-appearance: none;
+}*/
+
+.trav-quote-form select.journey {
+	background:url(../image/journey-bg.png) no-repeat 8px;
+  	-webkit-appearance: none;
+}
+.trav-quote-form #datepicker2, .trav-quote-form #timepicker-24-hr2 {
+	display:none;
+}
+
+/* Booking form */
+
+#searchform label {
+	/*display:none;*/
+}
+#tcplugin-journey-type label, 
+#tcplugin-pickup label, 
+#tcplugin-pickup label, 
+#tcplugin-destination label, 
+#tcplugin-via label, 
+#tcplugin-people label,
+#tcplugin-date label:first-child,
+#tcplugin-time label:first-child {
+	display:none;
+}
+
+#searchform .form-control, #purchaseform .form-control, #purchaseform select {
+	border-radius:6px!important;
+  	border:3px solid #e4733d;
+  	height:auto!important;
+}
+#searchform label.form-control {
+  	border:none!important;
+  	height:auto!important;
+}
+
+#searchform .btn {
+	padding: 0.5rem 0px 0.5rem 0px;
+}
+
+#searchform #tcplugin-journey-type select {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/journey-bg.png) no-repeat #fff;
+  	-webkit-appearance: none;
+  	background-position:8px;
+  	padding:12px 0px 12px 30px;
+  	border-radius:6px;
+  	border:3px solid #e4733d;
+  	height:auto!important;
+}
+#searchform #tcplugin-pickup input {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/form-pickup.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:12px 8px 14px 34px;
+}
+#searchform #tcplugin-destination input {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/form-destination.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:12px 8px 14px 34px;
+}
+#searchform #tcplugin-via input {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/03/form-via.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:12px 0px 14px 34px;
+}
+#searchform #tcplugin-date input {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-date.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:12px 8px 14px 34px;
+}
+#searchform #tcplugin-people input {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-people2.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+    padding:12px 8px 14px 34px;
+}
+#searchform #tcplugin-date #__BVID__14 svg.bi-calendar, 
+#searchform #tcplugin-date #__BVID__14 svg.bi-calendar-fill,
+#searchform #tcplugin-return-date #__BVID__20 svg.bi-calendar, 
+#searchform #tcplugin-return-date #__BVID__20 svg.bi-calendar-fill{
+	display:none;
+}
+#searchform #tcplugin-date label#__BVID__14__value_,
+#searchform #tcplugin-return-date label#__BVID__20__value_ {
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-date.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:6px 8px 6px 34px;
+}
+#searchform .b-form-datepicker, #searchform .b-form-timepicker {
+	padding:6px 8px 6px 0px;
+}
+
+#searchform #tcplugin-time #__BVID__17 svg.bi-clock, 
+#searchform #tcplugin-time #__BVID__17 svg.bi-clock-fill,
+#searchform #tcplugin-return-time #__BVID__23 svg.bi-clock, 
+#searchform #tcplugin-return-time #__BVID__23 svg.bi-clock-fill{
+	display:none;
+}
+#searchform #tcplugin-time label#__BVID__17__value_,
+#searchform #tcplugin-return-time label#__BVID__23__value_{
+	background:url(https://www.x0101.co.uk/clients/travaroo/wp-content/uploads/2020/07/form-time.png)no-repeat;
+  	background-position:8px center;
+  	background-color:#fff;
+  	padding:6px 8px 6px 34px;
+}
+#searchform #tcplugin-search-submit .form-control {
+	background:#e4733d!important;
+  	color:#fff!important;
+  	font-size:18px;
+  	line-height:1;
+  	padding:12px 0px 12px 0px;
+}
+#searchform #tcplugin-search-submit label {
+	display:none;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active, 
+.btn-primary:not(:disabled):not(.disabled):active, 
+.show > .btn-primary.dropdown-toggle {
+	background-color: #e4733d!important;
+}
+.btn-outline-primary {
+	color: #e4733d!important;
+}
+
+
+/* Results */
+
+#results {
+	max-width: 90%;
+	margin: 50px auto 0 auto;
+}
+#results .card-title {
+    text-align: center!important;
+  	font-size: 16px;
+  	font-weight:500;
+}
+#results #selected_price {
+    margin: 0px 0px 16px 0px;
+}
+#results .display-4 {
+    font-size: 2.2rem;
+    font-weight: 500;
+}
+
+#results .card-body .btn-primary {
+    color: #fff;
+    background-color: #e4733d!important;
+    border-color: #e4733d!important;
+}
+#results .card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0,0,0,.03);
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    text-align: center;
+}
+#results .text-muted {
+    color: #6c757d !important;
+    text-align: center;
+}
+#results img.card-img-top {
+    height: 100px;
+    max-height: 110px !important;
+  	width:auto;
+  	margin-left: auto;
+  	margin-right: auto;
+  	display:block;
+  	padding:12px 0px 0px 0px;
+}
+
+@media only screen and (max-width:600px) {
+	#searchform .col, #searchform .col-6 {
+    	max-width: 100%;
+      	width:100%;
+      	flex-direction: column;
+      	display:flex;
+      	flex:1;
+      	flex-basis: 100%;
+}
+	#searchform .bi-calendar .col {
+    	flex-basis: 0;
+      	min-width:0!important;
+    	max-width: 100%;
+      	width:auto;
+  }
+  	#tcplugin-via {
+  		margin-bottom:1rem;
+  	}
+  	#results .card {
+  		margin-bottom:20px;
+  }
+  
+}
+
+/* Purchase form */
+
+#purchaseform .card-header {
+	background:#e4733d;
+  	color:#fff;
+  	font-size:24px;
+}
+#purchaseform h4#tc_plugin-payment-heading, #purchaseform h4#tc_plugin-passenger-heading {
+	background:#e4733d;
+  	color:#fff;
+  	padding: .75rem 1.25rem;
+  	font-size:24px;
+  	border-radius:6px 6px 0px 0px!important;
+    margin-bottom:24px!important;
+    margin-top:24px!important;
+}
+
+
+
+#tcplugin-checkout-booking-details {
+	margin-top:30px;
+}
+#purchaseform .btn-primary {
+	background:#e4733d!important;
+  	color:#fff!important;
+  	font-size:18px;
+  	line-height:1;
+  	padding:12px 0px 12px 0px;
+  	width:100%;
+  	border:none;
+  	border-radius:6px;
+}
+
+body #page #purchaseform .form-group label {
+    display: none!important;
+}
+
+#purchaseform #card.form-control {
+	padding:.6rem .75rem!important;
+    margin-bottom:2rem!important;
+}
+#purchaseform .form-group {
+    margin-bottom:2rem!important;
+}
+
+#purchaseform .card-header:first-child {
+    border-radius: 6px 6px 0px 0px!important;
+}
+
+#purchaseform #tcplugin-payament-select {
+  	text-align: right;
+	padding-top: 6px;
+}
+#purchaseform select {
+	margin-bottom:2rem!important;
+}
+
+@media only screen and (max-width:600px) {
+	#purchaseform .col {
+    	min-width:100%!important;
+  }
+  #purchaseform #tcplugin-payament-select {
+  	text-align: left;
+	padding-bottom: 6px;
+}
+}
+
+
+
+
+
+
+
+
+/* Responsive */
+
+/* mobile */
+
+@media only screen and (max-width: 767px)
+{
+	.trav-quote-form input[type="text"] {
+  	width:100%;
+  	border-bottom:2px solid #ccc;
+}
+.trav-quote-form select {
+	width:100%;
+  	border:none;
+  	padding:16px 8px 16px 34px;
+  	border-radius:5px 5px 0px 0px;
+  	border-bottom:2px solid #ccc;
+}
+.trav-quote-form .ui-spinner {
+  	width:100%!important;
+  	padding: 0px 8px 0px 0px;
+  	border-top:none;
+  	border-bottom:none;
+  	margin-left: 0px;
+	margin-top: 0px;
+}
+.trav-quote-form .submit-btn {
+	background:#e4733d;
+  	color:#fff;
+  	padding:15px 24px 17px 24px;
+  	border:none;
+  	font-size:18px;
+  	border-radius:0px 8px 8px 0px;
+  	cursor:pointer;
+  	width:100%!important;
+}
+
+.form_1 {
+    padding-left: 0;
+}
+.trav-quote-form .submit-btn
+{
+	  border-radius: 0!important;
+    position: relative;
+    right: 0;
+}
+.trav-quote-form input.pass-number
+{
+	    padding: 0.9em 0 0.7em 63%;
+}
+.line_data
+{
+	display: none;
+}
+.data_line li {
+    text-align: center;
+    display: block;
+    margin-bottom: 15px;
+    margin-right: 0px;
+}
+.data_line .list-inline-item:not(:last-child) {
+    margin-right: 0;
+}
+.process_data
+{
+	    padding: 20px;
+}
+.car_sec
+{
+	    padding: 0;
+    margin-top: 30px;
+}
+.edit_button
+{
+	margin-bottom: 30px;
+}
+
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px)
+
+{
+
+.trav-quote-form input.pass-number
+{
+	    padding: 0.9em 0 0.7em 57%;
+}
+.data_line .list-inline-item:not(:last-child) {
+    margin-right: 30px;
+}
+.line_data
+{
+	    width: 78%;
+}
+.edit_button
+{
+	    width: 47%;
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    margin: 34px auto;
+}
+
+
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1499px)
+{
+.trav-quote-form input.pass-number
+{
+	    padding: 0.9em 0 0.7em 57%;
+}
+.data_line .list-inline-item:not(:last-child) {
+    margin-right: 22px;
+}
+.edit_button
+{
+	    padding: 19px 15px 19px 15px;
+}
+.entry-content-new
+{
+	    max-width:1200px;
+}
+
+}
+
+
+@media only screen and (min-width: 768px) and (max-width: 991px)
+{
+.trav-quote-form input.pass-number
+{
+	    padding: 0.9em 0 0.7em 58%;
+}
+.process_data
+{
+	    padding: 20px;
+}
+.form_1 {
+    padding-left: 0;
+}
+.edit_button
+{
+	    width: 47%;
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    margin: 34px auto;
+}
+
+
+
+}
+
+
+@media only screen and (max-width:768px) {
+	
+
+	h1 {
+	font-size:3.2em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h2 {
+	font-size:2.6em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h3 {
+	font-size:2.2em;
+  	line-height:1;
+	margin: 0.3em 0 0.3em 0;
+}
+h4 {
+	font-size:1em;
+  	line-height:1.9;
+	margin: 0.3em 0 0.3em 0;
+}
+h5 {
+	font-size:1.2em;
+  	line-height:1.4;
+	margin: 0.3em 0 0.3em 0;
+}
+.booking h4 {
+  	font-size:1.6em;
+  	line-height:1.9;
+	margin: 0.3em 0 0.3em 0;
+}
+.grab-discount p, .grab-discount h4 {
+  	text-align:center!important;
+}
+.grab-discount h4 {
+  	font-size:1.6em;
+}
+  
+.appstore-links {
+  	bottom:0px;
+  	width:155px;
+}
+.booking-buttons {
+	float:none;
+  	display:block;
+  	text-align:center;
+}
+
+.footer-booking h2 {
+	font-size:45px;
+  	line-height:1;
+  	color:#fff;
+  	float:left;
+  	margin:0px;
+  	text-align:center;
+}
+.book-button {
+  	margin-right:0px;
+  	margin-bottom:12px;
+}
+.maxbutton-1.maxbutton.maxbutton-orange-button {
+  	width:60%;
+}
+.book-ride img {
+  text-align:center;
+}
+/*.trav-quote-form input[type="text"] {
+  	width:100%;
+  	border-bottom:2px solid #ccc;
+}*/
+/*.trav-quote-form select {
+	width:100%;
+  	border:none;
+  	padding:16px 8px 16px 34px;
+  	border-radius:5px 5px 0px 0px;
+  	border-bottom:2px solid #ccc;
+}*/
+.trav-quote-form input[type="number"] {
+	width:100%;
+  	padding:16px 8px 16px 46px;
+  	border-top:none;
+  	border-bottom:none;
+}
+/*.trav-quote-form .ui-spinner {
+  	width:100%!important;
+  	padding: 0px 8px 0px 0px;
+  	border-top:none;
+  	border-bottom:none;
+  	margin-left: 0px;
+	margin-top: 0px;
+}
+.trav-quote-form .submit-btn {
+	background:#e4733d;
+  	color:#fff;
+  	padding:15px 24px 17px 24px;
+  	border:none;
+  	font-size:18px;
+  	border-radius:0px 8px 8px 0px;
+  	cursor:pointer;
+  	width:100%!important;
+}*/
+.trav-quote-form #datepicker2, .trav-quote-form #timepicker-24-hr2 {
+	display:none;
+}
+.hero-text {
+    padding: 0px 10px 0px 10px;
+}
+.trav-quote-form input.return-date {
+    border-radius: 0px 0px 0px 0px;
+    border-top:2px solid #ccc;
+}
+  /*.ui-spinner.ui-corner-all {
+    border-radius: 0px 0px 0px 0px !important;
+}*/
+
+}
+
+@media only screen and (min-width:601px) and (max-width:768px) {
+  
+.book-ride {
+  	padding:20px 0px 30px 0px!important;
+  }
+.book-ride img {
+  	width:130px;
+    height:auto;
+  }
+.booking-buttons {
+	float:right;
+  	/*display:block;*/
+  	text-align:right;
+}
+.book-button {
+  	margin-right:0px;
+  	margin-bottom:12px;
+}
+/*.trav-quote-form .submit-btn {
+    padding: 15px 4px 17px 4px;
+}*/
+}
+
+@media only screen and (min-width:769px) and (max-width:1032px) {
+.booking-buttons {
+	float:right;
+  	/*display:block;*/
+  	text-align:right;
+}
+.book-button {
+  	margin-right:8px;
+}
+}
+
+
+
+@media only screen and (max-width:850px){
+
+.header-1 {
+  	display:none;
+  }
+}
+  
+  
+@media only screen and (max-width:1200px){
+.site-branding {
+    padding: 16px 40px 0px 25px;
+}
+.header-1 {
+	right:30px;
+}
+
+}
+
+
+
+
+

@@ -35,9 +35,19 @@
                         <label for="paypal_public">Paypal Client ID</label>
                     </th>
                     <td>
-                        <input name="paypal_public" type="text" id="paypal_public"v-model="form.paypal_public" class="regular-text">
+                        <input name="paypal_public" type="text" id="paypal_public" v-model="form.paypal_public" class="regular-text">
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="mapbox_api">Mapbox API key</label>
+                    </th>
+                    <td>
+                        <input name="mapbox_api" type="text" id="mapbox_api" v-model="form.mapbox_api" class="regular-text">
+                    </td>
+                </tr>
+
+
             </tbody>
         </table>
         <h3>Plugin Settings</h3>
@@ -111,6 +121,7 @@
                     stripe_public:'',
                     stripe_private:'',
                     paypal_public: '',
+                    mapbox_api: '',
                     complete_page_text: '',
                     quote_type: '',
                     custom_css: '',
@@ -120,12 +131,15 @@
             };
         },
         created() {
-            axios.get('/wp-json/taxicode/v1/settings-get/').then(function(response){
+            this.tcplugin_data_url = tcplugin_data_url;
+            this.tcplugin_update_url = tcplugin_update_url;
+            axios.get(this.tcplugin_data_url).then(function(response){
                 this.form.taxicode_public = response.data.taxicode_public;
                 this.form.taxicode_private = response.data.taxicode_private;
                 this.form.stripe_public = response.data.stripe_public;
                 this.form.stripe_private = response.data.stripe_private;
                 this.form.paypal_public = response.data.paypal_public;
+                this.form.mapbox_api = response.data.mapbox_api;
                 this.form.quote_type = response.data.quote_type;
                 this.form.complete_page_text = response.data.complete_page_text;
                 this.form.custom_css = response.data.custom_css;
@@ -137,8 +151,7 @@
         methods: {
             save: function()
             {
-                console.log(this.form.data());
-                this.form.put('/wp-json/taxicode/v1/settings-save')
+                this.form.post(this.tcplugin_update_url)
                     .then(response => {
                         this.message_class = 'updated';
                         this.message = 'Settings Updated';
