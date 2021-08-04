@@ -4,7 +4,8 @@
 
 <script>
     import axios from 'axios';
-    import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
+    import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+    //import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
     import _ from 'underscore'
     import Mapbox from "mapbox-gl";
     import { MglMap,MglMarker,MglGeojsonLayer } from "vue-mapbox";
@@ -15,11 +16,17 @@
         match
     } from "postcode";
 
+    // would be the api key that was set in the php render
+    const mapbox_api = 'pk.eyJ1IjoidGF4aWNvZGUiLCJhIjoiY2p2d2FiMmVoMXpvNjQ4bHE2aGc2ejZibiJ9.7cygLzU4V1K1CH8S_elamQ';
+    const tcplugin_asset_path = '/taxicode/assets';
+    const postData = { };
+    const quote_settings = 'type_class';
 
     export default {
         name: 'search',
         components : {
-            'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
+            'vue-typeahead-bootstrap' : VueTypeaheadBootstrap,
+            //'vue-bootstrap-typeahead' : VueBootstrapTypeahead,
             MglMap,
             MglMarker,
             MglGeojsonLayer
@@ -64,9 +71,12 @@
                 quotesloaded: false,
                 mindate: new Date(),
                 accessToken: mapbox_api,
-                mapStyle: 'mapbox://styles/taxicode-testing/cke2xdy4u1chp19n2abb4516w',
-                pickup_coords: [-0.118092,51.509865],
-                destination_coords: [-0.118092,51.509865],
+                mapStyleC: 'mapbox://styles/taxicode-testing/cke2xdy4u1chp19n2abb4516w',
+                mapStyleN: 'mapbox://styles/mapbox/navigation-night-v1',
+                mapStyleD: 'mapbox://styles/mapbox/navigation-day-v1',
+                mapStyleS: 'mapbox://styles/mapbox/streets-v11',
+                pickup_coords: [51.509865, -0.118092],
+                destination_coords: [51.509865, -0.118092],
                 distance: 1,
                 geoJsonSource: {
                     type: 'geojson',
@@ -106,6 +116,10 @@
             mapCentre: function()
             {
                 return [((this.pickup_coords[0]+this.destination_coords[0])/2),((this.pickup_coords[1]+this.destination_coords[1])/2)]
+            },
+
+            mapStyle : function() {
+                return this.mapStyleN;
             }
         },
         created() {

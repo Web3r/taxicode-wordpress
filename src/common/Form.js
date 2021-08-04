@@ -111,9 +111,10 @@ export default class Form {
      * Send a POST request to the given URL.
      * .
      * @param {string} url
+     * @param {object} config
      */
-    post(url) {
-        return this.submit('post', url);
+    post(url, config) {
+        return this.submit('post', url, config);
     }
 
 
@@ -121,9 +122,10 @@ export default class Form {
      * Send a PUT request to the given URL.
      * .
      * @param {string} url
+     * @param {object} config
      */
     put(url) {
-        return this.submit('put', url);
+        return this.submit('put', url, config);
     }
 
 
@@ -131,9 +133,10 @@ export default class Form {
      * Send a PATCH request to the given URL.
      * .
      * @param {string} url
+     * @param {object} config
      */
     patch(url) {
-        return this.submit('patch', url);
+        return this.submit('patch', url, config);
     }
 
 
@@ -141,9 +144,10 @@ export default class Form {
      * Send a DELETE request to the given URL.
      * .
      * @param {string} url
+     * @param {object} config
      */
     delete(url) {
-        return this.submit('delete', url);
+        return this.submit('delete', url, config);
     }
 
 
@@ -152,10 +156,11 @@ export default class Form {
      *
      * @param {string} requestType
      * @param {string} url
+     * @param {object} config
      */
-    submit(requestType, url) {
+    submit(requestType, url, config) {
         return new Promise((resolve, reject) => {
-            axios[requestType](url, this.data())
+            axios[requestType](url, this.data(), config)
                 .then(response => {
                     this.onSuccess(response.data);
 

@@ -1,16 +1,22 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Home from 'admin/pages/Home.vue'
-import Settings from 'admin/pages/Settings.vue'
+import Vue from 'vue';
+// import the app router plugin
+import Router from 'vue-router';
 
-Vue.use(Router)
+// allow vue to use the web router plugin & ensure single inclusion
+Vue.use(Router);
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Settings',
-      component: Settings
-    },
-  ]
-})
+    routes : [
+        {
+            path : '/',
+            name : 'SettingsPage',
+            component : () => import(/* webpackChunkName: "BIQAdminSettings" */ 'admin/views/SettingsPage.vue')
+        },
+
+        {
+            path : '/tests/',
+            name : 'TestsPage',
+            component : () => import(/* webpackChunkName: "BIQAdminTests" */ 'admin/views/TestsPage.vue')
+        }
+    ]
+});

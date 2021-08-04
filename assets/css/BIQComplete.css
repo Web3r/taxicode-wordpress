@@ -1,0 +1,22 @@
+/** import the theme constucts */
+/** import the BIQ theme constucts */
+/*
+ * BIQ colour theme
+ */
+/*
+ * Beginning of the theme specific overwrite variable settings 
+ */
+/* Main app container div */
+#biq-vue-app {
+  width: 100%;
+}
+#biq-vue-app #biq-complete-page #biq-journey-details-booked .card-header {
+  width: 100%;
+  background: #e4733d;
+  color: #fae4da !important;
+  padding: 0.75rem 1.25rem;
+  font-size: 24px;
+  border-radius: 6px 6px 0px 0px !important;
+  margin-top: 24px !important;
+}
+

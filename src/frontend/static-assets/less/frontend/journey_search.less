@@ -1,0 +1,29 @@
+#biq-journey-search {
+    display : flex;
+    margin : 50px auto 50px auto;
+
+    /** import the themed search form */
+    @import url('../common/biq_search_form.less');
+
+    /** tweak search form margin as it's next to something & the margin is on the container*/
+    #biq-search-form {
+        margin : auto;
+    }
+
+    /** add some tweaks to the themed search forms specific to the layouts */
+    #biq-search-form.biq-layout-compact-column {
+        flex-flow : column;
+        gap : @col-gap;
+        border-radius :  @border-curve;
+    }
+    #biq-search-form.biq-layout-compact-row, 
+    #biq-search-form.biq-layout-compact {
+        flex-flow : row;
+        border-radius : @border-curve;
+    }
+
+    #biq-journey-route-map-container {
+        display : flex;
+    }
+
+}

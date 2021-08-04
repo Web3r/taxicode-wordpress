@@ -1,48 +1,35 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPlane,faTrain,faMapMarkerAlt,faUsers,faSuitcase } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import {  } from 'bootstrap-vue'
-import vuebraintree from 'vue-braintree'
+// import the dev mode flag from the common app & plugins setup 
+import { devMode } from './app_setup_common';
+// import the app CSS (webpack will chunk this  & auto load / include separately)
+import 'frontend/static-assets/less/frontend/main.less';
+// start importing & setting up the vue app
+import Vue from 'vue';
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+// import the vue braintree paypal plugin
+import vuebraintree from 'vue-braintree';
+// allow vue to use the plugin & ensure single inclusion
+Vue.use(vuebraintree);
 
-
-library.add(faPlane,faTrain,faMapMarkerAlt,faUsers,faSuitcase)
-
-Vue.component('font-awesome-icon', FontAwesomeIcon)
-
-import App from './App.vue'
-import router from './router'
-
-
-const config = require('./config.js');
-window.config = config;
-
-
-
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-Vue.use(Vuex)
-
-Vue.use(VueBootstrapTypeahead)
-Vue.use(vuebraintree)
-
-Vue.config.productionTip = false
-
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
-import store from './store/store.js'
+// start the import of the main BIQ app code 
+import BIQApp from 'frontend/BIQApp.vue';
+// import the setup main BIQ app router to use
+import router from 'frontend/router';
+// import the setup BIQ app state manager to use
+import store from 'frontend/store';
+// import the BIQ app config
+import conf from 'frontend/config';
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#vue-frontend-app',
-  router,
-  store,
-  render: h => h(App)
-})
+    store,
+    render : h => h(BIQApp, {
+        props : {
+            appURL : biqAppURL,
+            appAssetURL : biqAppAssetsURL,
+            biqAppConfig : conf,
+            appDebugEnabled : devMode || biqAppDebugEnabled
+        }
+    }),
+    el : '#biq-vue-app',
+    router
+});

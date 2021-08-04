@@ -1,0 +1,43 @@
+<div class="journey-outline d-flex flex-column">
+    <ul 
+        class="mb-1 data-line"
+        :class="ul_css"
+    >
+        <li>
+            <img :src="images('quote_type')">
+        </li>
+        <li>
+            <img :src="images('pickup')">
+        </li>
+        <li>
+            <img :src="images('destination')">
+        </li>
+        <li>
+            <img :src="images('date_time')">
+        </li>
+        <li>
+            <img :src="images('people')">
+        </li>
+    </ul>
+    
+    <ul 
+        class="mb-0"
+        :class="ul_css"
+    >
+        <li class="list-inline-item">
+            <span>{{journeyType}}</span>
+        </li>
+        <li class="list-inline-item">
+            <span>{{pickup}}</span>
+        </li>
+        <li class="list-inline-item">
+            <span>{{destination}}</span>
+        </li>
+        <li class="list-inline-item">
+            <span>{{when | readableDate}} &commat; {{when | readableTime}}</span>
+        </li>
+        <li class="list-inline-item">
+            <span>{{passengers}}</span>
+        </li>
+    </ul>
+</div>

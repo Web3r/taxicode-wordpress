@@ -1,145 +1,185 @@
 const webpack = require('webpack');
 const path = require('path');
-const package = require('./package.json');
+//const package = require('./package.json');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+//const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const config = require( './config.json' );
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const devMode = process.env.NODE_ENV !== 'production';
+const travarooo = true;
 
 // Naming and path settings
-var appName = 'app';
-var entryPoint = {
-  frontend: './src/frontend/main.js',
-  admin: './src/admin/main.js',
-  style: './assets/less/style.less',
+const entryPoints = {
+    frontend : './src/frontend/main.js',
+    search_lite : './src/frontend/search_lite.js',
+    admin : './src/admin/main.js'
 };
+const aliases = {
+    'vue$' : 'vue/dist/vue.esm.js',
+    '@' : path.resolve('./src/'),
+    '@BIQ' : path.resolve('./src/common/BIQ/'),
+    'BIQ' : path.resolve('./src/components/BIQ/'),
+    'BIQ-Images' : path.resolve('./src/components/BIQ/static-assets/images/'),
+    'BIQ-Less' : path.resolve('./src/components/BIQ/static-assets/less/'),
+    'BIQ-CSS' : path.resolve('./src/components/BIQ/static-assets/css/'),
+    'frontend' : path.resolve('./src/frontend/'),
+    'admin' : path.resolve('./src/admin/')
+};
+// @NOTE __dirname is coming from node & not from this files location
+// set the location where the compiled output will be
+const exportPath = path.resolve(__dirname, './assets/js');
+// this is where the wordpress website root should be???
+const webRoot = '/wp-content';
+// set the public access (web) path by removing the base of the absolute export path
+// so the lazy component loading can work out where to load the compiled assets in browser
+const publicPath = webRoot + exportPath.split(webRoot)[1];
+const pluginPath = (travarooo) ? publicPath.replace('taxicode', 'biq-client') : publicPath;
 
-var exportPath = path.resolve(__dirname, './assets/js');
+console.log("paths ", { publicPath, pluginPath });
+console.log("plugin path replace ", publicPath.replace('taxicode', 'biq-client'));
 
-// Enviroment flag
-var plugins = [];
-var env = process.env.NODE_ENV;
+// create an array of plugins being used
+const plugins = [];
+// create an array of module rules
+const moduleRules = [];
 
-function isProduction() {
-  return process.env.NODE_ENV === 'production';
-}
+// add build progress indicator plugin
+plugins.push(new webpack.ProgressPlugin());
 
-// extract css into its own file
-plugins.push(new MiniCssExtractPlugin({
-  filename: '../css/[name].css',
-  ignoreOrder: false, // Enable to remove warnings about conflicting order
-}));
+// add the clean build folder plugin
+const cleanOpts = {
+    verbose : true,
+    dry : false
+};
+plugins.push(new CleanWebpackPlugin(cleanOpts));
 
-// plugins.push(new BrowserSyncPlugin( {
-//   proxy: {
-//     target: config.proxyURL
-//   },
-//   files: [
-//     '**/*.php'
-//   ],
-//   cors: true,
-//   reloadDelay: 0
-// } ));
-
+// add the vue loader plugin
 plugins.push(new VueLoaderPlugin());
 
-// Differ settings based on production flag
-if ( devMode ) {
-  appName = '[name].js';
-} else {
-  appName = '[name].min.js';
-}
+// add the plugin to extract css into its own file
+const minCSSOpts = {
+    filename : '../css/[name].css',
+    ignoreOrder : false, // Enable to remove warnings about conflicting order
+};
+const minCSSFileLoader = {
+    loader : MiniCssExtractPlugin.loader,
+    options : {
+        publicPath : (resourcePath, context) => {
+            return path.relative(path.dirname(resourcePath), context) + '/';
+        },
+        hmr : process.env.NODE_ENV === 'development'
+    }
+};
+plugins.push(new MiniCssExtractPlugin(minCSSOpts));
 
+// create the webpack package build
 module.exports = {
-  entry: entryPoint,
-  mode: devMode ? 'development' : 'production',
-  output: {
-    path: exportPath,
-    filename: appName,
-  },
+    entry : entryPoints,
 
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js',
-      '@': path.resolve('./src/'),
-      'frontend': path.resolve('./src/frontend/'),
-      'admin': path.resolve('./src/admin/'),
+    // Differ settings based on production flag
+    mode : devMode ? 'development' : 'production',
+
+    plugins,
+
+    output : {
+        path : exportPath,
+        publicPath : `${pluginPath}/`,
+        // Differ settings based on production flag
+        filename : devMode ? '[name].js' : '[name].min.js'
     },
-    modules: [
-      path.resolve('./node_modules'),
-      path.resolve(path.join(__dirname, 'src/')),
-    ]
-  },
 
-  optimization: {
-    runtimeChunk: 'single',
-    splitChunks: {
-      cacheGroups: {
-        vendor: {
-          test: /[\\\/]node_modules[\\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    },
-    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
-  },
+    resolve : {
+        alias : aliases,
 
-  plugins,
-
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      },
-      {
-        test: /\.js$/,
-        use: 'babel-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.less$/,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-          'less-loader'
+        modules : [
+            path.resolve('./node_modules'),
+            path.resolve(path.join(__dirname, 'src/'))
         ]
-      },
-      {
-        test: /\.png$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              mimetype: 'image/png'
+    },
+
+    optimization : {
+        runtimeChunk : 'single',
+        splitChunks : {
+            cacheGroups : {
+                vendor : {
+                    test : /[\\\/]node_modules[\\\/]/,
+                    name : 'vendors',
+                    chunks : 'all'
+                },
             }
-          }
+        },
+        minimizer : [ 
+            new TerserJSPlugin({ }), 
+            new OptimizeCSSAssetsPlugin({ })
         ]
-      },
-      {
-        test: /\.svg$/,
-        use: 'file-loader'
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: (resourcePath, context) => {
-                return path.relative(path.dirname(resourcePath), context) + '/';
-              },
-              hmr: process.env.NODE_ENV === 'development',
+    },
+
+    module : {
+        rules : [
+            {
+                test : /\.vue$/,
+                loader : 'vue-loader'
             },
-          },
-          'css-loader',
-        ],
-      },
-    ]
-  },
-}
+
+            {
+                test : /\.js$/,
+                exclude : /node_modules/,
+                use : 'babel-loader'
+            },
+
+            {
+                test: /\.png$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            publicPath: (resourcePath, context) => {
+                                return path.relative(path.dirname(resourcePath), context) + '/';
+                            },
+                            mimetype: 'image/png'
+                        }
+                    }
+                ]
+            },
+
+            {
+                test: /\.jpg$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            filename: '[name].[ext]',
+                            mimetype: 'image/jpeg'
+                        }
+                    }
+                ]
+            },
+
+            {
+                test: /\.svg$/,
+                use: 'file-loader'
+            },
+
+            {
+                test : /\.less$/,
+                exclude : /node_modules/,
+                use : [
+                    minCSSFileLoader,
+                    'css-loader',
+                    'less-loader'
+                ]
+            },
+
+            {
+                test: /\.css$/,
+                use: [
+                    minCSSFileLoader,
+                    'css-loader'
+                ],
+            }
+        ]
+    }
+};
