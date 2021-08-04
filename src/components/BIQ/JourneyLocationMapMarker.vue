@@ -1,7 +1,7 @@
 <template>
     <map-marker
         :coordinates="geoJSONLocation" 
-        :color="color" 
+        class="my_map_marker"
     >
         <map-popup v-if="showPopup"
             :anchor="popupAnchor"
