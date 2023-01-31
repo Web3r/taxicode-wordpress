@@ -17,7 +17,7 @@
     "@mrjeffapp/vue-braintree-paypal-button": "^1.1.1",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
-    "bootstrap-vue": "^2.15.0",
+    "bootstrap-vue": "^2.23.1",
     "js-cookie": "^2.2.1",
     "qs": "^6.9.4",
     "underscore": "^1.10.2",
