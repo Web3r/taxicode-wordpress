@@ -15,7 +15,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@mrjeffapp/vue-braintree-paypal-button": "^1.1.1",
-    "axios": "^0.19.2",
+    "axios": "^1.6.3",
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
     "js-cookie": "^2.2.1",
